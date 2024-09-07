@@ -1,6 +1,7 @@
 import { RootState } from '../../Redux/store';
 import { useSelector } from 'react-redux';
 import DoctorVerifivationForm from '../../components/doctorComponents/DoctorVerifivationForm';
+import VerificationProcessingPage from '../../pages/doctorPages/VerificationProcessingPage';
 
 
 interface DoctorProtectedRouteProps {
@@ -19,13 +20,13 @@ function  DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
         
     );
   } else if (DoctorData.docStatus === "submitted") {
-    return (
-      <div>
-        <h1>Submitted</h1>
-      </div>
-    );
-  } else {
     return <>{children}</>
+   
+  } else {
+    return (
+      <VerificationProcessingPage/>
+    );
+    
   }
 }
 

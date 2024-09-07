@@ -53,10 +53,25 @@ export interface DoctorState {
     qualificationImage?: FileData[];
   }
   export interface docDetails {
-    profileUrl: string;
-    aadhaarFrontImageUrl: string;
-    aadhaarBackImageUrl: string;
-    certificateUrl: string;
-    qualificationUrl: string;
+    profileUrl: {
+      type:string,
+      url:string
+    };
+    aadhaarFrontImageUrl: {
+      type:string,
+      url:string
+    };
+    aadhaarBackImageUrl: {
+      type:string,
+      url:string
+    };
+    certificateUrl: {
+      type:string,
+      url:string
+    };
+    qualificationUrl: {
+      type:string,
+      url:string
+    };
 
   }

@@ -2,6 +2,7 @@ import { Document } from "mongoose";
 import adminModel from "../model/adminModel";
 import { Console } from "console";
 import specializationModel from "../model/SpecializationModel";
+import doctorApplicationModel from "../model/doctorApplicationModel";
 
 
 
@@ -89,6 +90,34 @@ export class adminRepository {
             return updatedSpecialization;
         } catch (error: any) {
             console.error("Error updating specialization:", error.message);
+            throw new Error(error.message);
+        }
+    }
+    async getAllApplication(){
+        try {
+            
+            const applications = await doctorApplicationModel.find()
+    
+           
+    
+            
+            return applications
+        } catch (error: any) {
+            console.error("Error getting specialization:", error.message);
+            throw new Error(error.message);
+        }
+    }
+    async getApplication(applicationId:string){
+        try {
+            
+            const application = await doctorApplicationModel.findById(applicationId)
+    
+           console.log("pppp",application)
+    
+            
+            return application
+        } catch (error: any) {
+            console.error("Error getting specialization:", error.message);
             throw new Error(error.message);
         }
     }

@@ -49,18 +49,18 @@ export class S3Service {
         }
     }
 
-    async getFile(key: string) {
-        const params = {
-            Bucket: this.bucketName,
-            Key: key,
-        };
-
+   
+    async getFile(fileName: string, folder: string): Promise<string> {
         try {
-            const command = new GetObjectCommand(params);
-            const data = await this.s3.send(command);
-            return data.Body; 
+            const options = {
+                Bucket: this.bucketName,
+                Key: `${folder}/${fileName}`,
+            };
+            const getCommand = new GetObjectCommand(options);
+            const url = await getSignedUrl(this.s3, getCommand, { expiresIn: 60 * 60 });
+            return url;
         } catch (error) {
-            console.error("Error getting file:", error);
+            console.error("Error generating signed URL:", error);
             throw error;
         }
     }
@@ -82,20 +82,5 @@ export class S3Service {
         }
     }
 
-    // Method to generate a signed URL for a file
-    async getSignedUrl(key: string, expiresIn: number = 60 * 60) {
-        const params = {
-            Bucket: this.bucketName,
-            Key: key,
-        };
-
-        try {
-            const command = new GetObjectCommand(params);
-            const url = await getSignedUrl(this.s3, command, { expiresIn });
-            console.log(`Signed URL generated: ${url}`);
-            return url;
-        } catch (error) {
-            console.error("Error generating signed URL:", error);
-            throw error;
-        }
-    }}
+    
+    }

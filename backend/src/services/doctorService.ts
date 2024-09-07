@@ -269,32 +269,52 @@ export class doctorService{
         try {
 
             const docDetails: docDetails = {
-                profileUrl: '',
-                aadhaarFrontImageUrl: '',
-                aadhaarBackImageUrl: '',
-                certificateUrl: '',
-                qualificationUrl: ''
+                profileUrl: {
+                    type:'',
+                    url:''
+                },
+                aadhaarFrontImageUrl: {
+                    type:'',
+                    url:''
+                },
+                aadhaarBackImageUrl: {
+                    type:'',
+                    url:''
+                },
+                certificateUrl: {
+                    type:'',
+                    url:''
+                },
+                qualificationUrl: {
+                    type:'',
+                    url:''
+                }
             };
 
 if (files.image) {
     const profileUrl = await this.S3Service.uploadFile('eliteCare/doctorProfileImages/', files.image[0]);
-    docDetails.profileUrl = profileUrl;
+    docDetails.profileUrl.url = profileUrl;
+    docDetails.profileUrl.type = "profile image";
 }
 if (files.aadhaarFrontImage) {
     const aadhaarFrontImageUrl = await this.S3Service.uploadFile('eliteCare/doctorDocuments/', files.aadhaarFrontImage[0]);
-    docDetails.aadhaarFrontImageUrl = aadhaarFrontImageUrl;
+    docDetails.aadhaarFrontImageUrl.url = aadhaarFrontImageUrl;
+    docDetails.aadhaarFrontImageUrl.type = "document";
 }
 if (files.aadhaarBackImage) {
     const aadhaarBackImageUrl = await this.S3Service.uploadFile('eliteCare/doctorDocuments/', files.aadhaarBackImage[0]);
-    docDetails.aadhaarBackImageUrl = aadhaarBackImageUrl;
+    docDetails.aadhaarBackImageUrl.url = aadhaarBackImageUrl;
+    docDetails.aadhaarBackImageUrl.type = "document";
 }
 if (files.certificateImage) {
     const certificateUrl = await this.S3Service.uploadFile('eliteCare/doctorDocuments/', files.certificateImage[0]);
-    docDetails.certificateUrl = certificateUrl;
+    docDetails.certificateUrl.url = certificateUrl;
+    docDetails.certificateUrl.type = "document";
 }
 if (files.qualificationImage) {
     const qualificationUrl = await this.S3Service.uploadFile('eliteCare/doctorDocuments/', files.qualificationImage[0]);
-    docDetails.qualificationUrl = qualificationUrl;
+    docDetails.qualificationUrl.url = qualificationUrl;
+    docDetails.qualificationUrl.type = "document";
 }
 
             

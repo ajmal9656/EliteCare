@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 function Sidebar() {
   return (
     <>
-      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <nav className=" fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
   <div className="px-3 py-3 lg:px-5 lg:pl-3">
     <div className="flex items-center justify-between">
       <div className="flex items-center justify-start rtl:justify-end">
@@ -101,14 +101,14 @@ function Sidebar() {
 
       <aside
         id="logo-sidebar"
-        className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+        className="fixed top-0 left-0 z-40 w-64  h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
         aria-label="Sidebar"
       >
         <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
           <ul className="space-y-2 font-medium">
             <li>
               <Link
-                to="/dashboard"
+                to="/admin/dashboard"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -179,7 +179,7 @@ function Sidebar() {
             </li>
             <li>
               <Link
-                to="/products"
+                to="/admin/applications"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -191,7 +191,7 @@ function Sidebar() {
                 >
                   <path d="M10 0a2 2 0 0 0-2 2v8.992l-3.528 4.94A2 2 0 0 0 6.237 20h7.526a2 2 0 0 0 1.765-4.068L12 10.992V2a2 2 0 0 0-2-2Z" />
                 </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Pernding Requests</span>
+                <span className="flex-1 ms-3 whitespace-nowrap">Pending Applications</span>
               </Link>
             </li>
           </ul>

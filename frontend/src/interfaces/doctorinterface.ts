@@ -36,4 +36,24 @@ export interface Specializations {
     previewUrl?: string | null; 
   }
 
+  export interface DoctorApplication {
+    _id: string;
+    doctorId: string;
+    name: string;
+    DOB: Date;
+    department: string;
+    gender: "Male" | "Female";
+    image: string;
+    fees: number;
+    kycDetails: {
+      certificateImage: string;
+      qualificationImage: string;
+      adharFrontImage: string;
+      adharBackImage: string;
+      adharNumber: number;
+    };
+    createdAt: Date;
+  }
+  
+
   

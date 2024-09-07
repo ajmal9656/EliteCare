@@ -1,4 +1,4 @@
-import React from 'react';
+
 import DoctorVerifivationForm from '../../components/doctorComponents/DoctorVerifivationForm';
 
 

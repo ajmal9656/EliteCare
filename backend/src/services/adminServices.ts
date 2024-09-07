@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import { adminRepository } from '../repository/adminRepository';
 import { Admin,adminType } from '../interface/adminInterface/adminInterface';
+import { S3Service } from '../config/s3client';
 
 
 
@@ -11,12 +12,14 @@ import { Admin,adminType } from '../interface/adminInterface/adminInterface';
 
 export class adminService{
     private adminRepository: adminRepository;
+    private S3Service: S3Service;
 
    private adminData: adminType | null = null;
 
 
-    constructor(adminRepository: adminRepository) {
+    constructor(adminRepository: adminRepository,S3ServiceInstance: S3Service) {
         this.adminRepository = adminRepository;
+        this.S3Service = S3ServiceInstance;
      };
    
 
@@ -151,7 +154,83 @@ export class adminService{
             throw new Error(`Failed to edit specialization: ${error.message}`);
         }
     }
+    async getApplication() {
+        try {
+            console.log("Entering getSpecialization method in adminService");
     
+            
+            const response = await this.adminRepository.getAllApplication();
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("Specialization successfully fetched:", response);
+                return response;
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to get specialization: Response is invalid");
+                throw new Error("Something went wrong while fetching the specialization.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in addSpecialization:", error.message);
+            throw new Error(`Failed to add specialization: ${error.message}`);
+        }
+    }
+    async getDoctorApplication(applicationId:string) {
+        try {
+            console.log("Entering getSpecialization method in adminService");
+    
+            
+            const response = await this.adminRepository.getApplication(applicationId);
+            const documents = []
+
+
+
+
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("data successfully fetched:", response);
+                documents.push(response.image);
+                documents.push(
+                    response.kycDetails.certificateImage,
+                    response.kycDetails.qualificationImage,
+                    response.kycDetails.adharFrontImage,
+                    response.kycDetails.adharBackImage
+                  );
+                  console.log(documents);
+                  const signedFiles = await Promise.all(
+                    documents.map(async (file: { type: string, url: string }) => {
+                        const folderPath = this.getFolderPathByFileType(file.type);
+                        const signedUrl = await this.S3Service.getFile(file.url, folderPath);
+                        return { ...file, signedUrl };
+                    })
+                );
+                 const files = signedFiles
+                return {response,files};
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to get specialization: Response is invalid");
+                throw new Error("Something went wrong while fetching the specialization.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in addSpecialization:", error.message);
+            throw new Error(`Failed to add specialization: ${error.message}`);
+        }
+    }
+    
+    private getFolderPathByFileType(fileType: string): string {
+        switch (fileType) {
+            case 'profile image':
+                return 'eliteCare/doctorProfileImages/';
+            case 'document':
+                return 'eliteCare/doctorDocuments/';
+            
+            default:
+                throw new Error(`Unknown file type: ${fileType}`);
+        }
+    }
 
 
 }
