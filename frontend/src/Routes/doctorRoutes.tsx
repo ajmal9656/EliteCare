@@ -6,6 +6,7 @@ import DoctorProtectedRoute from './ProtectedRoutes/DoctorProtectedRoute';
 import DoctorHomePage from '../pages/doctorPages/DoctorHomePage';
 import DashboardPage from '../pages/doctorPages/DashboardPage';
 import DoctorsListpage from '../pages/doctorPages/DoctorsListpage';
+import VerificationProcessingPage from '../pages/doctorPages/VerificationProcessingPage';
 
 
 
@@ -21,6 +22,7 @@ function doctorRoutes() {
       <Route path="/home" element={<DoctorProtectedRoute><DoctorHomePage /></DoctorProtectedRoute>} />
       <Route path="/dashboard" element={<DashboardPage/>} />
       <Route path="/doctorsList" element={<DoctorsListpage/>} />
+      <Route path="/verificationProcessing" element={<VerificationProcessingPage/>} />
       
       
       

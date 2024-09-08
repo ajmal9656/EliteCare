@@ -10,7 +10,7 @@ function DetailsUpload({
   previewUrl
 }: FileUploadSectionProps) {
 
-  console.log('Preview URL:', previewUrl);
+  
 
   return (
     <div className="flex justify-center items-center mb-6">

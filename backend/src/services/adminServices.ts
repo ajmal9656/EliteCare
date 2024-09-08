@@ -231,6 +231,46 @@ export class adminService{
                 throw new Error(`Unknown file type: ${fileType}`);
         }
     }
+    async approveApplication(doctorId:string) {
+        try {
+            console.log("Entering approve method in adminService");
+    
+            
+            const response = await this.adminRepository.approveDoctorApplication(doctorId);
+            return response
+            
+
+
+
+
+    
+           
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in addSpecialization:", error.message);
+            throw new Error(`Failed to add specialization: ${error.message}`);
+        }
+    }
+    async rejectApplication(doctorId:string,reason:string) {
+        try {
+            console.log("Entering reject method in adminService");
+    
+            
+            const response = await this.adminRepository.rejectDoctorApplication(doctorId,reason);
+            return response
+            
+
+
+
+
+    
+           
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in addSpecialization:", error.message);
+            throw new Error(`Failed to add specialization: ${error.message}`);
+        }
+    }
 
 
 }

@@ -222,6 +222,63 @@ export class adminController {
           }
       }
   }
+    async approveApplication(req: Request, res: Response): Promise<void> {
+      try {
+          console.log("Entering approve method in adminController");
+          const doctorId = req.params.doctorId
+          console.log("sasa",doctorId)
+  
+          
+  
+        
+          const response = await this.adminService.approveApplication(doctorId as string);
+  
+         
+          console.log("successfully fetched", response);
+  
+         
+          res.status(200).json({ message: "Application approved successfully"});
+          
+      } catch (error: any) {
+         
+          console.error("Error in addSpecialization controller:", error.message);
+  
+          if (error.message === "Something went wrong while creating the specialization.") {
+              res.status(400).json({ message: "Something went wrong while creating the specialization." });
+          } else {
+            
+              res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+          }
+      }
+  }
+ 
+
+  async rejectApplication(req: Request, res: Response): Promise<void> {
+    try {
+      console.log("Entering reject method in adminController");
+      const doctorId = req.params.doctorId;
+      const { reason } = req.body; // Extract the reason from the request body
+      console.log("Doctor ID:", doctorId);
+      console.log("Rejection Reason:", reason);
+      console.log("Rhgff:", req.body);
+  
+      // Pass the doctorId and reason to the service layer
+      const response = await this.adminService.rejectApplication(doctorId as string, reason);
+  
+      console.log("Successfully processed rejection:", response);
+      res.status(200).json({ message: "Application rejected successfully" });
+      
+    } catch (error: any) {
+      console.error("Error in rejectApplication controller:", error.message);
+      
+      if (error.message === "Something went wrong while rejecting the application.") {
+        res.status(400).json({ message: "Something went wrong while rejecting the application." });
+      } else {
+        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+    }
+  }
+  
     
 
       

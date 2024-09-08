@@ -2,6 +2,7 @@ import doctorModel from "../model/doctorModel";
 import { Document } from "mongoose";
 import { doctorType,DoctorData,DoctorFiles,docDetails } from "../interface/doctorInterface/doctorInterface";
 import doctorApplicationModel from "../model/doctorApplicationModel";
+import RejectDoctorModel from "../model/RejectDoctorSchema";
 
 
 export class doctorRepository {
@@ -47,25 +48,33 @@ export class doctorRepository {
         }
     }
 
-    async doctorCheck(email:string){
+    async doctorCheck(email: string) {
         try {
-            console.log("login doctorrep");
-            const doctorData = await doctorModel.findOne({email:email})
-            if(doctorData){
-                return doctorData
+          console.log("login doctorrep");
+          const doctorData = await doctorModel.findOne({ email: email });
+      
+          if (doctorData) {
+            let result: any = doctorData; 
+      
+            if (doctorData.kycStatus === "rejected") {
+              const rejectedData = await RejectDoctorModel.findOne({ doctorId: doctorData._id });
+      
+              if (rejectedData) {
+                result.rejectedReason = rejectedData.reason;
+              }
             }
-            throw new Error("Doctor Doesn't exist")
-            
-        
-            
-
-             
-            
-        } catch (error:any) {
-            console.log("rep error")
-            throw new Error(error.message)
+      
+            return result;
+          }
+      
+          throw new Error("Doctor Doesn't exist");
+      
+        } catch (error: any) {
+          console.log("rep error");
+          throw new Error(error.message);
         }
-    }
+      }
+      
     async uploadDoctorData(data:DoctorData,docDetails:docDetails){
         try {
             
@@ -94,6 +103,8 @@ export class doctorRepository {
                 const newDoctorApplication = await doctorApplicationModel.create(details);
 
                 console.log("new",newDoctorApplication)
+
+                return true
 
             }
 

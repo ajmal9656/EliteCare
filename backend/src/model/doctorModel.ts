@@ -8,6 +8,11 @@ enum KYCStatus {
   REJECTED = "rejected",
 }
 
+interface ImageField {
+  type: string;
+  url: string;
+}
+
 interface IDoctor extends Document {
   doctorId: string;
   name: string;
@@ -17,13 +22,14 @@ interface IDoctor extends Document {
   DOB: Date;
   department: string;
   gender: string;
-  image: string;
+  image: ImageField;
   fees: number;
-  kycStatus: KYCStatus; // Updated to use the enum
+  kycStatus: KYCStatus; 
   kycDetails: {
-    certificateImage: string;
-    qualificationImage: string;
-    yearOfExperience: number;
+    certificateImage: ImageField;
+    qualificationImage: ImageField;
+    adharFrontImage: ImageField;
+    adharBackImage: ImageField;
     adharNumber: number;
   };
   createdAt: Date;
@@ -31,6 +37,19 @@ interface IDoctor extends Document {
   isBlocked: boolean;
 }
 
+// Define the schema for ImageField
+const imageFieldSchema = new Schema<ImageField>({
+  type: {
+    type: String,
+    required: true,
+  },
+  url: {
+    type: String,
+    required: true,
+  },
+});
+
+// Define the main Doctor schema
 const doctorSchema = new Schema<IDoctor>({
   doctorId: {
     type: String,
@@ -63,7 +82,8 @@ const doctorSchema = new Schema<IDoctor>({
     type: String,
   },
   image: {
-    type: String,
+    type: imageFieldSchema,
+    
   },
   fees: {
     type: Number,
@@ -75,13 +95,20 @@ const doctorSchema = new Schema<IDoctor>({
   },
   kycDetails: {
     certificateImage: {
-      type: String,
+      type: imageFieldSchema,
+     
     },
     qualificationImage: {
-      type: String,
+      type: imageFieldSchema,
+     
     },
-    yearOfExperience: {
-      type: Number,
+    adharFrontImage: {
+      type: imageFieldSchema,
+     
+    },
+    adharBackImage: {
+      type: imageFieldSchema,
+     
     },
     adharNumber: {
       type: Number,

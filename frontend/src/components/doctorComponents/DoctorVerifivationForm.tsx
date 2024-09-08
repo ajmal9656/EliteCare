@@ -5,6 +5,7 @@ import DetailsUpload from '../../components/doctorComponents/DetailsUpload';
 import axiosUrl from '../../utils/axios';
 import { Specializations } from '../../interfaces/doctorinterface';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 // Validation schema for the form
 const validationSchema = Yup.object({
@@ -24,6 +25,7 @@ const validationSchema = Yup.object({
 });
 
 function DoctorVerifivationForm() {
+  const navigate = useNavigate()
   const [specializations, setSpecializations] = React.useState<Specializations[]>([]);
   const [imagePreviews, setImagePreviews] = React.useState({
     image: null,
@@ -36,9 +38,10 @@ function DoctorVerifivationForm() {
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     const file = event.currentTarget.files ? event.currentTarget.files[0] : null;
+    
   
     if (file) {
-      console.log(file)
+      
       const previewUrl = URL.createObjectURL(file);
       setImagePreviews((prev) => ({
         ...prev,
@@ -88,7 +91,7 @@ function DoctorVerifivationForm() {
       
       
       const email = parseData.email;
-      console.log(email)
+      
       
       const formData = new FormData();
 
@@ -123,7 +126,10 @@ function DoctorVerifivationForm() {
             'Content-Type': 'multipart/form-data',
           },
         });
+
         console.log('Form submitted successfully', response.data);
+        navigate("/doctor/verificationProcessing")
+        
       } catch (error:any) {
         console.error('Failed to submit the form', error);
         if(error.message==="Email not found..!Login again"){

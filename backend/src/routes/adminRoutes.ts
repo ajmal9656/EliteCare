@@ -22,6 +22,8 @@ route.put('/updateSpecialization',adminControllerInstance.editSpecialization.bin
 route.put('/listUnlistSpecialization',adminControllerInstance.listUnlistSpecialization.bind(adminControllerInstance));
 route.get('/getApplications',adminControllerInstance.getApplication.bind(adminControllerInstance));
 route.get('/getDoctorApplication/:applicationId',adminControllerInstance.getDoctorApplication.bind(adminControllerInstance));
+route.post('/approveApplication/:doctorId',adminControllerInstance.approveApplication.bind(adminControllerInstance));
+route.delete('/rejectApplication/:doctorId',adminControllerInstance.rejectApplication.bind(adminControllerInstance));
 
 
 

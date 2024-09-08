@@ -240,6 +240,10 @@ export class doctorService{
                 const refreshToken = jwt.sign({ id: doctorData.doctorId, email: doctorData.email }, process.env.JWT_SECRET as string, {
                     expiresIn: "7d"
                 });
+
+               
+
+                
                 
                 const doctorInfo = {
                     name: doctorData.name,
@@ -247,7 +251,8 @@ export class doctorService{
                     doctorId: doctorData.doctorId,
                     phone: doctorData.phone,
                     isBlocked: doctorData.isBlocked,
-                    docStatus: doctorData.kycStatus
+                    docStatus: doctorData.kycStatus,
+                    rejectedReason:doctorData.rejectedReason
                     
                 };
                 
@@ -323,7 +328,8 @@ if (files.qualificationImage) {
 
 
             const response = await this.doctorRepository.uploadDoctorData(data,docDetails);
-            // if (response) {
+            if (response) {
+                return response
                 
     
                 
@@ -331,7 +337,7 @@ if (files.qualificationImage) {
                 
                 
                 
-            // } 
+            } 
         } catch (error: any) {
             console.log("service error")
             throw new Error(error.message);

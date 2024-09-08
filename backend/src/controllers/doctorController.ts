@@ -175,14 +175,14 @@ export class doctorController {
          
           
           const response = await this.doctorService.uploadData(req.body,req.files as DoctorFiles);
-          // if (response) {
+          if (response) {
     
-          //   console.log("teeerurrrrr")
+            console.log("teeerurrrrr")
     
-          //   res.status(200).json({ status: true, message: "OTP Resended successfully",response });
-          // } else {
-          //   res.status(400).json({ status: false, message: "something wnt wrong" });
-          // }
+            res.status(200).json({ status: true, message: "Application Submitted"});
+          } else {
+            res.status(400).json({ status: false, message: "something wnt wrong" });
+          }
         } catch (error: any) {
             console.log("kkkk",error);
             

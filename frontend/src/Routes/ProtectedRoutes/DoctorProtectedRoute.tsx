@@ -2,6 +2,7 @@ import { RootState } from '../../Redux/store';
 import { useSelector } from 'react-redux';
 import DoctorVerifivationForm from '../../components/doctorComponents/DoctorVerifivationForm';
 import VerificationProcessingPage from '../../pages/doctorPages/VerificationProcessingPage';
+import RejectionApplicationPage from '../../pages/doctorPages/RejectionApplicationPage';
 
 
 interface DoctorProtectedRouteProps {
@@ -20,11 +21,18 @@ function  DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
         
     );
   } else if (DoctorData.docStatus === "submitted") {
-    return <>{children}</>
+    return <VerificationProcessingPage/>
+   
+  } 
+   else if (DoctorData.docStatus === "rejected") {
+    const reason = DoctorData.doctorInfo?.rejectedReason || "No reason provided";
+    
+    return <RejectionApplicationPage reason={reason}  />
    
   } else {
     return (
-      <VerificationProcessingPage/>
+      
+      <>{children}</>
     );
     
   }

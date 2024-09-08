@@ -17,6 +17,7 @@ export interface Doctor {
     email: string;
     isBlocked: boolean;
     
+    
   
   }
   
@@ -25,6 +26,7 @@ export interface DoctorState {
     accessToken: string | null;
     loading: boolean;
     error: string | null;
+    
   }
 
   export interface DoctorData {

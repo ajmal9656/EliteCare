@@ -6,11 +6,13 @@ export interface Doctor {
     email: string;
     isBlocked: boolean;
     docStatus:string;
+    rejectedReason?:string
     
   
   }
   
 export interface DoctorState {
+    
     doctorInfo: Doctor | null;
     accessToken: string | null;
     loading: boolean;
