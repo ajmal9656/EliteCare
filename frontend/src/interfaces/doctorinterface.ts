@@ -10,6 +10,18 @@ export interface Doctor {
     
   
   }
+export interface DoctorDetails {
+    _id:string
+    doctorId: string;
+    name: string;
+    phone : string;
+    email: string;
+    isBlocked: boolean;
+    docStatus:string;
+    rejectedReason?:string
+    
+  
+  }
   
 export interface DoctorState {
     

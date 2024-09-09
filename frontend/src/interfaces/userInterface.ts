@@ -7,6 +7,16 @@ export interface User {
     
   
   }
+export interface UserDetails {
+    _id:string
+    userId: string;
+    name: string;
+    phone : string;
+    email: string;
+    isBlocked: boolean;
+    
+  
+  }
   
 export interface UserState {
     userInfo: User | null;

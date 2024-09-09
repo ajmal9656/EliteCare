@@ -155,4 +155,59 @@ export class userController {
       }
     }
   }
+
+  async getSpecializations(req: Request, res: Response): Promise<void> {
+    try {
+        console.log("Entering addSpecialization method in adminController");
+
+        
+
+      
+        const response = await this.userService.getSpecialization();
+
+       
+        console.log("Specialization successfully fetched", response);
+
+       
+        res.status(200).json({ message: "Specialization added successfully", response });
+        
+    } catch (error: any) {
+       
+        console.error("Error in addSpecialization controller:", error.message);
+
+        if (error.message === "Something went wrong while creating the specialization.") {
+            res.status(400).json({ message: "Something went wrong while creating the specialization." });
+        } else {
+          
+            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        }
+    }
+}
+  async getDoctorsWithSpecialization(req: Request, res: Response): Promise<void> {
+    try {
+        console.log("Entering addSpecialization method in adminController");
+
+        const specializationId = req.params.specializationId
+
+      
+        const response = await this.userService.getDoctorsWithSpecialization(specializationId);
+
+       
+        console.log("Specialization successfully fetched", response);
+
+       
+        res.status(200).json({ message: "Specialization added successfully", response });
+        
+    } catch (error: any) {
+       
+        console.error("Error in addSpecialization controller:", error.message);
+
+        if (error.message === "Something went wrong while creating the specialization.") {
+            res.status(400).json({ message: "Something went wrong while creating the specialization." });
+        } else {
+          
+            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        }
+    }
+}
 }

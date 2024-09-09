@@ -6,6 +6,8 @@ import AdminLayout from '../pages/adminPages/AdminLayout';
 import DashboardPage from '../pages/adminPages/DashboardPage';
 import ApplicationsPage from '../pages/adminPages/ApplicationsPage';
 import ApplicationDetailspage from '../pages/adminPages/ApplicationDetailspage';
+import UsersListPage from '../pages/adminPages/UsersListPage';
+import DoctorListingPage from '../pages/adminPages/DoctorListingPage';
 
 function adminRoutes() {
   return (
@@ -17,6 +19,8 @@ function adminRoutes() {
                    <Route path="specializations" element={<SpecializationPage/>} />
                    <Route path="applications" element={<ApplicationsPage/>} />
                    <Route path="viewApplication" element={<ApplicationDetailspage/>} />
+                   <Route path="usersList" element={<UsersListPage/>} />
+                   <Route path="doctorsList" element={<DoctorListingPage/>} />
             </Route>
 
             

@@ -18,6 +18,8 @@ route.post('/signUp',userControllerInstance.createUser.bind(userControllerInstan
 route.post('/verifyOtp',userControllerInstance.verifyOtp.bind(userControllerInstance));
 route.post('/login',userControllerInstance.loginUser.bind(userControllerInstance));
 route.post('/resendOtp',userControllerInstance.resendOtp.bind(userControllerInstance));
+route.get('/getSpecializations',userControllerInstance.getSpecializations.bind(userControllerInstance));
+route.get('/getDoctorsWithSpecialization/:specializationId',userControllerInstance.getDoctorsWithSpecialization.bind(userControllerInstance));
 
 
 export default route

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-scroll"; // React Scroll Link
 import { Link as RouterLink } from "react-router-dom"; // React Router Link
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
@@ -16,7 +16,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className=" fixed w-full z-10 text-white">
+    <div className=" fixed w-screen z-10 text-white">
       <div>
         <div className=" flex flex-row justify-between p-5 md:px-32 px-5 bg-backgroundColor shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <div className=" flex flex-row items-center cursor-pointer">

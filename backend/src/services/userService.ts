@@ -253,6 +253,51 @@ export class userService{
             throw error;
         }
     }
+
+    async getSpecialization() {
+        try {
+            console.log("Entering getSpecialization method in adminService");
+    
+            
+            const response = await this.userRepository.getAllSpecialization();
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("Specialization successfully fetched:", response);
+                return response;
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to get specialization: Response is invalid");
+                throw new Error("Something went wrong while fetching the specialization.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in addSpecialization:", error.message);
+            throw new Error(`Failed to add specialization: ${error.message}`);
+        }
+    }
+    async getDoctorsWithSpecialization(specializationId:string) {
+        try {
+            console.log("Entering getSpecialization method in adminService");
+    
+            
+            const response = await this.userRepository.getAllDoctorsWithSpecialization(specializationId);
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("Specialization successfully fetched:", response);
+                return response;
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to get specialization: Response is invalid");
+                throw new Error("Something went wrong while fetching the specialization.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in addSpecialization:", error.message);
+            throw new Error(`Failed to add specialization: ${error.message}`);
+        }
+    }
     
 
 }

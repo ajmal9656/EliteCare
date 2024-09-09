@@ -6,6 +6,9 @@ import Login from '../pages/userPages/Login';
 import LandingPage from '../pages/userPages/LandingPage';
 import ProfilePage from '../pages/userPages/ProfilePage';
 import UserProtectRoute from './ProtectedRoutes/UserProtectRoute';
+import SpecializationPage from '../pages/userPages/SpecializationPage';
+import DoctorsWithSpecializationPage from '../pages/userPages/DoctorsWithSpecializationPage';
+
 
 
 function UserRoutes() {
@@ -18,6 +21,9 @@ function UserRoutes() {
       <Route path="/login" element={<Login/>} />
       <Route path="/home" element={<LandingPage/>} />
       <Route path="/profile" element={<UserProtectRoute><ProfilePage/></UserProtectRoute>} />
+      <Route path="/specializations" element={<SpecializationPage/>} />
+      <Route path="/doctorsWithSpecialization/:id" element={<DoctorsWithSpecializationPage/>} />
+      
       
       
     </Routes>

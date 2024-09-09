@@ -24,6 +24,10 @@ route.get('/getApplications',adminControllerInstance.getApplication.bind(adminCo
 route.get('/getDoctorApplication/:applicationId',adminControllerInstance.getDoctorApplication.bind(adminControllerInstance));
 route.post('/approveApplication/:doctorId',adminControllerInstance.approveApplication.bind(adminControllerInstance));
 route.delete('/rejectApplication/:doctorId',adminControllerInstance.rejectApplication.bind(adminControllerInstance));
+route.get('/getUsers',adminControllerInstance.getUsers.bind(adminControllerInstance));
+route.put('/listUnlistUser/:userId',adminControllerInstance.listUnlistUser.bind(adminControllerInstance));
+route.get('/getDoctors',adminControllerInstance.getDoctors.bind(adminControllerInstance));
+route.put('/listUnlistDoctor/:doctorId',adminControllerInstance.listUnlistDoctor.bind(adminControllerInstance));
 
 
 

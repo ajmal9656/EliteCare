@@ -271,6 +271,95 @@ export class adminService{
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
+    async getUsers() {
+        try {
+            console.log("Entering getuser method in adminService");
+    
+            
+            const response = await this.adminRepository.getAllUsers();
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("user successfully fetched:", response);
+                return response;
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to get user: Response is invalid");
+                throw new Error("Something went wrong while fetching the user.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in user:", error.message);
+            throw new Error(`Failed to user: ${error.message}`);
+        }
+    }
+    async getDoctors() {
+        try {
+            console.log("Entering getuser method in adminService");
+    
+            
+            const response = await this.adminRepository.getAllDoctors();
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("user successfully fetched:", response);
+                return response;
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to get user: Response is invalid");
+                throw new Error("Something went wrong while fetching the user.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in user:", error.message);
+            throw new Error(`Failed to user: ${error.message}`);
+        }
+    }
+
+    async listUnlistUser(id:string) {
+        try {
+            console.log("Entering edituser method in adminService");
+    
+            
+            const response = await this.adminRepository.changeUserStatus(id);
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("user successfully edited:", response);
+                return response;
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to edit user: Response is invalid");
+                throw new Error("Something went wrong while editing the user.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in edituser:", error.message);
+            throw new Error(`Failed to edit user: ${error.message}`);
+        }
+    }
+    async listUnlistDoctor(id:string) {
+        try {
+            console.log("Entering editoctor method in adminService");
+    
+            
+            const response = await this.adminRepository.changeDoctorStatus(id);
+    
+            // Check if the response is valid
+            if (response) {
+                console.log("octor successfully edited:", response);
+                return response;
+            } else {
+                // Handle the case where the response is not as expected
+                console.error("Failed to edit user: Response is invalid");
+                throw new Error("Something went wrong while editing the user.");
+            }
+        } catch (error: any) {
+            // Log the error and rethrow it with a message
+            console.error("Error in edituser:", error.message);
+            throw new Error(`Failed to edit user: ${error.message}`);
+        }
+    }
 
 
 }

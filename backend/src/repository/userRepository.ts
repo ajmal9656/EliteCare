@@ -1,6 +1,8 @@
 import userModel from "../model/userModel";
 import { userType } from "../interface/interface";
 import { Document } from "mongoose";
+import specializationModel from "../model/SpecializationModel";
+import doctorModel from "../model/doctorModel";
 
 
 export class userRepository {
@@ -61,6 +63,34 @@ export class userRepository {
         } catch (error:any) {
             console.log("rep error")
             throw new Error(error.message)
+        }
+    }
+    async getAllSpecialization(){
+        try {
+            
+            const specializations = await specializationModel.find({isListed:true})
+    
+           
+    
+            
+            return specializations
+        } catch (error: any) {
+            console.error("Error getting specialization:", error.message);
+            throw new Error(error.message);
+        }
+    }
+    async getAllDoctorsWithSpecialization(specializationId:string){
+        try {
+            
+            const doctors = await doctorModel.find({department:specializationId,isBlocked:false})
+    
+           
+    
+            
+            return doctors
+        } catch (error: any) {
+            console.error("Error getting specialization:", error.message);
+            throw new Error(error.message);
         }
     }
 }

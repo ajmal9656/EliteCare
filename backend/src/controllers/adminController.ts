@@ -278,6 +278,117 @@ export class adminController {
       }
     }
   }
+  async getUsers(req: Request, res: Response): Promise<void> {
+    try {
+        console.log("Entering  method in adminController");
+
+        
+
+      
+        const response = await this.adminService.getUsers();
+
+       
+        console.log("Specialization successfully fetched", response);
+
+       
+        res.status(200).json({ message: "fetch users successfully", response });
+        
+    } catch (error: any) {
+       
+        console.error("Error in addSpecialization controller:", error.message);
+
+        if (error.message === "Something went wrong while creating the specialization.") {
+            res.status(400).json({ message: "Something went wrong while creating the specialization." });
+        } else {
+          
+            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        }
+    }
+}
+  async getDoctors(req: Request, res: Response): Promise<void> {
+    try {
+        console.log("Entering  method in adminController");
+
+        
+
+      
+        const response = await this.adminService.getDoctors();
+
+       
+        console.log("Specialization successfully fetched", response);
+
+       
+        res.status(200).json({ message: "fetch Doctors successfully", response });
+        
+    } catch (error: any) {
+       
+        console.error("Error in addSpecialization controller:", error.message);
+
+        if (error.message === "Something went wrong while creating the specialization.") {
+            res.status(400).json({ message: "Something went wrong while creating the specialization." });
+        } else {
+          
+            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        }
+    }
+}
+
+async listUnlistUser(req: Request, res: Response): Promise<void> {
+    try {
+        console.log("Entering editSpecialization method in adminController");
+        const id  = req.params.userId
+ 
+        
+
+      
+        const response = await this.adminService.listUnlistUser(id);
+
+       
+        console.log("user successfully edited", response);
+
+       
+        res.status(200).json({ message: "user updated successfully", response });
+        
+    } catch (error: any) {
+       
+        console.error("Error in edituser controller:", error.message);
+
+        if (error.message === "Something went wrong while creating the user.") {
+            res.status(400).json({ message: "Something went wrong while updating the user." });
+        } else {
+          
+            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        }
+    }
+}
+async listUnlistDoctor(req: Request, res: Response): Promise<void> {
+    try {
+        console.log("Entering editSpecialization method in adminController");
+        const id  = req.params.doctorId
+ 
+        
+
+      
+        const response = await this.adminService.listUnlistDoctor(id);
+
+       
+        console.log("Doctor successfully edited", response);
+
+       
+        res.status(200).json({ message: "Doctor updated successfully", response });
+        
+    } catch (error: any) {
+       
+        console.error("Error in edituser controller:", error.message);
+
+        if (error.message === "Something went wrong while creating the user.") {
+            res.status(400).json({ message: "Something went wrong while updating the user." });
+        } else {
+          
+            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        }
+    }
+}
   
     
 
