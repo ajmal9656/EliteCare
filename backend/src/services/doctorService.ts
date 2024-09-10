@@ -62,7 +62,7 @@ export class doctorService{
       };
     const Generated_OTP: string = Math.floor(1000 + Math.random() * 9000).toString();
     const hashedOTP:string = await bcrypt.hash(Generated_OTP, saltRounds);
-    console.log(hashedOTP)
+    
 
     this.OTP = hashedOTP;
 
@@ -84,7 +84,7 @@ export class doctorService{
         expiresIn:"1min"
 
      })
-     console.log("done",token )
+     
 
      return {token};
 
@@ -108,23 +108,23 @@ export class doctorService{
 
     async otpCheck(otp: string, token: string) {
         try {
-            console.log("hhhh")
+            
            
             const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
-            console.log("dec",decoded)
+            
 
             
             const tokenOTP = decoded.OTP;
             const expirationTime = new Date(decoded.expirationTime);
             const doctorData = decoded.doctorData
-            console.log(tokenOTP,expirationTime)
+            
             
 
             if(new Date() < expirationTime){
                 const result = await bcrypt.compare(otp, tokenOTP);
                 if(result){
                     await this.doctorRepository.createDoctor(doctorData)
-                    console.log("true")
+                    
 
                     return { valid: true };
 
@@ -175,7 +175,7 @@ export class doctorService{
             const Generated_OTP: string = Math.floor(1000 + Math.random() * 9000).toString();
             let saltRounds:number =10;
             const hashedOTP:string = await bcrypt.hash(Generated_OTP, saltRounds);
-            console.log(hashedOTP)
+            console.log("top",Generated_OTP)
 
            this.OTP = hashedOTP;
 

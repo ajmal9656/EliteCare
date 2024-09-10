@@ -26,7 +26,7 @@ export class doctorController {
             
           //   path:"/"
           // });
-          console.log("aaaaaaaaaaa",response.token)
+          
           
           res.status(200).json({ status: true, response });
         } catch (error: any) {
@@ -44,7 +44,7 @@ export class doctorController {
 
       async verifyOtp(req: Request, res: Response): Promise<void> {
         try {
-            console.log("vrtrwf")
+            console.log("verifyController")
           
           const token = req.headers.authorization?.split(" ")[1];
           console.log(token)
@@ -52,6 +52,7 @@ export class doctorController {
             res.status(401).json({ message: "No token provided" });
             return;
           }
+          console.log("token",token)
     
           
           const doctorOtp: string = req.body.otp;
@@ -60,13 +61,13 @@ export class doctorController {
             res.status(400).json({ message: "OTP is required" });
             return;
           }
-          console.log("otp",doctorOtp)
+          console.log("otppp",doctorOtp)
     
           
           const response = await this.doctorService.otpCheck(doctorOtp, token);
           if (response.valid) {
     
-            console.log("trurrrrr")
+            console.log("trueeeeeee")
     
             res.status(200).json({ status: true, message: "OTP verified successfully" });
           } else {

@@ -223,9 +223,9 @@ export class adminService{
     private getFolderPathByFileType(fileType: string): string {
         switch (fileType) {
             case 'profile image':
-                return 'eliteCare/doctorProfileImages/';
+                return 'eliteCare/doctorProfileImages';
             case 'document':
-                return 'eliteCare/doctorDocuments/';
+                return 'eliteCare/doctorDocuments';
             
             default:
                 throw new Error(`Unknown file type: ${fileType}`);

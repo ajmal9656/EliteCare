@@ -6,16 +6,18 @@ import { userType } from "../interface/interface";
 import sendMail from "../config/emailConfig";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
-
+import { S3Service} from '../config/s3client';
 
 dotenv.config()
 
 
 export class userService{
+   private S3Services = new S3Service()
    private userRepository: userRepository;
    private OTP: string | null = null;
    private expiryOTP_time: Date | null = null;
    private userData: userType | null = null;
+   
 
    constructor(userRepository: userRepository) {
       this.userRepository = userRepository;
@@ -276,26 +278,54 @@ export class userService{
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
-    async getDoctorsWithSpecialization(specializationId:string) {
+    async getDoctorsWithSpecialization(specializationId: string) {
         try {
-            console.log("Entering getSpecialization method in adminService");
-    
-            
-            const response = await this.userRepository.getAllDoctorsWithSpecialization(specializationId);
-    
-            // Check if the response is valid
-            if (response) {
-                console.log("Specialization successfully fetched:", response);
-                return response;
-            } else {
-                // Handle the case where the response is not as expected
-                console.error("Failed to get specialization: Response is invalid");
-                throw new Error("Something went wrong while fetching the specialization.");
-            }
+          console.log("Entering getSpecialization method in adminService");
+      
+          const response = await this.userRepository.getAllDoctorsWithSpecialization(specializationId);
+      
+          // Check if the response is valid and it's an array
+          if (response && Array.isArray(response)) {
+            console.log("Specialization successfully fetched:", response);
+      
+            // Iterate through the list of doctors and handle the image for each
+            const doctorsWithSignedUrls = await Promise.all(
+              response.map(async (doctor) => {
+                if (doctor.image && doctor.image.url && doctor.image.type) {
+                  const folderPath = this.getFolderPathByFileType(doctor.image.type);
+                  const signedUrl = await this.S3Services.getFile(doctor.image.url, folderPath);
+      
+                  // Append signed URL to the doctor object
+                  return {
+                    ...doctor,
+                    signedImageUrl: signedUrl, // Include signed URL for the image
+                  };
+                }
+                return doctor;
+              })
+            );
+      
+            return doctorsWithSignedUrls;
+          } else {
+            console.error("Failed to get specialization: Response is invalid or not an array");
+            throw new Error("Something went wrong while fetching the specialization.");
+          }
         } catch (error: any) {
-            // Log the error and rethrow it with a message
-            console.error("Error in addSpecialization:", error.message);
-            throw new Error(`Failed to add specialization: ${error.message}`);
+          console.error("Error in getDoctorsWithSpecialization:", error.message);
+          throw new Error(`Failed to get specialization: ${error.message}`);
+        }
+      }
+      
+
+     private getFolderPathByFileType(fileType: string): string {
+        switch (fileType) {
+            case 'profile image':
+                return 'eliteCare/doctorProfileImages';
+            case 'document':
+                return 'eliteCare/doctorDocuments';
+            
+            default:
+                throw new Error(`Unknown file type: ${fileType}`);
         }
     }
     

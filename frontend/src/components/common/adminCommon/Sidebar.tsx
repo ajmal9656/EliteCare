@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Sidebar() {
   return (
@@ -36,7 +36,7 @@ function Sidebar() {
             alt="FlowBite Logo"
           />
           <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
-            Flowbite
+            EliteCare
           </span>
         </a>
       </div>
@@ -64,24 +64,24 @@ function Sidebar() {
             </div>
             <ul className="py-1" role="none">
               <li>
-                <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
+                <NavLink to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
                   Dashboard
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
+                <NavLink to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
                   Settings
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link to="/earnings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
+                <NavLink to="/earnings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
                   Earnings
-                </Link>
+                </NavLink>
               </li>
               <li>
-                <Link to="/logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
+                <NavLink to="/logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
                   Sign out
-                </Link>
+                </NavLink>
               </li>
             </ul>
           </div>
@@ -99,106 +99,124 @@ function Sidebar() {
 </nav>
 
 
-      <aside
-        id="logo-sidebar"
-        className="fixed top-0 left-0 z-40 w-64  h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
-        aria-label="Sidebar"
-      >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
-          <ul className="space-y-2 font-medium">
-            <li>
-              <Link
-                to="/admin/dashboard"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 22 21"
-                >
-                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-                </svg>
-                <span className="ms-3">Dashboard</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/doctorsList"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Doctors</span>
-                
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/usersList"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
-                </svg>
-                
-                <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
-                
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/specializations"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 18 16"
-                >
-                  <path d="M17.618 4.078 10 .335a2.015 2.015 0 0 0-1.968 0L.618 4.078A1.969 1.969 0 0 0 0 5.82v6.36a1.969 1.969 0 0 0 .618 1.742l7.414 4.035a2.015 2.015 0 0 0 1.968 0l7.414-4.035A1.969 1.969 0 0 0 18 12.179V5.82a1.969 1.969 0 0 0-.382-1.742ZM9 14a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm7-7h-4a.5.5 0 1 1 0-1h4a.5.5 0 0 1 0 1Z" />
-                </svg>
-                
-                <span className="flex-1 ms-3 whitespace-nowrap">Specilizations</span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/admin/applications"
-                className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-              >
-                <svg
-                  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M10 0a2 2 0 0 0-2 2v8.992l-3.528 4.94A2 2 0 0 0 6.237 20h7.526a2 2 0 0 0 1.765-4.068L12 10.992V2a2 2 0 0 0-2-2Z" />
-                </svg>
-                <span className="flex-1 ms-3 whitespace-nowrap">Pending Applications</span>
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </aside>
+      
+<aside
+  id="logo-sidebar"
+  className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+  aria-label="Sidebar"
+>
+  <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+    <ul className="space-y-2 font-medium">
+      <li>
+        <NavLink
+          to="/admin/dashboard"
+          className={({ isActive }) =>
+            isActive
+              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
+              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+          }
+        >
+          <svg
+            className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 22 21"
+          >
+            <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+            <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+          </svg>
+          <span className="ms-3">Dashboard</span>
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          to="/admin/doctorsList"
+          className={({ isActive }) =>
+            isActive
+              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
+              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+          }
+        >
+          <svg
+            className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
+          </svg>
+          <span className="ms-3">Doctors</span>
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          to="/admin/usersList"
+          className={({ isActive }) =>
+            isActive
+              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
+              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+          }
+        >
+          <svg
+            className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
+          </svg>
+          <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          to="/admin/specializations"
+          className={({ isActive }) =>
+            isActive
+              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
+              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+          }
+        >
+          <svg
+            className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 18 16"
+          >
+            <path d="M17.618 4.078 10 .335a2.015 2.015 0 0 0-1.968 0L.618 4.078A1.969 1.969 0 0 0 0 5.82v6.36a1.969 1.969 0 0 0 .618 1.742l7.414 4.035a2.015 2.015 0 0 0 1.968 0l7.414-4.035A1.969 1.969 0 0 0 18 12.179V5.82a1.969 1.969 0 0 0-.382-1.742ZM9 14a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm7-7h-4a.5.5 0 1 1 0-1h4a.5.5 0 0 1 0 1Z" />
+          </svg>
+          <span className="flex-1 ms-3 whitespace-nowrap">Specializations</span>
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          to="/admin/applications"
+          className={({ isActive }) =>
+            isActive
+              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
+              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+          }
+        >
+          <svg
+            className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M10 0a2 2 0 0 0-2 2v4h4V2a2 2 0 0 0-2-2Zm-5 7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5Zm1 2h8v8H6V9Zm2-7a.5.5 0 0 0-1 0v3.5A.5.5 0 0 0 7.5 6h5a.5.5 0 0 0 0-1H8V2Z" />
+          </svg>
+          <span className="flex-1 ms-3 whitespace-nowrap">Applications</span>
+        </NavLink>
+      </li>
+    </ul>
+  </div>
+</aside>
+
     </>
   );
 }

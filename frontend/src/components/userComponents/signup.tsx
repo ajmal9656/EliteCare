@@ -74,10 +74,10 @@ const Signup: React.FC = () => {
   return (
     <div className="relative bg-center  mt-0 min-h-screen">
       <div className='absolute -z-10 h-full overflow-hidden '>
-        <div className='absolute bg-[#833a3a1f] w-full h-full' ></div>
+        <div className='absolute bg-[#c8ebc51f] w-full h-full' ></div>
         <img src={image} alt="" className='w-screen object-contain' />
       </div>
-      <section className="flex flex-col items-center py-10 " >
+      <section className="flex flex-col items-center py-10  justify-center" >
         <div
          className="w-full bg-[#ffffff24] rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0  ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8 ">
@@ -192,14 +192,14 @@ const Signup: React.FC = () => {
               </div>
               <button
                 type="submit"
-                className=" w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className=" w-full text-white bg-backgroundColor hover:bg-green-300 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-backgroundColor dark:hover:bg-[#4ca992] "
               >
                 Create an account
               </button>
               <p className="text-sm font-light text-trbg-transparent0 dark:text-gray-700 text-center">
                 Already have an account?{' '}
                 <Link 
-  className="font-medium text-blue-600 hover:underline dark:text-blue-700"
+  className="font-medium text-backgroundColor hover:underline hover:text-[#4ca992] "
   to="/login"
 >
   Login here

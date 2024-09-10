@@ -216,7 +216,7 @@ function Signup() {
           <div className="mt-4">
             <button 
               type="submit" 
-              className="w-full block py-2 text-center text-white bg-teal-500 border border-teal-500 rounded hover:bg-transparent hover:text-teal-500 transition uppercase font-roboto font-medium"
+              className="w-full block py-2 text-center text-white bg-gradient-to-l from-cyan-500 to-blue-500 border  rounded hover:bg-blue-400  transition uppercase font-roboto font-medium"
             >
               Register
             </button>
@@ -224,7 +224,7 @@ function Signup() {
         </form>
         <p className="mt-4 text-gray-600 text-center">
           Already have an account? 
-          <Link to="/doctor/login"  className="text-teal-500 ml-2">Login Now</Link>
+          <Link to="/doctor/login"  className="text-blue-300  ml-2">Login Now</Link>
         </p>
       </div>
     </div>

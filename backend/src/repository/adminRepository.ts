@@ -113,7 +113,7 @@ export class adminRepository {
     async getApplication(doctorId:string){
         try {
             
-            const application = await doctorApplicationModel.findById(doctorId)
+            const application = await doctorApplicationModel.findById(doctorId).populate("department")
     
            console.log("pppp",application)
     

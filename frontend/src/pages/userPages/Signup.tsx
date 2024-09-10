@@ -1,11 +1,11 @@
 import React from 'react';
 import SignupPage from '../../components/userComponents/signup';
-import Header from '../../components/common/userCommon/Header';
+import Navbar from '../../components/common/userCommon/Navbar';
 
 function Signup() {
   return (
     <>
-      <Header/>
+      
        <SignupPage/>
 
       

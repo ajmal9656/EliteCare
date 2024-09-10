@@ -126,7 +126,7 @@ const Specialization: React.FC = () => {
         <thead>
           <tr>
             <th className="py-2 px-4 border-b border-gray-300 text-center">Name</th>
-            <th className="py-2 px-4 border-b border-gray-300 text-center">Description</th>
+            
             <th className="py-2 px-4 border-b border-gray-300 text-center">Actions</th>
           </tr>
         </thead>
@@ -136,9 +136,7 @@ const Specialization: React.FC = () => {
               <td className="py-2 px-4 border-b border-gray-300 text-center">
                 {category.name}
               </td>
-              <td className="py-2 px-4 border-b border-gray-300 text-center">
-                {category.description}
-              </td>
+              
               <td className="py-2 px-4 border-b border-gray-300 text-center">
                 <button
                   className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"

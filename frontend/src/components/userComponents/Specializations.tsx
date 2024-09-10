@@ -2,6 +2,7 @@
 import axiosUrl from '../../utils/axios';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { MdHealthAndSafety } from "react-icons/md";
 
 interface Specialization {
   _id: string;
@@ -31,6 +32,8 @@ function Specializations() {
     fetchSpecializations();
   }, []); // Empty dependency array to run once on mount
 
+  const icon2 = <MdHealthAndSafety size={35} className="text-backgroundColor" />;
+
   
   return (
     <>
@@ -50,27 +53,35 @@ function Specializations() {
         </div>
       </div>
       <section className="py-12 bg-gray-100 px-24">
-        <div className="container mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-10">
-            Our Specializations
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {specializations.map((specialization) => (
-              <Link 
-              key={specialization._id} 
-              to={`/doctorsWithSpecialization/${specialization._id}`} 
-              className="bg-white shadow-lg rounded-lg p-6 h-72 w-full sm:w-3/4 lg:w-2/3 mx-auto flex flex-col transition-transform transform hover:-translate-y-2 cursor-pointer"
-              
-            >
-              <h3 className="text-2xl font-semibold mb-4">{specialization.name}</h3>
-              <p className="text-gray-700 flex-1 overflow-hidden text-ellipsis">
-                {specialization.description}
-              </p>
-            </Link>
-            ))}
+  <div className="container mx-auto">
+    <h2 className="text-4xl font-bold text-center mb-10 text-backgroundColor ">
+      Our Specializations
+    </h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {specializations.map((specialization) => (
+        <Link
+          key={specialization._id}
+          to={`/doctorsWithSpecialization/${specialization._id}`}
+          className="bg-white shadow-lg rounded-lg p-6 h-85 w-full sm:w-3/4 lg:w-2/3 mx-auto flex flex-col items-center transition-transform transform hover:-translate-y-2 cursor-pointer"
+        >
+          {/* Centered Icon */}
+          <div className="bg-[#d5f2ec] p-4 rounded-full transition-colors duration-300 ease-in-out group-hover:bg-[#ade9dc] flex items-center justify-center mb-4">
+            {icon2}
           </div>
-        </div>
-      </section>
+          {/* Centered Name */}
+          <h3 className="text-2xl font-semibold mb-2 text-center text-backgroundColor">
+            {specialization.name}
+          </h3>
+          {/* Centered Description */}
+          <p className=" text-center flex-1 overflow-hidden text-ellipsis">
+            {specialization.description}
+          </p>
+        </Link>
+      ))}
+    </div>
+  </div>
+</section>
+
     </>
   );
 }

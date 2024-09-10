@@ -52,7 +52,7 @@ function AdminLogin() {
       <div className="relative py-3 sm:w-96 mx-auto text-center">
         <span className="text-2xl font-light">Login to your account</span>
         <div className="mt-4 bg-white shadow-md rounded-lg text-left">
-          <div className="h-2 bg-purple-400 rounded-t-md"></div>
+          <div className="h-2 bg-gray-800 rounded-t-md"></div>
           <form onSubmit={formik.handleSubmit} className="px-8 py-6">
             <div>
               <label htmlFor="email" className="block font-semibold">Username or Email</label>
@@ -61,7 +61,7 @@ function AdminLogin() {
                 name="email"
                 type="email"
                 placeholder="Email"
-                className={`border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md ${formik.touched.email && formik.errors.email ? 'border-red-500' : ''}`}
+                className={`border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:gray-900 focus:ring-1 rounded-md ${formik.touched.email && formik.errors.email ? 'border-red-500' : ''}`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.email}
@@ -77,7 +77,7 @@ function AdminLogin() {
                 name="password"
                 type="password"
                 placeholder="Password"
-                className={`border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md ${formik.touched.password && formik.errors.password ? 'border-red-500' : ''}`}
+                className={`border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:gray-900 focus:ring-1 rounded-md ${formik.touched.password && formik.errors.password ? 'border-red-500' : ''}`}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
                 value={formik.values.password}
@@ -87,7 +87,7 @@ function AdminLogin() {
               ) : null}
             </div>
             <div className="flex justify-between items-baseline">
-              <button type="submit" className="mt-4 bg-purple-500 text-white py-2 px-6 rounded-md hover:bg-purple-600">
+              <button type="submit" className="mt-4 bg-gray-800 text-white py-2 px-6 rounded-md hover:bg-gray-900">
                 Login
               </button>
               <Link to="/forgot-password" className="text-sm hover:underline">

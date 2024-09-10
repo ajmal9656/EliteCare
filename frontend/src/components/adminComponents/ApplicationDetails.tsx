@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axiosUrl from "../../utils/axios";
 import { useFormik } from "formik";
@@ -55,45 +55,67 @@ function ApplicationDetails() {
         </div>
       </div>
 
-      <main className="w-full h-[560px] py-5">
-        <section className="w-full h-1/4 bg-red-100 flex justify-between gap-10 rounded-lg">
+      <main className="w-full h-[600px] py-5">
+        <section className="w-full h-1/4 bg-gray-300 flex justify-between gap-10 rounded-lg">
           <div className="h-full w-1/2 flex-row px-2">
-            <p className="pt-5">Name: {response?.name}</p>
-            <p className="py-2">Fees: {response?.fees}</p>
-            <p>Gender: {response?.gender}</p>
+          <div className="flex pt-5 ">
+  <h3 className="font-bold">Name:</h3>
+  <p className="pl-3 font-medium" >  {response?.name}</p>
+</div>
+          
+          <div className="flex py-2 ">
+  <h3 className="font-bold">Fees:</h3>
+  <p className="pl-3 font-medium" >  {response?.fees}</p>
+</div>
+<div className="flex ">
+  <h3 className="font-bold">Gender:</h3>
+  <p className="pl-3 font-medium" >  {response?.gender}</p>
+</div>
+
+            
+            
           </div>
           <div className="h-full w-1/2 flex-row px-2">
-            <p className="pt-5">Department: {response?.department}</p>
-            <p className="py-2">
-              Date Of Birth: {new Date(response?.DOB).toLocaleDateString()}
-            </p>
-            <p>Aadhaar Number: {response?.kycDetails?.adharNumber}</p>
+          <div className="flex pt-5 ">
+  <h3 className="font-bold">Department:</h3>
+  <p className="pl-3 font-medium" >  {response?.department.name}</p>
+</div>
+          
+          <div className="flex py-2 ">
+  <h3 className="font-bold">Date Of Birth:</h3>
+  <p className="pl-3 font-medium" >  {new Date(response?.DOB).toLocaleDateString()}</p>
+</div>
+<div className="flex ">
+  <h3 className="font-bold">Aadhaar Number:</h3>
+  <p className="pl-3 font-medium" >  {response?.kycDetails?.adharNumber}</p>
+</div>
+            
           </div>
         </section>
 
         <section className="h-3/5 w-full bg-gray-300 mt-5 rounded-lg flex gap-10 px-10 py-5 justify-between">
-          <div className="h-full w-60 bg-violet-300 rounded-md overflow-hidden">
+          <div className="h-full w-60 bg-gray-300  rounded-md overflow-hidden">
             <img
               src={files[0].signedUrl} // Certificate Image
               alt="Certificate"
               className="h-full w-full object-cover"
             />
           </div>
-          <div className="h-full w-60 bg-violet-300 rounded-md overflow-hidden">
+          <div className="h-full w-60 bg-gray-300  rounded-md overflow-hidden">
             <img
               src={files?.[1]?.signedUrl} // Qualification Image
               alt="Qualification"
               className="h-full w-full object-cover"
             />
           </div>
-          <div className="h-full w-60 bg-violet-300 rounded-md overflow-hidden">
+          <div className="h-full w-60 bg-gray-300  rounded-md overflow-hidden">
             <img
               src={files?.[2]?.signedUrl} // Aadhaar Front Image
               alt="Aadhaar Front"
               className="h-full w-full object-cover"
             />
           </div>
-          <div className="h-full w-60 bg-violet-300 rounded-md overflow-hidden">
+          <div className="h-full w-60 bg-gray-300  rounded-md overflow-hidden">
             <img
               src={files?.[3]?.signedUrl} // Aadhaar Back Image
               alt="Aadhaar Back"
@@ -104,13 +126,13 @@ function ApplicationDetails() {
 
         <div className="flex justify-end gap-5 pr-10 pt-4">
           <button
-            className="w-40 h-12 bg-green-600 rounded-lg"
+            className="w-40 h-12 bg-green-500 rounded-lg text-white"
             onClick={handleApprove}
           >
             Accept
           </button>
           <button
-            className="w-40 h-12 bg-red-600 rounded-lg"
+            className="w-40 h-12 bg-red-500 rounded-lg text-white"
             onClick={handleReject}
           >
             Reject

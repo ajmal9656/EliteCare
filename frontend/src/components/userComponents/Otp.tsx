@@ -108,7 +108,7 @@ function OtpPage() {
     return (
         <div className="relative bg-center  mt-0 min-h-screen">
         <div className='absolute -z-10 h-full overflow-hidden '>
-          <div className='absolute bg-[#833a3a1f] w-full h-full' ></div>
+          <div className='absolute bg-[#c8ebc51f] w-full h-full' ></div>
           <img src={image} alt="" className='w-screen object-contain' />
         </div>
         <section className="flex flex-row justify-center items-end py-10  " >
@@ -137,7 +137,7 @@ function OtpPage() {
   <div className="flex justify-center">
     <button
       type="submit"
-      className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-[160px]"
+      className="text-white bg-backgroundColor hover:bg-green-300 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-backgroundColor dark:hover:bg-[#4ca992] w-[160px]"
     >
       {buttonText}
     </button>

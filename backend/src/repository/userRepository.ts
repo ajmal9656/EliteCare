@@ -3,6 +3,10 @@ import { userType } from "../interface/interface";
 import { Document } from "mongoose";
 import specializationModel from "../model/SpecializationModel";
 import doctorModel from "../model/doctorModel";
+import mongoose from "mongoose";
+
+
+const ObjectId = mongoose.Types.ObjectId;
 
 
 export class userRepository {
@@ -79,18 +83,34 @@ export class userRepository {
             throw new Error(error.message);
         }
     }
-    async getAllDoctorsWithSpecialization(specializationId:string){
+    async getAllDoctorsWithSpecialization(specializationId: string) {
         try {
+            console.log(specializationId)
+          const doctors = await doctorModel
+            .find(
+              { department: new ObjectId(specializationId), isBlocked: false },
+              {
+                name: 1,
+                _id: 1,
+                doctorId: 1,
+                email: 1,
+                department: 1,
+                fees: 1,
+                image: 1,
+              }
+            )
+            .populate('department','name').lean() 
+
+        console.log(specializationId, "dd");
+        
+
             
-            const doctors = await doctorModel.find({department:specializationId,isBlocked:false})
-    
-           
-    
-            
-            return doctors
+      
+          return doctors;
         } catch (error: any) {
-            console.error("Error getting specialization:", error.message);
-            throw new Error(error.message);
+          console.error("Error getting doctors with specialization:", error.message);
+          throw new Error(`Failed to fetch doctors for specialization ${specializationId}: ${error.message}`);
         }
-    }
+      }
+      
 }

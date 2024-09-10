@@ -1,4 +1,4 @@
-import { Document, model, Schema } from "mongoose";
+import mongoose, { Document, model, Schema } from "mongoose";
 
 // Define the enum for KYC status
 enum KYCStatus {
@@ -20,7 +20,7 @@ interface IDoctor extends Document {
   phone: string;
   password: string;
   DOB: Date;
-  department: string;
+  department: mongoose.Types.ObjectId;
   gender: string;
   image: ImageField;
   fees: number;
@@ -76,7 +76,9 @@ const doctorSchema = new Schema<IDoctor>({
     type: Date,
   },
   department: {
-    type: String,
+    type: Schema.Types.ObjectId,  // Updated to reference the Department model
+    ref: 'Specialization', // Ensure this matches the Department model name
+    
   },
   gender: {
     type: String,

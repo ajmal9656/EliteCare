@@ -7,7 +7,7 @@ import Header from '../../components/common/userCommon/Header';
 function Login() {
   return (
     <div>
-     <Header/>
+     
       <LoginComp/>
     </div>
   )

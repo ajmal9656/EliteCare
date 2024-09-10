@@ -19,7 +19,7 @@ function doctorRoutes() {
       <Route path="/signup" element={<SignupPage/>} />
       <Route path="/otp" element={<OTPForm/>} />
       <Route path="/login" element={<Login/>} />
-      <Route path="/home" element={<DoctorProtectedRoute><DoctorHomePage /></DoctorProtectedRoute>} />
+      <Route path="/" element={<DoctorProtectedRoute><DoctorHomePage /></DoctorProtectedRoute>} />
       <Route path="/dashboard" element={<DashboardPage/>} />
       <Route path="/doctorsList" element={<DoctorsListpage/>} />
       <Route path="/verificationProcessing" element={<VerificationProcessingPage/>} />

@@ -26,7 +26,7 @@ interface IDoctorApplication extends Document {
   doctorId: mongoose.Types.ObjectId;
   name: string;
   DOB: Date;
-  department: string;
+  department: mongoose.Types.ObjectId; // Updated to ObjectId
   gender: string;
   image: IImage;
   fees: number;
@@ -57,12 +57,13 @@ const doctorApplicationSchema = new Schema<IDoctorApplication>({
     type: String,
     required: true,
   },
- 
   DOB: {
     type: Date,
   },
   department: {
-    type: String,
+    type: Schema.Types.ObjectId,  // Updated to reference the Department model
+    ref: 'Specialization', // Ensure this matches the Department model name
+    required: true,
   },
   gender: {
     type: String,

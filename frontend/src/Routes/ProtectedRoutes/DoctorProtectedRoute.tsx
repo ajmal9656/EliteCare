@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import DoctorVerifivationForm from '../../components/doctorComponents/DoctorVerifivationForm';
 import VerificationProcessingPage from '../../pages/doctorPages/VerificationProcessingPage';
 import RejectionApplicationPage from '../../pages/doctorPages/RejectionApplicationPage';
+import { useNavigate } from 'react-router-dom';
 
 
 interface DoctorProtectedRouteProps {
@@ -10,16 +11,16 @@ interface DoctorProtectedRouteProps {
 }
 
 function  DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
+  const navigate = useNavigate()
   const DoctorData = useSelector((state: RootState) => state.doctor);
 
   console.log("DoctorData:", DoctorData);
   
 
-  if (DoctorData.docStatus === "pending") {
-    return (
-      <DoctorVerifivationForm/>
-        
-    );
+  if (DoctorData.doctorInfo===null) {
+    navigate("/doctor/login")
+
+    
   } else if (DoctorData.docStatus === "submitted") {
     return <VerificationProcessingPage/>
    
@@ -29,7 +30,14 @@ function  DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
     
     return <RejectionApplicationPage reason={reason}  />
    
-  } else {
+  } else if(DoctorData.docStatus === "pending") {
+    return (
+      <DoctorVerifivationForm/>
+        
+    );
+    
+    
+  }else{
     return (
       
       <>{children}</>

@@ -1,4 +1,4 @@
-
+import mongoose from "mongoose";
 export interface Doctor {
     doctorId: string;
     name: string;
@@ -67,6 +67,31 @@ export interface Specializations {
       adharNumber: number;
     };
     createdAt: Date;
+  }
+
+
+  interface IImage {
+    type: string;
+    url: string;
+    _id: mongoose.Types.ObjectId;
+  }
+  interface dept{
+    name:string
+    _id: mongoose.Types.ObjectId;
+  }
+  
+
+ 
+  export interface DoctorDataWithSpecialization {
+    _id: string;
+    doctorId: string;
+    name: string;
+    email: string;
+    department: dept; 
+    fees: number;
+    image: IImage; 
+    signedImageUrl:string
+   
   }
   
 

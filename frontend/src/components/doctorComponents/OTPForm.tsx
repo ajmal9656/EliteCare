@@ -118,13 +118,13 @@ function OTPForm() {
           <div className="mt-4 flex flex-col items-center">
             <button 
               type="submit" 
-              className="w-48 py-3 text-center text-white bg-teal-500 border border-teal-500 rounded hover:bg-transparent hover:text-teal-500 transition uppercase font-medium"
+              className="w-48 block py-2 text-center text-white bg-gradient-to-l from-cyan-500 to-blue-500 border  rounded hover:bg-blue-400  transition uppercase font-roboto font-medium"
             >
               {buttonText}
             </button>
             <div className="text-gray-600 mt-4">
               {timer > 0 ? (
-                <>Resend OTP in <span className="text-teal-500">{timer}s</span></>
+                <>Resend OTP in <span className="text-blue-400">{timer}s</span></>
               ) : (
                 "OTP expired"
               )}
