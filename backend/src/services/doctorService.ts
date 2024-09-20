@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import sendMail from "../config/emailConfig";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
-import { doctorType ,DoctorData,DoctorFiles,docDetails} from '../interface/doctorInterface/doctorInterface';
+import { doctorType ,DoctorData,DoctorFiles,docDetails,TimeSlot} from '../interface/doctorInterface/doctorInterface';
 import { S3Service } from '../config/s3client';
 
 
@@ -248,7 +248,7 @@ export class doctorService{
                 const doctorInfo = {
                     name: doctorData.name,
                     email: doctorData.email,
-                    doctorId: doctorData.doctorId,
+                    doctorId: doctorData._id,
                     phone: doctorData.phone,
                     isBlocked: doctorData.isBlocked,
                     docStatus: doctorData.kycStatus,
@@ -343,6 +343,81 @@ if (files.qualificationImage) {
             throw new Error(error.message);
         }
     }
-
+    async createSlot(data: TimeSlot) {
+        try {
+            
+            const response = await this.doctorRepository.createSlot(data);
+    
+           
+            if (response) {
+                return response;
+            } else {
+                throw new Error('Failed to create slot. No response received.');
+            }
+        } catch (error: any) {
+            
+            console.error("Service error:", error.message);
+            throw new Error(error.message);
+        }
+    }
+    async getSlots(date: string, doctorId: string) {
+        try {
+            // Assuming doctorRepository is correctly handling the date and doctorId
+            const response = await this.doctorRepository.getSlots(date, doctorId);
+      
+            if (response) {
+                return response;
+            } else {
+                throw new Error('Failed to retrieve slot. No response received.');
+            }
+        } catch (error: any) {
+            console.error("Service error:", error.message);
+            throw new Error(error.message);
+        }
+      }
+    async checkAvailability(date: string, doctorId: string,start:string,end:string) {
+        try {
+            // Assuming doctorRepository is correctly handling the date and doctorId
+            const response = await this.doctorRepository.checkSlots(date, doctorId,start,end);
+      
+            if (response) {
+                return response;
+            } else {
+                return false;
+            }
+        } catch (error: any) {
+            console.error("Service error:", error.message);
+            throw new Error(error.message);
+        }
+      }
+      async deleteSlot(date: Date, doctorId: string, slotId: string) {
+        try {
+            // Log the input parameters for better traceability
+            console.log("Deleting slot with parameters:", { date, doctorId, slotId });
+    
+            const response = await this.doctorRepository.deleteTimeSlot(date, doctorId, slotId);
+    
+            // Check if the response is valid
+            if (response) {
+                return response;
+            } else {
+                throw new Error('Failed to delete slot. No response received from the repository.');
+            }
+        } catch (error: any) {
+            // Log the error with more context
+            console.error("Service error during slot deletion:", {
+                message: error.message,
+                date,
+                doctorId,
+                slotId
+            });
+            
+            // Rethrow the error with additional context
+            throw new Error(`Error deleting slot: ${error.message}`);
+        }
+    }
+    
+      
+    
 
 }

@@ -5,8 +5,9 @@ import Login from '../pages/doctorPages/Login';
 import DoctorProtectedRoute from './ProtectedRoutes/DoctorProtectedRoute';
 import DoctorHomePage from '../pages/doctorPages/DoctorHomePage';
 import DashboardPage from '../pages/doctorPages/DashboardPage';
-import DoctorsListpage from '../pages/doctorPages/DoctorsListpage';
 import VerificationProcessingPage from '../pages/doctorPages/VerificationProcessingPage';
+import DoctorLayout from '../pages/doctorPages/DoctorLayout';
+import SlotManagementPage from '../pages/doctorPages/SlotManagementPage';
 
 
 
@@ -20,9 +21,15 @@ function doctorRoutes() {
       <Route path="/otp" element={<OTPForm/>} />
       <Route path="/login" element={<Login/>} />
       <Route path="/" element={<DoctorProtectedRoute><DoctorHomePage /></DoctorProtectedRoute>} />
-      <Route path="/dashboard" element={<DashboardPage/>} />
-      <Route path="/doctorsList" element={<DoctorsListpage/>} />
+      
       <Route path="/verificationProcessing" element={<VerificationProcessingPage/>} />
+      <Route path='/' element={<DoctorLayout/>}>
+                   <Route index path="dashboard" element={<DashboardPage/>} />
+                   <Route  path="slotManagement" element={<SlotManagementPage/>} />
+                  
+                   
+                   
+            </Route>
       
       
       

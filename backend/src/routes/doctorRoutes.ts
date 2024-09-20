@@ -30,8 +30,10 @@ route.post('/signUp', doctorControllerInstance.createDoctor.bind(doctorControlle
 route.post('/verifyOtp', doctorControllerInstance.verifyOtp.bind(doctorControllerInstance));
 route.post('/resendOtp', doctorControllerInstance.resendOtp.bind(doctorControllerInstance));
 route.post('/login', doctorControllerInstance.loginDoctor.bind(doctorControllerInstance));
-
-// Use the uploadDoctorDataFiles middleware for handling file uploads
 route.post('/uploadDoctorData', uploadDoctorDataFiles, doctorControllerInstance.uploadDoctorData.bind(doctorControllerInstance));
+route.post('/createSlot', doctorControllerInstance.createTimeSlot.bind(doctorControllerInstance));
+route.get('/getSlots', doctorControllerInstance.getTimeSlot.bind(doctorControllerInstance));
+route.post('/checkSlotAvailability', doctorControllerInstance.checkSlotAvailability.bind(doctorControllerInstance));
+route.delete('/deleteSlot', doctorControllerInstance.deleteSlot.bind(doctorControllerInstance));
 
 export default route;

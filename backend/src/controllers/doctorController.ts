@@ -4,6 +4,7 @@ import { S3Service } from "../config/s3client";
 import { Request, Response } from "express";
 
 
+
 export class doctorController {
     private doctorService: doctorService;
     
@@ -44,15 +45,15 @@ export class doctorController {
 
       async verifyOtp(req: Request, res: Response): Promise<void> {
         try {
-            console.log("verifyController")
+            
           
           const token = req.headers.authorization?.split(" ")[1];
-          console.log(token)
+          
           if (!token) {
             res.status(401).json({ message: "No token provided" });
             return;
           }
-          console.log("token",token)
+          
     
           
           const doctorOtp: string = req.body.otp;
@@ -67,17 +68,17 @@ export class doctorController {
           const response = await this.doctorService.otpCheck(doctorOtp, token);
           if (response.valid) {
     
-            console.log("trueeeeeee")
+           
     
             res.status(200).json({ status: true, message: "OTP verified successfully" });
           } else {
             res.status(400).json({ status: false, message: "Invalid OTP" });
           }
         } catch (error: any) {
-            console.log("kkkk",error);
+            
             
           if (error.message === "Invalid OTP") {
-            console.log("errorotp")
+          
             res.status(400).json({ message: "Invalid OTP" });
           } else if (error.message === "OTP has expired") {
             res.status(400).json({ message: "OTP has expired" });
@@ -93,29 +94,29 @@ export class doctorController {
 
       async loginDoctor(req: Request, res: Response): Promise<void> {
         try {
-          console.log("login userController");
+          
           
     
           const {email,password} = req.body;
     
           const loginResponse = await this.doctorService.verifyDoctor(email,password)
-          console.log("controller res",loginResponse)
+          
           
           const response = {
             accessToken:loginResponse.accessToken,
             doctorInfo:loginResponse.doctorInfo
           }
-          console.log(res);
+         
           
           res.cookie('refreshToken', loginResponse.refreshToken, {
             httpOnly: true,  
             maxAge: 7 * 24 * 60 * 60 * 1000,  
           });
-          console.log("logindata",response)
+         
           res.status(200).json({ message: "Login successful", response});
             
         } catch (error: any) {
-          console.log("controller error")
+         
           if(error.message==="Doctor Doesn't exist"){
             res.status(400).json({ message: "Doctor Doesn't exist" });
     
@@ -134,10 +135,10 @@ export class doctorController {
 
       async resendOtp(req: Request, res: Response): Promise<void> {
         try {
-            console.log("resendControl")
+            
           
           const token = req.headers.authorization?.split(" ")[1];
-          console.log("tokennn",token)
+         
           if (!token) {
             res.status(401).json({ message: "No token provided" });
             return;
@@ -149,14 +150,13 @@ export class doctorController {
           const response = await this.doctorService.resendOtpCheck(token);
           if (response) {
     
-            console.log("teeerurrrrr")
+            
     
             res.status(200).json({ status: true, message: "OTP Resended successfully",response });
           } else {
             res.status(400).json({ status: false, message: "something wnt wrong" });
           }
         } catch (error: any) {
-            console.log("kkkk",error);
             
             if (error.message === "Otp not send") {
               res.status(500).json({ message: "OTP not sent" });
@@ -167,9 +167,7 @@ export class doctorController {
       }
       async uploadDoctorData(req: Request, res: Response): Promise<void> {
         try {
-            console.log("Control")
-          console.log(req.body)
-          console.log(req.files);
+           
 
     
           
@@ -178,14 +176,14 @@ export class doctorController {
           const response = await this.doctorService.uploadData(req.body,req.files as DoctorFiles);
           if (response) {
     
-            console.log("teeerurrrrr")
+           
     
             res.status(200).json({ status: true, message: "Application Submitted"});
           } else {
             res.status(400).json({ status: false, message: "something wnt wrong" });
           }
         } catch (error: any) {
-            console.log("kkkk",error);
+            
             
             if (error.message === "Otp not send") {
               res.status(500).json({ message: "OTP not sent" });
@@ -194,4 +192,122 @@ export class doctorController {
           }
         }
       }
+      async createTimeSlot(req: Request, res: Response): Promise<void> {
+        try {
+            // Log incoming request data for debugging
+            console.log("Control");
+            console.log("Form data:", req.body);
+
+            // Call the service layer to create the slot
+            const response = await this.doctorService.createSlot(req.body);
+
+            // Send success response
+            res.status(200).json({ status: true, message: "Slot created successfully", data: response });
+        } catch (error: any) {
+            // Log the error for debugging
+           
+
+            // Handle different types of errors
+            if (error.message === "Failed to create slot. No response received.") {
+                res.status(500).json({ message: "Failed to create slot. No response received." });
+            } else {
+                res.status(500).json({ message: "Something went wrong, please try again later" });
+            }
+        }
+    }
+    async getTimeSlot(req: Request, res: Response): Promise<void> {
+      try {
+         
+    
+          // Access query parameters (they come as strings, so convert if necessary)
+          const { date, doctorId } = req.query;
+          console.log("date",date)
+          
+          if (!date || !doctorId) {
+              res.status(400).json({ message: "Missing required query parameters: date or doctorId" });
+          }
+    
+          // Call the service with query parameters
+          const response = await this.doctorService.getSlots(date as string, doctorId as string);
+          
+    
+          // Send success response
+          res.status(200).json({ status: true, message: "Slot retrieved successfully", data: response });
+      } catch (error: any) {
+          
+    
+          res.status(500).json({ message: "Something went wrong, please try again later" });
+      }
+    }
+    async checkSlotAvailability(req: Request, res: Response): Promise<void> {
+      try {
+         
+    
+          // Access query parameters (they come as strings, so convert if necessary)
+          const { date, doctorId,start,end } = req.body;
+          console.log("dates",date)
+          console.log("d",doctorId)
+          console.log("s",start)
+          console.log("e",end)
+          
+          if (!date || !doctorId) {
+              res.status(400).json({ message: "Missing required query parameters: date or doctorId" });
+          }
+    
+          // Call the service with query parameters
+          const response = await this.doctorService.checkAvailability(date as string, doctorId as string,start as string,end as string);
+          
+    console.log(response)
+          // Send success response
+          res.status(200).json({ status: true, message: "Slot retrieved successfully", data: response });
+      } catch (error: any) {
+          
+    
+          res.status(500).json({ message: "Something went wrong, please try again later" });
+      }
+    }
+    async deleteSlot(req: Request, res: Response): Promise<void> {
+      try {
+        const { slotId, date, doctorId } = req.query;
+    
+        // Log the incoming query parameters
+        console.log("Date:", date);
+        console.log("Doctor ID:", doctorId);
+        console.log("Slot ID:", slotId);
+    
+        // Validate query parameters
+        if (!date || !doctorId || !slotId) {
+           res.status(400).json({
+            message: "Missing required query parameters: date, doctorId, or slotId"
+          });
+        }
+    
+        // Optional: Convert `date` to a Date object (if required by your service logic)
+        const parsedDate = new Date(date as string);
+        console.log("Date:", parsedDate);
+    
+        // Call the service with validated query parameters
+        const response = await this.doctorService.deleteSlot(parsedDate as Date, doctorId as string, slotId as string);
+    
+        console.log("Service response:", response);
+    
+        // Send success response
+        res.status(200).json({ 
+          status: true, 
+          message: "Slot deleted successfully", 
+          data: response 
+        });
+      } catch (error: any) {
+        // Log the error for debugging
+        console.error("Error deleting slot:", error.message);
+    
+        // Send generic error response
+        res.status(500).json({
+          message: "Something went wrong, please try again later"
+        });
+      }
+    }
+    
+    
+  
 }

@@ -5,7 +5,7 @@ import OTPForm from '../../components/doctorComponents/OTPForm';
 function OtpPage() {
   return (
     <div>
-      
+        
         <OTPForm/>
       
     </div>

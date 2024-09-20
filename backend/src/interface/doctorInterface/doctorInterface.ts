@@ -77,3 +77,14 @@ export interface DoctorState {
     };
 
   }
+
+  interface Time{
+    start:string,
+    end:string
+  }
+
+  export interface TimeSlot{
+    selectedDate:string,
+    selectedSlots:Time[],
+    doctorId:string
+  }
