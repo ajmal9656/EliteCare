@@ -155,7 +155,7 @@ function Sidebar() {
   </li>
   <li>
     <NavLink
-      to="/inbox"
+      to="/doctor/slotManagement"
       className={({ isActive }) =>
         `flex items-center p-2 rounded-lg group ${
           isActive
@@ -173,7 +173,7 @@ function Sidebar() {
       >
         <path d="M17.618 4.078 10 .335a2.015 2.015 0 0 0-1.968 0L.618 4.078A1.969 1.969 0 0 0 0 5.82v6.36a1.969 1.969 0 0 0 .618 1.742l7.414 4.035a2.015 2.015 0 0 0 1.968 0l7.414-4.035A1.969 1.969 0 0 0 18 12.179V5.82a1.969 1.969 0 0 0-.382-1.742ZM9 14a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm7-7h-4a.5.5 0 1 1 0-1h4a.5.5 0 0 1 0 1Z" />
       </svg>
-      <span className="flex-1 ms-3 whitespace-nowrap">Users</span>
+      <span className="flex-1 ms-3 whitespace-nowrap">Slot Management</span>
     </NavLink>
   </li>
   <li>

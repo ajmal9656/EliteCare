@@ -109,14 +109,14 @@ const Doctors: React.FC = () => {
         <Slider ref={slider} {...settings}>
           {data.map((e, index) => (
             <div
-              className="h-[350px] text-black rounded-xl shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] mb-2 cursor-pointer"
+              className="h-[390px]  text-black rounded-xl shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] mb-2 cursor-pointer"
               key={index}
             >
               <div>
                 <img
                   src={e.img}
                   alt="img"
-                  className=" h-56 rounded-t-xl w-full"
+                  className=" h-64 rounded-t-xl w-full"
                 />
               </div>
 

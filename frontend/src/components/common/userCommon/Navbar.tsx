@@ -46,6 +46,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="services"
+              href="#services"
               spy={true}
               smooth={true}
               duration={500}
