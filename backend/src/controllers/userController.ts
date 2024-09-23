@@ -210,4 +210,58 @@ export class userController {
         }
     }
 }
+async getDoctorSlots(req: Request, res: Response): Promise<void> {
+  try {
+      console.log("Entering getDoctorSlots method in adminController");
+
+      const { date, doctorId } = req.query;
+
+      // Check if both date and doctorId are provided
+      if (!date || !doctorId) {
+          res.status(400).json({ message: "Date and doctorId are required." });
+      }
+
+      console.log("Received date:", date);
+      console.log("Received doctorId:", doctorId);
+
+      // Fetch the slots from the service
+      const response = await this.userService.getSlots(date as string, doctorId as string);
+
+      // Send a success response
+      res.status(200).json({ message: "Doctor slots fetched successfully", response });
+      
+  } catch (error: any) {
+      console.error("Error in getDoctorSlots controller:", error.message);
+
+      // Handle specific error messages if necessary
+      if (error.message.includes("something went wrong")) {
+          res.status(400).json({ message: "Error fetching doctor slots." });
+      } else {
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+  }
+}
+async updateUserProfile(req: Request, res: Response): Promise<void> {
+  try {
+    // Extract the user data from the request body
+    const { _id, name, DOB, address } = req.body;
+
+    // Pass the data to the service to update the profile
+    const response = await this.userService.updateProfile(_id, { name, DOB, address });
+
+    // Send a success response
+    res.status(200).json({ message: "Profile updated successfully", response });
+  } catch (error: any) {
+    console.error("Error updating profile:", error.message);
+
+    // Handle specific error messages if necessary
+    if (error.message.includes("something went wrong")) {
+      res.status(400).json({ message: "Error updating profile." });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+
+
 }

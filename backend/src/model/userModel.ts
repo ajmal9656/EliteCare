@@ -8,7 +8,7 @@ interface Iuser extends Document{
    phone: string;
    password: string;
    DOB:Date;
-   gender:string;
+   address:string;
    image:string
    createdAt: Date;
    lastLogin: Date;
@@ -49,13 +49,16 @@ const userSchema = new Schema<Iuser>({
          type: Date 
       },
       DOB: {
-        type: Date 
+        type: Date ,
+        default: null
      },
-      gender: {
-        type: String 
+      address: {
+        type: String ,
+        default: null
      },
       image: {
-        type: String 
+        type: String ,
+        default:null
      },
      
       referral: {

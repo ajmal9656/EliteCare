@@ -20,6 +20,8 @@ route.post('/login',userControllerInstance.loginUser.bind(userControllerInstance
 route.post('/resendOtp',userControllerInstance.resendOtp.bind(userControllerInstance));
 route.get('/getSpecializations',userControllerInstance.getSpecializations.bind(userControllerInstance));
 route.get('/getDoctorsWithSpecialization/:specializationId',userControllerInstance.getDoctorsWithSpecialization.bind(userControllerInstance));
+route.get('/getSlots',userControllerInstance.getDoctorSlots.bind(userControllerInstance));
+route.put('/updateUser',userControllerInstance.updateUserProfile.bind(userControllerInstance));
 
 
 export default route

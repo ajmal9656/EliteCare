@@ -92,6 +92,8 @@ function SlotManagement() {
         };
 
         await axiosUrl.post('/doctor/createSlot', formData);
+        
+    fetchSlotsForDate(selectedDateUTC);
         toggleAddSlotModal();
       } catch (error) {
         console.error('Error submitting form:', error);

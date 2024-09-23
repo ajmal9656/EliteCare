@@ -1,4 +1,5 @@
 
+import { UpdateUserProfilePayload } from '../../interfaces/userInterface';
 import axiosUrl from '../../utils/axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
@@ -119,3 +120,30 @@ export const resendOtp = ():any =>{
     }
 
 }
+
+export const updateUserProfile = createAsyncThunk(
+    'user/updateUserProfile',
+    async ({ _id, name, dob, address }: UpdateUserProfilePayload, { rejectWithValue }) => {
+      try {
+        const response = await axiosUrl.put('/updateUser', {
+          _id,
+          name,
+          DOB:dob,
+          address,
+        });
+  
+        console.log("Thunkkkk response:", response.data.response);
+        return response.data.response; // Adjust according to your API response structure
+      } catch (error: any) {
+        if (error.response) {
+          const errorMessage = error.response.data.message || 'Update failed';
+          console.log("Error response:", errorMessage);
+          return rejectWithValue(errorMessage);
+        } else if (error.request) {
+          return rejectWithValue('No response from server.');
+        } else {
+          return rejectWithValue(error.message || 'Update failed');
+        }
+      }
+    }
+  );

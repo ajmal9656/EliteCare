@@ -1,5 +1,5 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-import { login } from "../Action/userActions";
+import { login, updateUserProfile } from "../Action/userActions";
 import { User,UserState } from "../../interfaces/userInterface";
 
 
@@ -36,8 +36,24 @@ const userSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
             state.loading = false;
             state.error = (action.payload as string) || 'Login failed';
-          })
+        }).addCase(updateUserProfile.pending,(state)=>{
+            state.loading =true;
+            state.error = null
+            
+        })
+        .addCase(updateUserProfile.fulfilled,(state,action:PayloadAction<{ accessToken: string; userInfo: User }>)=>{
+        const { userInfo } = action.payload;
+        state.userInfo = userInfo;  
+        state.loading = false;
 
+        
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+        })
+        .addCase(updateUserProfile.rejected, (state, action) => {
+            state.loading = false;
+            state.error = (action.payload as string) || 'Login failed';
+        })
     }
 })
 

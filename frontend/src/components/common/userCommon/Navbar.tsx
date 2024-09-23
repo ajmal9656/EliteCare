@@ -5,7 +5,7 @@ import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 
 const Navbar = () => {
   const [menu, setMenu] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+
 
   const handleChange = () => {
     setMenu(!menu);
@@ -16,7 +16,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className=" fixed w-screen z-10 text-white">
+    <div className=" fixed w-screen z-20 text-white ">
       <div>
         <div className=" flex flex-row justify-between p-5 md:px-32 px-5 bg-backgroundColor shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
           <div className=" flex flex-row items-center cursor-pointer">
@@ -77,7 +77,7 @@ const Navbar = () => {
           {/* Profile Link using React Router */}
           <div className="hidden lg:flex">
             <RouterLink
-              to="/profile"
+              to="/userProfile/profile"
               className="bg-brightColor text-white px-4 py-2 rounded-md hover:bg-hoverColor transition duration-300 ease-in-out"
             >
               Profile
@@ -150,13 +150,14 @@ const Navbar = () => {
           </Link>
 
           {/* Profile Link for small screens */}
-          <RouterLink
-            to="/profile"
-            className="bg-brightColor text-white px-4 py-2 rounded-md hover:bg-hoverColor transition duration-300 ease-in-out"
-            onClick={closeMenu} // Close the menu on click
-          >
-            Profile
-          </RouterLink>
+          <Link
+  to="/userProfile/profile"
+  className="bg-brightColor text-white px-4 py-2 rounded-md hover:bg-hoverColor transition duration-300 ease-in-out"
+  onClick={closeMenu} // Close the menu on click
+>
+  Profile
+</Link>
+
         </div>
       </div>
     </div>

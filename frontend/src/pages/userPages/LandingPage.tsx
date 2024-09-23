@@ -11,13 +11,13 @@ import Footer from '../../components/common/userCommon/Footer';
 function LandingPage() {
   return (
     <>
-    <Navbar/>
+    
     <Home/>
     <About/>
     <Services/>
     <Doctors/>
     <Blogs/>
-    <Footer/>
+    
 
     
       

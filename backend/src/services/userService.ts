@@ -180,7 +180,12 @@ export class userService{
                     userId: userData.userId,
                     phone: userData.phone,
                     isBlocked: userData.isBlocked,
+                    DOB:userData.DOB,
+                    address:userData.address,
+                    image:userData.image,
+                    _id:userData._id
                 };
+                console.log("userr",userInfo)
                 
                 return {
                     userInfo,
@@ -328,6 +333,56 @@ export class userService{
                 throw new Error(`Unknown file type: ${fileType}`);
         }
     }
+
+    async getSlots(date: string, doctorId: string) {
+        try {
+            // Validate the inputs
+            if (!date || !doctorId) {
+                throw new Error("Date and doctorId must be provided.");
+            }
+    
+            const parsedDate = new Date(date);
+    
+            // Get the available slots from the repository
+            const availableSlots = await this.userRepository.getAllSlots(parsedDate, doctorId);
+    
+            // Return the available slots
+            return availableSlots;
+        } catch (error: any) {
+            console.error("Error in getSlots:", error.message);
+            throw new Error(`Failed to get slots: ${error.message}`);
+        }
+    }
+    
+    async updateProfile(_id: string, updateData: { name: string; DOB: Date; address: string }): Promise<any> {
+        try {
+            // Update the user profile in the repository
+            const updatedUser = await this.userRepository.updateProfile(_id, updateData);
+
+            const userInfo = {
+                name: updatedUser.name,
+                email: updatedUser.email,
+                userId: updatedUser.userId,
+                phone: updatedUser.phone,
+                isBlocked: updatedUser.isBlocked,
+                DOB:updatedUser.DOB,
+                address:updatedUser.address,
+                image:updatedUser.image,
+                _id:updatedUser._id
+            };
+    
+            // Return the updated user profile
+            return {userInfo};
+        } catch (error: any) {
+            console.error("Error in updateProfile:", error.message);
+            throw new Error(`Failed to update profile: ${error.message}`);
+        }
+    }
+    
+    
+    
+
+
     
 
 }
