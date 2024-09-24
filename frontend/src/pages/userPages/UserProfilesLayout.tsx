@@ -19,7 +19,7 @@ function UserProfilesLayout() {
   console.log("kjsvbkjsbvs")
   return (
     <div className="bg-gray-100 h-screen flex ">
-      <div className="w-[25%] h-screen pl-24 mt-10 ">
+      <div className="w-[25%] h-screen pl-20 mt-10 ">
       <div className="object-cover p-3 space-y-2 w-60 bg-white text-gray-100 border rounded-lg">
           <div className="flex items-center p-2 space-x-4">
             <img

@@ -54,7 +54,7 @@ function UserProfile() {
   const closeModal = () => setIsModalOpen(false);
 
   return (
-    <div className="w-[75%] h-screen mt-10 pr-10">
+    <div className="w-[75%] h-screen mt-10 pr-14">
       <div className="bg-white h-[88%] rounded-lg border flex flex-col">
         <div className="w-[100%] h-[25%] rounded-md border bg-gradient-to-r from-[#D2EFEA] to-[#ADE9DC] flex place-content-center">
           <div className="w-[15%] h-[165px] mt-16 relative flex">
