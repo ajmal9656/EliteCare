@@ -1,7 +1,7 @@
 import mongoose, { Types } from "mongoose";
 
 // Define the Slot interface
-interface Slot {
+export interface Slots {
   _id:string;
   start: Date;
   end: Date;
@@ -14,9 +14,10 @@ interface Slot {
 
 // Define the DoctorSlot interface
 export interface DoctorSlot {
+  
   doctorId: Types.ObjectId;
   date: Date;
-  slots: Slot[];
+  slots: Slots[];
   active: boolean;
   createdAt: Date;
   updatedAt: Date;

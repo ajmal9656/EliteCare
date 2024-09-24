@@ -1,13 +1,17 @@
 import userModel from "../model/userModel";
-import { userType } from "../interface/interface";
+import { userImage, userType } from "../interface/userInterface/interface";
 import { Document } from "mongoose";
 import specializationModel from "../model/SpecializationModel";
 import doctorModel from "../model/doctorModel";
 import mongoose from "mongoose";
 import doctorSlotsModel from "../model/doctorSlotModel";
+import { Slot } from "../interface/userInterface/interface";
+
 
 
 const ObjectId = mongoose.Types.ObjectId;
+
+
 
 
 export class userRepository {
@@ -166,6 +170,101 @@ export class userRepository {
             throw new Error(`Failed to update profile: ${error.message}`);
         }
     }
+    async uploadProfileImage(userID: string, imageData: userImage) {
+        try {
+            // Find the user by userID
+            const user = await userModel.findById(userID);
+            
+            if (!user) {
+                throw new Error('User not found');
+            }
+    
+            // Update the user's profile image data
+            user.image.url = imageData.profileUrl.url;
+            user.image.type = imageData.profileUrl.type
+    
+            // Save the updated user document
+            const updatedUser = await user.save();
+    
+            // Optionally, return the updated user data or a success message
+            return updatedUser;  // or return { message: 'Profile image updated successfully' };
+            
+        } catch (error: any) {
+            console.error("Repository error:", error.message);
+            throw new Error(error.message);  // Throw the error to be handled in the service layer
+        }
+    }
+    
+
+    async checkSlotAvailability(doctorId: string, slotId: Slot, date: string, userId: string) {
+        try {
+            console.log("Doctor ID:", doctorId);
+            console.log("Date:", new Date(date));
+            console.log("Slot ID:", slotId);
+            const slotID = slotId._id;
+    
+            // Find the doctor's slot information by doctorId and date
+            const doctorSlot = await doctorSlotsModel.findOne({
+                doctorId: new mongoose.Types.ObjectId(doctorId),
+                date: new Date(date)
+            });
+    
+            console.log("Doctor Slot:", doctorSlot);
+    
+            if (!doctorSlot) {
+                throw new Error('Slot not found or doctor does not exist.');
+            }
+    
+            // Check if the slots exist
+            if (doctorSlot.slots) {
+                for (const slot of doctorSlot.slots) {
+                    // Ensure slot._id exists before using it
+                    if (slot._id && slot._id.equals(new mongoose.Types.ObjectId(slotId._id))) {
+                        console.log("Found Slot:", slot);
+    
+                        if (!slot.locked) {
+                            // Get the current local time (in IST)
+                            const currentLocalTime = new Date(); // This gives the current local time
+                            
+    
+                            // Add 5 minutes to the local time
+                            const lockExpirationLocalTime = new Date(currentLocalTime.getTime() + 5 * 60 * 1000); // 5 minutes later
+                            
+    
+                            // Convert local time (IST) to UTC before storing
+                            const lockExpirationUTC = new Date(lockExpirationLocalTime.getTime() - (currentLocalTime.getTimezoneOffset() * 60000));
+                           
+    
+                            // Update the slot with locked status, lockedBy userId, and lock expiration
+                            slot.locked = true;
+                            slot.lockedBy = new mongoose.Types.ObjectId(userId);
+                            slot.lockExpiration = lockExpirationUTC; // Save the expiration in UTC
+    
+                            // Save the updated doctorSlot document
+                            await doctorSlot.save();
+    
+                            console.log(`Slot locked by user ${userId} until ${lockExpirationLocalTime} (Local Time)`);
+                            return true; // Slot locked successfully
+                        } else {
+                            console.log("Slot is already locked.");
+                            return false; // Slot is already locked
+                        }
+                    }
+                }
+            }
+    
+            // If no matching slot was found
+            throw new Error('Slot not found.');
+    
+        } catch (error: any) {
+            console.error("Repository error:", error.message);
+            throw new Error(error.message); // Throw the error to be handled in the service layer
+        }
+    }
+    
+    
+    
+    
     
     
       

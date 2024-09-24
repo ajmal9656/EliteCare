@@ -2,7 +2,7 @@
 import { userRepository } from "../repository/userRepository";
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from "uuid";
-import { userType } from "../interface/interface";
+import { FileData,  Slot,  userImage, userType } from "../interface/userInterface/interface";
 import sendMail from "../config/emailConfig";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
@@ -10,13 +10,14 @@ import { S3Service} from '../config/s3client';
 
 dotenv.config()
 
-
+const S3Services = new S3Service()
 export class userService{
    private S3Services = new S3Service()
    private userRepository: userRepository;
    private OTP: string | null = null;
    private expiryOTP_time: Date | null = null;
    private userData: userType | null = null;
+   
    
 
    constructor(userRepository: userRepository) {
@@ -158,6 +159,7 @@ export class userService{
         try {
             console.log("login userService");
             const userData = await this.userRepository.userCheck(email);
+            console.log("hh",userData)
             if (userData) {
                 const result = await bcrypt.compare(password, userData.password);
                 if (!result) {
@@ -173,6 +175,20 @@ export class userService{
                 const refreshToken = jwt.sign({ id: userData.userId, email: userData.email }, process.env.JWT_SECRET as string, {
                     expiresIn: "7d"
                 });
+                console.log("hh",userData)
+                if(userData.image.url!==''){
+                    console.log("jbcksc")
+                    
+                    const folderPath = this.getFolderPathByFileType(userData.image.type);
+                      const signedUrl = await this.S3Services.getFile(userData.image.url, folderPath);
+                      console.log("f",folderPath);
+                      console.log("s",signedUrl);
+                      
+    
+                      userData.image.url = signedUrl
+    
+                }
+                console.log("hhh",userData)
                 
                 const userInfo = {
                     name: userData.name,
@@ -323,11 +339,15 @@ export class userService{
       
 
      private getFolderPathByFileType(fileType: string): string {
+        console.log(fileType);
+        
         switch (fileType) {
             case 'profile image':
                 return 'eliteCare/doctorProfileImages';
             case 'document':
                 return 'eliteCare/doctorDocuments';
+            case 'user profile image':
+                return 'eliteCare/userProfileImages';
             
             default:
                 throw new Error(`Unknown file type: ${fileType}`);
@@ -359,6 +379,14 @@ export class userService{
             // Update the user profile in the repository
             const updatedUser = await this.userRepository.updateProfile(_id, updateData);
 
+            if(updatedUser.image!=null){
+                const folderPath = this.getFolderPathByFileType(updatedUser.image.type);
+                  const signedUrl = await this.S3Services.getFile(updatedUser.image.url, folderPath);
+
+                  updatedUser.image.url = signedUrl
+
+            }
+
             const userInfo = {
                 name: updatedUser.name,
                 email: updatedUser.email,
@@ -378,6 +406,79 @@ export class userService{
             throw new Error(`Failed to update profile: ${error.message}`);
         }
     }
+    async updateImage(userID:string,file:FileData) {
+        try {
+
+            const userProfileImage: userImage = {
+                profileUrl: {
+                    type:'',
+                    url:''
+                }
+            };
+            console.log(file)
+
+if (file) {
+    const profileUrl = await this.S3Services.uploadFile('eliteCare/userProfileImages/', file);
+    userProfileImage.profileUrl.url = profileUrl;
+    userProfileImage.profileUrl.type = "user profile image";
+}
+console.log("",userProfileImage)
+
+
+            
+
+            
+
+
+            const response = await this.userRepository.uploadProfileImage(userID,userProfileImage);
+            if (response) {
+                
+
+                const folderPath = this.getFolderPathByFileType(response.image.type);
+                  const signedUrl = await this.S3Services.getFile(response.image.url, folderPath);
+                  response.image.url = signedUrl
+                  const userInfo = {
+                    name: response.name,
+                    email: response.email,
+                    userId: response.userId,
+                    phone: response.phone,
+                    isBlocked: response.isBlocked,
+                    DOB:response.DOB,
+                    address:response.address,
+                    image:response.image,
+                    _id:response._id
+                };
+
+                  
+                  console.log("res",response)
+
+                  return {userInfo};
+                
+    
+                
+                
+                
+                
+                
+            } 
+        } catch (error: any) {
+            console.log("service error")
+            throw new Error(error.message);
+        }
+    }
+    async checkSlotLocked(doctorId: string, slotId: Slot,date:string,userId:string): Promise< boolean > {
+        try {
+          // Call userRepository to check the availability of the slot
+          const availability = await this.userRepository.checkSlotAvailability(doctorId, slotId,date,userId);
+      
+          return availability;
+      
+        } catch (error: any) {
+          console.error("Error in checkSlotLocked service:", error.message);
+          throw new Error(error.message);
+        }
+      }
+      
     
     
     

@@ -24,8 +24,8 @@ function UserProfilesLayout() {
           <div className="flex items-center p-2 space-x-4">
             <img
               src={
-                userData?.image
-                  ? userData.image
+                userData?.image?.url && userData.image.url !== ''
+                  ? userData.image.url
                   : "https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg"
               }
               alt=""

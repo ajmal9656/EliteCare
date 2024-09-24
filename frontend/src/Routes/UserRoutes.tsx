@@ -16,6 +16,7 @@ import TimeSlotsPage from '../pages/userPages/TimeSlotsPage';
 import UserProfilePage from '../components/userComponents/UserProfilePage';
 import UserProfilesLayout from '../pages/userPages/UserProfilesLayout';
 import SecurityPage from '../pages/userPages/SecurityPage';
+import AppoinmentPage from '../pages/userPages/AppoinmentPage';
 
 
 
@@ -37,6 +38,7 @@ function UserRoutes() {
                 <Route path='/doctorProfile' element={<DoctorProfileLayout/>} >
                     <Route path="profile" element={<DoctorProfilePage/>} />
                     <Route path="checkSlots" element={<TimeSlotsPage/>} />
+                    <Route path="appoinmentDetails" element={<AppoinmentPage/>} />
 
                 </Route>
                 

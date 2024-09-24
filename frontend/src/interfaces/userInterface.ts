@@ -1,3 +1,7 @@
+interface UserImage {
+  url: string;
+  type: string;
+}
 export interface User {
   _id:string;
     userId: string;
@@ -7,7 +11,7 @@ export interface User {
     isBlocked: boolean;
     address:string|null;
     DOB:Date|null;
-    image:string|null
+    image:UserImage
     
   
   }

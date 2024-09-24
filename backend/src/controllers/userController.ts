@@ -262,6 +262,67 @@ async updateUserProfile(req: Request, res: Response): Promise<void> {
     }
   }
 }
+async updateProfileImage(req: Request, res: Response): Promise<void> {
+  try {
+    // Check if the request has a file
+    if (!req.file) {
+      res.status(400).json({ message: "No image file provided." });
+      return;
+    }
+
+    // Extract user ID from the request (assuming it's sent in the request body)
+    const userId = req.body._id;
+    if (!userId) {
+      res.status(400).json({ message: "User ID is required." });
+      return;
+    }
+    console.log("file",req.file)
+
+    // Call the userService to update the image with the provided userId and file
+    const response = await this.userService.updateImage(userId, req.file);
+
+    // Send a success response
+    res.status(200).json({ message: "Profile image updated successfully" ,response});
+  } catch (error: any) {
+    console.error("Error updating profile:", error.message);
+
+    // Handle specific error messages if necessary
+    if (error.message.includes("something went wrong")) {
+      res.status(400).json({ message: "Error updating profile." });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+async checkSlotStatus(req: Request, res: Response): Promise<void> {
+  try {
+    const doctorId = req.body.doctorId;
+    const slotId = req.body.slotId;
+    const date = req.body.date
+    const userId = req.body.userId
+
+    // Call the userService to check if the slot is locked
+    const response = await this.userService.checkSlotLocked(doctorId, slotId,date,userId);
+
+    // Return a success response with the slot status
+    res.status(200).json({ 
+      message: "Slot status retrieved successfully", 
+      data: response 
+    });
+
+  } catch (error: any) {
+    console.error("Error checking slot status:", error.message);
+
+    // Handle specific error messages based on the logic
+    if (error.message.includes("Slot is locked")) {
+      res.status(400).json({ message: "The selected slot is already locked." });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+
+
 
 
 }

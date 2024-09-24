@@ -1,10 +1,9 @@
-import { useOutletContext } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useEffect, useState, forwardRef, Ref } from 'react';
 import DatePicker from 'react-datepicker';
 import { addDays } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 import { DoctorDataWithSpecialization } from '../../interfaces/doctorinterface';
-import { forwardRef, Ref } from 'react';
 import axiosUrl from '../../utils/axios';
 import Button from '../common/userCommon/Button';
 import { toast } from 'sonner';
@@ -21,15 +20,12 @@ interface Slot {
 
 function TimeSlots() {
   const { doctor } = useOutletContext<{ doctor: DoctorDataWithSpecialization }>();
-  
+  const navigate = useNavigate();
 
   const userData: User | null = useSelector((state: RootState) => state.user.userInfo);
 
-
-
-
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
   const [slots, setSlots] = useState<Slot[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [patientName, setPatientName] = useState<string>('');
@@ -43,6 +39,7 @@ function TimeSlots() {
   };
 
   const formatTimeRange = (start: string, end: string) => {
+    
     const formatTime = (date: string) => {
       const options: Intl.DateTimeFormatOptions = {
         hour: '2-digit',
@@ -50,12 +47,12 @@ function TimeSlots() {
         hour12: true,
         timeZone: 'UTC',
       };
+      
+      
       return new Date(date).toLocaleTimeString([], options);
     };
 
-    const startTime = formatTime(start);
-    const endTime = formatTime(end);
-    return `${startTime} to ${endTime}`;
+    return `${formatTime(start)} to ${formatTime(end)}`;
   };
 
   const sendDateToBackend = async (date: Date | null) => {
@@ -69,6 +66,7 @@ function TimeSlots() {
         },
       });
       setSlots(response.data.response);
+      setSelectedSlot(null); // Reset selected slot when slots change
     } catch (error) {
       console.error('Error sending date to backend:', error);
     }
@@ -79,7 +77,7 @@ function TimeSlots() {
       toast.error('Please select a slot');
       return;
     }
-    // Open modal when slot is selected
+    
     setIsModalOpen(true);
   };
 
@@ -88,61 +86,82 @@ function TimeSlots() {
       toast.error('Please fill all the fields');
       return;
     }
-  
+
     if (!selectedSlot || !selectedDate) {
       toast.error('Please select a slot and date');
       return;
     }
-  
+
     if (!userData) {
       toast.error('User not logged in');
-      return; // Prevent further execution if userData is null
+      return;
     }
-  
+
     try {
-      const formattedDate = formatDateForBackend(selectedDate); // Format date for backend;
-      
-      // Call the backend API to book the appointment
-      const response = await axiosUrl.post('/bookAppointment', {
-        patientName,
-        age,
-        description,
-        date: formattedDate, // send formatted date to backend
-        slotId: selectedSlot, // send selected time slot
-        doctorId: doctor._id,
-        userId: userData._id, // userData is checked to not be null here
+      const formattedDate = formatDateForBackend(selectedDate);
+      console.log("gggg",formattedDate)
+
+      const response = await axiosUrl.post('/checkSlotStatus', {
+        slotId: selectedSlot,   
+        doctorId: doctor._id ,
+        date:formattedDate ,
+        userId:userData._id  
       });
+      console.log("qqqqqq",response.data.data)
+      if(response.data.data){
+
+
+
+
+        const appointmentData = {
+          patientName,
+          age,
+          description,
+          date: formattedDate,
+          slotId: selectedSlot,
+          doctorId: doctor,
+          userId: userData._id,
+        };
   
-      if (response.status === 200) {
-        toast.success('Appointment booked successfully');
-        setIsModalOpen(false); // Close the modal after booking
-      } else {
-        toast.error('Failed to book appointment');
+        navigate('/doctorProfile/appoinmentDetails', { state: { appointmentData, doctor: doctor } });
+
+      }else{
+        toast.error("Slot is busy");
+        setIsModalOpen(false);
+
       }
+
+
+      
+    
     } catch (error) {
-      console.error('Error booking appointment:', error);
+      console.error('Error preparing appointment data:', error);
       toast.error('Something went wrong. Please try again.');
     }
   };
-  
 
   useEffect(() => {
     sendDateToBackend(selectedDate);
   }, [selectedDate]);
 
+  // Filter out slots that are less than 1 hour from the current UTC time
+  const currentDateTimeLocal = new Date();
+  const currentDateTimeUTC = new Date(currentDateTimeLocal.getTime() - (currentDateTimeLocal.getTimezoneOffset() * 60000));
+  const oneHourLaterUTC = new Date(currentDateTimeUTC.getTime() + 300);
+  const availableSlots = slots.filter(slot => new Date(slot.start) >= oneHourLaterUTC);
+
+  const selectedSlotDetails = slots.find(slot => slot._id === selectedSlot?._id);
+
   return (
-    <div className='w-[100%] h-[1000px] flex place-content-center'>
+    <div className='w-full h-[1000px] flex justify-center'>
       <div className='w-[70%] h-[400px] flex flex-col justify-center items-center'>
         <div className='w-[80%] h-[600px] bg-white mt-5 shadow-lg shadow-gray-200 flex flex-col'>
-          <div className='w-[100%] h-[90px] flex flex-row'>
+          <div className='w-full h-[90px] flex flex-row'>
             <div className='w-[50%] h-[90px]'></div>
-            <div className='w-[50%] h-[90px] flex items-center justify-end mr-16'>
+            <div className='w-[50%] h-[90px] flex items-center justify-end '>
               <DatePicker
                 selected={selectedDate}
-                onChange={(date) => {
-                  setSelectedDate(date);
-                  sendDateToBackend(date);
-                }}
+                onChange={(date) => setSelectedDate(date)}
                 minDate={new Date()}
                 maxDate={addDays(new Date(), 3)}
                 placeholderText="Select a date"
@@ -151,10 +170,10 @@ function TimeSlots() {
               />
             </div>
           </div>
-          <div className='flex flex-col w-[100%] h-[290px] ml-10'>
+          <div className='flex flex-col w-full h-[290px] ml-10'>
             <div className='w-[90%] h-[230px] grid grid-cols-3 grid-rows-3 gap-4 p-4'>
-              {slots.length > 0 ? (
-                slots.map(slot => (
+              {availableSlots.length > 0 ? (
+                availableSlots.map(slot => (
                   <label key={slot._id} className="flex items-center border-2 rounded-lg p-2 bg-backgroundColor text-white">
                     <input
                       type="radio"
@@ -162,7 +181,7 @@ function TimeSlots() {
                       value={slot._id}
                       className="mr-2"
                       disabled={!slot.availability}
-                      onChange={() => setSelectedSlot(slot._id)}
+                      onChange={() => setSelectedSlot(slot)}
                     />
                     <span className="flex-1">{formatTimeRange(slot.start, slot.end)}</span>
                   </label>
@@ -172,7 +191,7 @@ function TimeSlots() {
               )}
             </div>
             <div className='w-[90%] h-[60px] flex justify-center items-center'>
-              {slots.length > 0 && <Button title='Book Slot' onClick={handleClick} />}
+              {availableSlots.length > 0 && <Button title='Book Slot' onClick={handleClick} />}
             </div>
           </div>
         </div>
@@ -209,8 +228,27 @@ function TimeSlots() {
                 className="w-full p-2 border border-gray-300 rounded-lg"
               />
             </div>
+
+            {/* Show selected date and slot */}
+            {selectedDate && (
+              <div className="mb-4">
+                <p><strong>Selected Date:</strong> {selectedDate.toLocaleDateString()}</p>
+              </div>
+            )}
+            {selectedSlotDetails && (
+              <div className="mb-4">
+                <p><strong>Selected Slot:</strong> {formatTimeRange(selectedSlotDetails.start, selectedSlotDetails.end)}</p>
+              </div>
+            )}
+
             <div className="flex justify-end space-x-4">
-              <Button title='Cancel' onClick={() => setIsModalOpen(false)} />
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md"
+              >
+                Cancel
+              </button>
               <Button title='Book Appointment' onClick={handleBookAppointment} />
             </div>
           </div>
@@ -228,12 +266,12 @@ interface CustomInputProps {
 const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
   ({ value, onClick }, ref: Ref<HTMLInputElement>) => (
     <input
-      className="text-center px-4 py-2 border border-gray-400 rounded-md cursor-pointer w-[150px]"
-      value={value}
+      className="text-center px-3 py-2 rounded-md shadow-md border border-gray-300 focus:outline-none cursor-pointer w-[70%]"
       onClick={onClick}
+      ref={ref}
+      value={value || ''}
       readOnly
       placeholder="Select date"
-      ref={ref}
     />
   )
 );
