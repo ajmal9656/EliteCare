@@ -93,7 +93,8 @@ function TimeSlots() {
     }
 
     if (!userData) {
-      toast.error('User not logged in');
+      navigate("/login")
+      toast.error('Please login');
       return;
     }
 
@@ -118,12 +119,12 @@ function TimeSlots() {
           age,
           description,
           date: formattedDate,
-          slotId: selectedSlot,
-          doctorId: doctor,
+          slot: selectedSlot,
+          doctor: doctor,
           userId: userData._id,
         };
   
-        navigate('/doctorProfile/appoinmentDetails', { state: { appointmentData, doctor: doctor } });
+        navigate('/doctorProfile/appoinmentDetails', { state: {doctor, appointmentData} });
 
       }else{
         toast.error("Slot is busy");

@@ -19,7 +19,7 @@ function DoctorProfile() {
   return (
     <div className='w-[100%] h-[1000px] flex place-content-center'>
       <div className='w-[70%] h-[400px] flex flex-col justify-center items-center'>
-        <div className='w-[80%] h-[600px] pt-24 bg-white mt-5 shadow-lg shadow-gray-200'>
+        <div className='w-[80%] h-[600px] pt-16 bg-white mt-5 shadow-lg shadow-gray-200'>
           {/* Doctor's Name */}
           <div className='w-[100%] h-[45px] flex place-content-center items-center'>
             <h1 className='text-2xl font-semibold font-serif text-backgroundColor'>

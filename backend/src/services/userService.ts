@@ -7,6 +7,8 @@ import sendMail from "../config/emailConfig";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 import { S3Service} from '../config/s3client';
+import { Appointment } from "../interface/userInterface/interface";
+import makeThePayment from "../config/stripeConfig";
 
 dotenv.config()
 
@@ -79,7 +81,7 @@ export class userService{
         expiresIn:"1min"
 
      })
-     console.log("done",token )
+    
 
      return {token};
 
@@ -103,33 +105,33 @@ export class userService{
 
     async otpCheck(otp: string, token: string) {
         try {
-            console.log("hhhh")
+            
            
             const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
-            console.log("dec",decoded)
+            
 
             
             const tokenOTP = decoded.OTP;
             const expirationTime = new Date(decoded.expirationTime);
             const userData = decoded.userData
-            console.log(tokenOTP,expirationTime)
+            
             
 
             if(new Date() < expirationTime){
                 const result = await bcrypt.compare(otp, tokenOTP);
                 if(result){
                     await this.userRepository.createUser(userData)
-                    console.log("true")
+                    
 
                     return { valid: true };
 
                 }else{
-                    console.log("error")
+                    
                 throw new Error("Invalid OTP");
 
                 }
             }else{
-                console.log("skjgvjsk")
+               
                 throw new Error("OTP has expired");
 
             }
@@ -142,10 +144,10 @@ export class userService{
             
 
         } catch (error: any) {
-            console.log("errrrrrr",error);
+            
             
             if (error instanceof jwt.TokenExpiredError) {
-                console.log(error.message);
+                
                 
                 throw new Error("Token has expired");
             }
@@ -157,9 +159,9 @@ export class userService{
     }
     async verifyUser(email: string, password: string) {
         try {
-            console.log("login userService");
+            
             const userData = await this.userRepository.userCheck(email);
-            console.log("hh",userData)
+            
             if (userData) {
                 const result = await bcrypt.compare(password, userData.password);
                 if (!result) {
@@ -175,20 +177,19 @@ export class userService{
                 const refreshToken = jwt.sign({ id: userData.userId, email: userData.email }, process.env.JWT_SECRET as string, {
                     expiresIn: "7d"
                 });
-                console.log("hh",userData)
+                
                 if(userData.image.url!==''){
-                    console.log("jbcksc")
+                  
                     
                     const folderPath = this.getFolderPathByFileType(userData.image.type);
                       const signedUrl = await this.S3Services.getFile(userData.image.url, folderPath);
-                      console.log("f",folderPath);
-                      console.log("s",signedUrl);
+                     
                       
     
                       userData.image.url = signedUrl
     
                 }
-                console.log("hhh",userData)
+                
                 
                 const userInfo = {
                     name: userData.name,
@@ -201,7 +202,7 @@ export class userService{
                     image:userData.image,
                     _id:userData._id
                 };
-                console.log("userr",userInfo)
+                
                 
                 return {
                     userInfo,
@@ -209,26 +210,26 @@ export class userService{
                     refreshToken
                 };
             } else {
-                console.log("userdata not found")
+                
                 throw new Error("User Doesn't exist");
             }
         } catch (error: any) {
-            console.log("service error")
+            
             throw new Error(error.message);
         }
     }
 
     async resendOtpCheck(userToken: string) {
         try {
-            console.log("resendService")
+            
            
             const decoded: any = jwt.decode(userToken);
-            console.log("decoded",decoded)
+            
 
             
             
             const email = decoded.userData.email
-            console.log("resend email",email);
+          
             const Generated_OTP: string = Math.floor(1000 + Math.random() * 9000).toString();
             let saltRounds:number =10;
             const hashedOTP:string = await bcrypt.hash(Generated_OTP, saltRounds);
@@ -279,14 +280,14 @@ export class userService{
 
     async getSpecialization() {
         try {
-            console.log("Entering getSpecialization method in adminService");
+            
     
             
             const response = await this.userRepository.getAllSpecialization();
     
             // Check if the response is valid
             if (response) {
-                console.log("Specialization successfully fetched:", response);
+                
                 return response;
             } else {
                 // Handle the case where the response is not as expected
@@ -301,13 +302,13 @@ export class userService{
     }
     async getDoctorsWithSpecialization(specializationId: string) {
         try {
-          console.log("Entering getSpecialization method in adminService");
+          
       
           const response = await this.userRepository.getAllDoctorsWithSpecialization(specializationId);
       
           // Check if the response is valid and it's an array
           if (response && Array.isArray(response)) {
-            console.log("Specialization successfully fetched:", response);
+            
       
             // Iterate through the list of doctors and handle the image for each
             const doctorsWithSignedUrls = await Promise.all(
@@ -339,7 +340,7 @@ export class userService{
       
 
      private getFolderPathByFileType(fileType: string): string {
-        console.log(fileType);
+        
         
         switch (fileType) {
             case 'profile image':
@@ -415,14 +416,14 @@ export class userService{
                     url:''
                 }
             };
-            console.log(file)
+            
 
 if (file) {
     const profileUrl = await this.S3Services.uploadFile('eliteCare/userProfileImages/', file);
     userProfileImage.profileUrl.url = profileUrl;
     userProfileImage.profileUrl.type = "user profile image";
 }
-console.log("",userProfileImage)
+
 
 
             
@@ -450,7 +451,7 @@ console.log("",userProfileImage)
                 };
 
                   
-                  console.log("res",response)
+                 
 
                   return {userInfo};
                 
@@ -461,8 +462,7 @@ console.log("",userProfileImage)
                 
                 
             } 
-        } catch (error: any) {
-            console.log("service error")
+    } catch (error: any)  {  
             throw new Error(error.message);
         }
     }
@@ -478,6 +478,76 @@ console.log("",userProfileImage)
           throw new Error(error.message);
         }
       }
+      async createSession(appointmentData: Appointment): Promise<any> {
+        try {
+
+            const data = {
+                
+                doctor: appointmentData.doctor,
+                slot: appointmentData.slot,
+                date: appointmentData.date,
+                image:appointmentData.doctor.signedImageUrl
+            };
+            const patientData = {
+                patientName: appointmentData.patientName,
+                age: parseInt(appointmentData.age),
+                description: appointmentData.description,
+                doctor: appointmentData.doctor,
+                slot: appointmentData.slot,
+                date: appointmentData.date,
+                image:appointmentData.doctor.signedImageUrl,
+                userId:appointmentData.userId
+
+            }
+            const appointment =await this.userRepository.createAppointment(patientData);
+            console.log("appointment",appointment)
+
+            if(appointment){
+
+                const session = await makeThePayment(data,appointment._id)
+            if(session){
+                console.log("sess",session)
+                const updateAppointment =await this.userRepository.updateAppointment(session.id,appointment._id)
+                console.log("appo",updateAppointment)
+            return session;
+                
+            }
+
+            }
+
+
+            
+
+            // Call repository to create Stripe session
+            
+            
+
+        } catch (error: any) {
+            console.error("Error in createSession service:", error.message);
+            throw new Error(error.message);
+        }
+    }
+      async confirmAppointment(appointmentId: string): Promise<any> {
+        try {
+
+            
+            const confirmAppointment =await this.userRepository.confirmAppointmentPayment(appointmentId);
+            console.log("appointment",confirmAppointment)
+
+            return confirmAppointment
+
+
+            
+
+            // Call repository to create Stripe session
+            
+            
+
+        } catch (error: any) {
+            console.error("Error in createSession service:", error.message);
+            throw new Error(error.message);
+        }
+    }
       
     
     

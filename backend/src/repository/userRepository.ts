@@ -6,6 +6,7 @@ import doctorModel from "../model/doctorModel";
 import mongoose from "mongoose";
 import doctorSlotsModel from "../model/doctorSlotModel";
 import { Slot } from "../interface/userInterface/interface";
+import appointmentModel from "../model/AppoinmentModel";
 
 
 
@@ -44,7 +45,7 @@ export class userRepository {
     async createUser(userData:userType):Promise<Document>{
         try {
         
-            console.log(userData)
+            
             const newUser = new userModel(userData);
             return await newUser.save()
 
@@ -57,7 +58,7 @@ export class userRepository {
     }
     async userCheck(email:string){
         try {
-            console.log("login userrep");
+            
             const userData = await userModel.findOne({email:email})
             if(userData){
                 return userData
@@ -90,7 +91,7 @@ export class userRepository {
     }
     async getAllDoctorsWithSpecialization(specializationId: string) {
         try {
-            console.log(specializationId)
+            
           const doctors = await doctorModel
             .find(
               { department: new ObjectId(specializationId), isBlocked: false },
@@ -106,7 +107,7 @@ export class userRepository {
             )
             .populate('department','name').lean() 
 
-        console.log(specializationId, "dd");
+        
         
 
             
@@ -126,7 +127,7 @@ export class userRepository {
                     $eq: date, // Match the exact date
                 },
             })
-            console.log("adcslots",doctorSlots)
+            
     
             // Check if slots were found
             if (!doctorSlots) {
@@ -135,7 +136,7 @@ export class userRepository {
     
             // Filter slots to return only those that are available
             const availableSlots = doctorSlots.slots.filter(slot => slot.availability);
-            console.log("availableSlots",availableSlots)
+            
     
             // Check if there are available slots
             if (availableSlots.length === 0) {
@@ -198,10 +199,8 @@ export class userRepository {
 
     async checkSlotAvailability(doctorId: string, slotId: Slot, date: string, userId: string) {
         try {
-            console.log("Doctor ID:", doctorId);
-            console.log("Date:", new Date(date));
-            console.log("Slot ID:", slotId);
-            const slotID = slotId._id;
+            
+            
     
             // Find the doctor's slot information by doctorId and date
             const doctorSlot = await doctorSlotsModel.findOne({
@@ -209,45 +208,55 @@ export class userRepository {
                 date: new Date(date)
             });
     
-            console.log("Doctor Slot:", doctorSlot);
+           
     
             if (!doctorSlot) {
                 throw new Error('Slot not found or doctor does not exist.');
             }
     
-            // Check if the slots exist
+            
             if (doctorSlot.slots) {
                 for (const slot of doctorSlot.slots) {
-                    // Ensure slot._id exists before using it
+                   
                     if (slot._id && slot._id.equals(new mongoose.Types.ObjectId(slotId._id))) {
-                        console.log("Found Slot:", slot);
+                        
     
                         if (!slot.locked) {
-                            // Get the current local time (in IST)
-                            const currentLocalTime = new Date(); // This gives the current local time
                             
-    
-                            // Add 5 minutes to the local time
-                            const lockExpirationLocalTime = new Date(currentLocalTime.getTime() + 5 * 60 * 1000); // 5 minutes later
+                            const currentLocalTime = new Date(); 
                             
-    
-                            // Convert local time (IST) to UTC before storing
+                            
+                            const lockExpirationLocalTime = new Date(currentLocalTime.getTime() + 5 * 60 * 1000); 
+                            
                             const lockExpirationUTC = new Date(lockExpirationLocalTime.getTime() - (currentLocalTime.getTimezoneOffset() * 60000));
-                           
     
-                            // Update the slot with locked status, lockedBy userId, and lock expiration
+                            
                             slot.locked = true;
                             slot.lockedBy = new mongoose.Types.ObjectId(userId);
-                            slot.lockExpiration = lockExpirationUTC; // Save the expiration in UTC
+                            slot.lockExpiration = lockExpirationUTC; 
     
-                            // Save the updated doctorSlot document
+                            
                             await doctorSlot.save();
     
-                            console.log(`Slot locked by user ${userId} until ${lockExpirationLocalTime} (Local Time)`);
-                            return true; // Slot locked successfully
+                         
+    
+                            
+                            setTimeout(async () => {
+                                
+                                slot.locked = false;
+                                slot.lockedBy = null as any;
+                                slot.lockExpiration = null as any;
+    
+                                
+                                await doctorSlot.save();
+    
+                               
+                            }, 1 * 60 * 1000); 
+    
+                            return true; 
                         } else {
-                            console.log("Slot is already locked.");
-                            return false; // Slot is already locked
+                            
+                            return false; 
                         }
                     }
                 }
@@ -261,6 +270,81 @@ export class userRepository {
             throw new Error(error.message); // Throw the error to be handled in the service layer
         }
     }
+    async createAppointment(patientData: any) {
+        try {
+            // Extract necessary information from patientData
+
+            const doctorSlot = await doctorSlotsModel.findOne({
+                doctorId: new mongoose.Types.ObjectId(patientData.doctor.doctorId as string),
+                date: new Date(patientData.date)
+            });
+
+
+            
+
+
+
+
+            const { patientName, age, description, doctor, slot, date,userId } = patientData;
+            
+            // Create a new appointment object
+            const newAppointment = new appointmentModel({
+                userId: userId, // Assuming you have userId in the session
+                docId: doctor._id, // Doctor ID from the patientData
+                patientNAme: patientName,
+                age: age,
+                description: description,
+                date: new Date(date), // Ensure date is in Date format
+                start: new Date(slot.start), // Ensure start time is in Date format
+                end: new Date(slot.end), // Ensure end time is in Date format
+                status: "pending", // Initial status
+                fees: doctor.fees, // Convert fees to string as per your model
+                paymentMethod: "stripe", // Assuming payment method is stripe
+                paymentStatus: "payment pending", // Initial payment status
+                
+            });
+    
+            // Save the appointment to the database
+            const savedAppointment = await newAppointment.save();
+            
+            return savedAppointment; // Return the saved appointment or necessary information
+        } catch (error: any) {
+            console.error("Repository error:", error.message);
+            throw new Error(error.message); // Throw the error to be handled in the service layer
+        }
+    }
+    async updateAppointment(sessionId: any, appointmentId: any) {
+        try {
+            // Find the appointment by ID and update it with the provided data
+            const updatedAppointment = await appointmentModel.findByIdAndUpdate(
+                appointmentId,  // The ID of the appointment to update
+                {paymentId:sessionId},     // The data to update the appointment with
+                { new: true }   // This option returns the updated document
+            );
+            
+            return updatedAppointment; // Return the updated appointment
+        } catch (error: any) {
+            console.error("Repository error:", error.message);
+            throw new Error(error.message); // Throw the error to be handled in the service layer
+        }
+    }
+    async confirmAppointmentPayment(appointmentId: string) {
+        try {
+            // Find the appointment by ID and update it with the provided data
+            const updatedAppointment = await appointmentModel.findByIdAndUpdate(
+                appointmentId,  // The ID of the appointment to update
+                {paymentStatus:"payment completed"},     // The data to update the appointment with
+                { new: true }   // This option returns the updated document
+            );
+            
+            return updatedAppointment; // Return the updated appointment
+        } catch (error: any) {
+            console.error("Repository error:", error.message);
+            throw new Error(error.message); // Throw the error to be handled in the service layer
+        }
+    }
+    
+    
     
     
     

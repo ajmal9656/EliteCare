@@ -30,5 +30,7 @@ route.put('/updateUser', userControllerInstance.updateUserProfile.bind(userContr
 // Update the updateProfileImage route to use the uploadUserFiles middleware
 route.put('/updateProfileImage', uploadUserFiles, userControllerInstance.updateProfileImage.bind(userControllerInstance));
 route.post('/checkSlotStatus', userControllerInstance.checkSlotStatus.bind(userControllerInstance));
+route.post('/create-checkout-session', userControllerInstance.createCheckoutSession.bind(userControllerInstance));
+route.post('/confirmPayment/:appointmentId', userControllerInstance.confirmPayment.bind(userControllerInstance));
 
 export default route;

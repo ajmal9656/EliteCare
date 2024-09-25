@@ -19,7 +19,7 @@ export class userController {
         
       //   path:"/"
       // });
-      console.log("aaaaaaaaaaa",response.token)
+      
       
       res.status(200).json({ status: true, response });
     } catch (error: any) {
@@ -36,10 +36,10 @@ export class userController {
   }
   async verifyOtp(req: Request, res: Response): Promise<void> {
     try {
-        console.log("vrtrwf")
+        
       
       const token = req.headers.authorization?.split(" ")[1];
-      console.log(token)
+      
       if (!token) {
         res.status(401).json({ message: "No token provided" });
         return;
@@ -58,17 +58,17 @@ export class userController {
       const response = await this.userService.otpCheck(userOtp, token);
       if (response.valid) {
 
-        console.log("trurrrrr")
+        
 
         res.status(200).json({ status: true, message: "OTP verified successfully" });
       } else {
         res.status(400).json({ status: false, message: "Invalid OTP" });
       }
     } catch (error: any) {
-        console.log("kkkk",error);
+        
         
       if (error.message === "Invalid OTP") {
-        console.log("errorotp")
+        
         res.status(400).json({ message: "Invalid OTP" });
       } else if (error.message === "OTP has expired") {
         res.status(400).json({ message: "OTP has expired" });
@@ -83,13 +83,13 @@ export class userController {
   }
   async loginUser(req: Request, res: Response): Promise<void> {
     try {
-      console.log("login userController");
+      
       
 
       const {email,password} = req.body;
 
       const loginResponse = await this.userService.verifyUser(email,password)
-      console.log("controller res",loginResponse)
+      
       
       const response = {
         accessToken:loginResponse.accessToken,
@@ -101,11 +101,11 @@ export class userController {
         sameSite: 'strict',  // Protects against CSRF attacks
         maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
       });
-      console.log("logindata",response)
+      
       res.status(200).json({ message: "Login successful", response});
         
     } catch (error: any) {
-      console.log("controller error")
+      
       if(error.message==="User Doesn't exist"){
         res.status(400).json({ message: "User Doesn't exist" });
 
@@ -124,10 +124,10 @@ export class userController {
 
   async resendOtp(req: Request, res: Response): Promise<void> {
     try {
-        console.log("resendControl")
+      
       
       const token = req.headers.authorization?.split(" ")[1];
-      console.log("tokennn",token)
+      
       if (!token) {
         res.status(401).json({ message: "No token provided" });
         return;
@@ -139,14 +139,13 @@ export class userController {
       const response = await this.userService.resendOtpCheck(token);
       if (response) {
 
-        console.log("teeerurrrrr")
-
+       
         res.status(200).json({ status: true, message: "OTP Resended successfully",response });
       } else {
         res.status(400).json({ status: false, message: "something wnt wrong" });
       }
     } catch (error: any) {
-        console.log("kkkk",error);
+        
         
         if (error.message === "Otp not send") {
           res.status(500).json({ message: "OTP not sent" });
@@ -158,7 +157,7 @@ export class userController {
 
   async getSpecializations(req: Request, res: Response): Promise<void> {
     try {
-        console.log("Entering addSpecialization method in adminController");
+        
 
         
 
@@ -166,14 +165,13 @@ export class userController {
         const response = await this.userService.getSpecialization();
 
        
-        console.log("Specialization successfully fetched", response);
+       
 
        
         res.status(200).json({ message: "Specialization added successfully", response });
         
     } catch (error: any) {
-       
-        console.error("Error in addSpecialization controller:", error.message);
+      
 
         if (error.message === "Something went wrong while creating the specialization.") {
             res.status(400).json({ message: "Something went wrong while creating the specialization." });
@@ -185,7 +183,7 @@ export class userController {
 }
   async getDoctorsWithSpecialization(req: Request, res: Response): Promise<void> {
     try {
-        console.log("Entering addSpecialization method in adminController");
+       
 
         const specializationId = req.params.specializationId
 
@@ -193,14 +191,14 @@ export class userController {
         const response = await this.userService.getDoctorsWithSpecialization(specializationId);
 
        
-        console.log("Specialization successfully fetched", response);
+        
 
        
         res.status(200).json({ message: "Specialization added successfully", response });
         
     } catch (error: any) {
        
-        console.error("Error in addSpecialization controller:", error.message);
+       
 
         if (error.message === "Something went wrong while creating the specialization.") {
             res.status(400).json({ message: "Something went wrong while creating the specialization." });
@@ -212,7 +210,7 @@ export class userController {
 }
 async getDoctorSlots(req: Request, res: Response): Promise<void> {
   try {
-      console.log("Entering getDoctorSlots method in adminController");
+      
 
       const { date, doctorId } = req.query;
 
@@ -221,8 +219,7 @@ async getDoctorSlots(req: Request, res: Response): Promise<void> {
           res.status(400).json({ message: "Date and doctorId are required." });
       }
 
-      console.log("Received date:", date);
-      console.log("Received doctorId:", doctorId);
+   
 
       // Fetch the slots from the service
       const response = await this.userService.getSlots(date as string, doctorId as string);
@@ -231,7 +228,7 @@ async getDoctorSlots(req: Request, res: Response): Promise<void> {
       res.status(200).json({ message: "Doctor slots fetched successfully", response });
       
   } catch (error: any) {
-      console.error("Error in getDoctorSlots controller:", error.message);
+      
 
       // Handle specific error messages if necessary
       if (error.message.includes("something went wrong")) {
@@ -276,7 +273,7 @@ async updateProfileImage(req: Request, res: Response): Promise<void> {
       res.status(400).json({ message: "User ID is required." });
       return;
     }
-    console.log("file",req.file)
+    
 
     // Call the userService to update the image with the provided userId and file
     const response = await this.userService.updateImage(userId, req.file);
@@ -319,6 +316,61 @@ async checkSlotStatus(req: Request, res: Response): Promise<void> {
     } else {
       res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
+  }
+}
+async createCheckoutSession(req: Request, res: Response): Promise<void> {
+  try {
+      const { appointment } = req.body;
+      console.log("app",appointment)
+
+    
+
+      const session = await this.userService.createSession(appointment);
+
+      console.log("cintroller",session)
+
+      // Return the session ID and any other needed data
+      res.status(200).json({ 
+          message: "Checkout session created successfully", 
+          session 
+      });
+  } catch (error: any) {
+      console.error("Error checking slot status:", error.message);
+
+      if (error.message.includes("Slot is locked")) {
+          res.status(400).json({ message: "The selected slot is already locked." });
+      } else {
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+  }
+}
+async confirmPayment(req: Request, res: Response): Promise<void> {
+  try {
+
+    const appointmentId = req.params.appointmentId
+
+    const confirmAppointment = await this.userService.confirmAppointment(appointmentId);
+      
+
+    
+
+      
+
+      // console.log("cintroller",response)
+
+      // Return the response ID and any other needed data
+      res.status(200).json({ 
+          message: "Checkout response created successfully", 
+          confirmAppointment
+      });
+  } catch (error: any) {
+      console.error("Error checking slot status:", error.message);
+
+      if (error.message.includes("Slot is locked")) {
+          res.status(400).json({ message: "The selected slot is already locked." });
+      } else {
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
   }
 }
 
