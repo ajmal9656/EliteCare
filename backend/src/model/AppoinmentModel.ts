@@ -10,6 +10,7 @@ interface IAppointment extends Document {
   date: Date;
   start: Date;
   end: Date;
+  locked:mongoose.Types.ObjectId | null;
   status: "pending" | "completed" | "cancelled";
   fees: number;
   paymentMethod: "stripe" | "wallet";
@@ -65,6 +66,11 @@ const AppointmentSchema = new Schema<IAppointment>(
     end: {
       type: Date,
       required: true,
+    },
+    locked: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default:null,
     },
     status: {
       type: String,

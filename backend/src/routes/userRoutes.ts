@@ -31,6 +31,7 @@ route.put('/updateUser', userControllerInstance.updateUserProfile.bind(userContr
 route.put('/updateProfileImage', uploadUserFiles, userControllerInstance.updateProfileImage.bind(userControllerInstance));
 route.post('/checkSlotStatus', userControllerInstance.checkSlotStatus.bind(userControllerInstance));
 route.post('/create-checkout-session', userControllerInstance.createCheckoutSession.bind(userControllerInstance));
-route.post('/confirmPayment/:appointmentId', userControllerInstance.confirmPayment.bind(userControllerInstance));
+route.post('/checkSessionStatus', userControllerInstance.confirmPayment.bind(userControllerInstance));
+route.get('/doctordetails/:doctorId', userControllerInstance.getDoctorDetails.bind(userControllerInstance));
 
 export default route;

@@ -337,6 +337,29 @@ export class userService{
           throw new Error(`Failed to get specialization: ${error.message}`);
         }
       }
+    async getDoctorData(doctorId: string) {
+        try {
+          
+      
+          const response = await this.userRepository.getDoctor(doctorId);
+
+          if (response?.image && response.image.url && response.image.type) {
+            const folderPath = this.getFolderPathByFileType(response.image.type);
+            const signedUrl = await this.S3Services.getFile(response.image.url, folderPath);
+
+            // Append signed URL to the response object
+            return {
+              ...response,
+              signedImageUrl: signedUrl, // Include signed URL for the image
+            };
+          }
+      
+          
+        } catch (error: any) {
+          console.error("Error in getDoctorsWithSpecialization:", error.message);
+          throw new Error(`Failed to get specialization: ${error.message}`);
+        }
+      }
       
 
      private getFolderPathByFileType(fileType: string): string {
@@ -500,15 +523,15 @@ if (file) {
 
             }
             const appointment =await this.userRepository.createAppointment(patientData);
-            console.log("appointment",appointment)
+            
 
             if(appointment){
 
                 const session = await makeThePayment(data,appointment._id)
             if(session){
-                console.log("sess",session)
+                
                 const updateAppointment =await this.userRepository.updateAppointment(session.id,appointment._id)
-                console.log("appo",updateAppointment)
+              
             return session;
                 
             }
@@ -523,7 +546,7 @@ if (file) {
             
 
         } catch (error: any) {
-            console.error("Error in createSession service:", error.message);
+            console.error("Error in createSession servicessss:", error.message);
             throw new Error(error.message);
         }
     }

@@ -38,13 +38,13 @@ async function makeThePayment(
 
   try {
     const session = await stripe.checkout.sessions.create({
-      success_url: `http://localhost:5000/confirmPayment/${appointmentId}`, // Replace with your actual frontend URL
+      success_url: `http://localhost:5173/confirmPayment/${appointmentId}/${doctorId}`, // Replace with your actual frontend URL
       cancel_url: `http://localhost:5000/paymentFailed`, // Replace with your actual frontend URL
       line_items: line_items,
       mode: 'payment',
     });
 
-    console.log("Session:", session);
+    
     return session;
   } catch (error: any) {
     console.log("Error in payment", error);

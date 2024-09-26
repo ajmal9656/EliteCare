@@ -35,10 +35,7 @@
     "redux-thunk": "^3.1.0",
     "slick-carousel": "^1.8.1",
     "sonner": "^1.5.0",
-<<<<<<< HEAD
     "stripe": "^16.12.0",
-=======
->>>>>>> 10b7c48f1592b2eaa5cf789c67e0b422e7233e93
     "sweetalert2": "^11.14.0",
     "sweetalert2-react-content": "^5.0.7",
     "tailwindcss": "^3.4.10",

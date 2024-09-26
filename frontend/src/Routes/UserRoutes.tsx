@@ -17,6 +17,7 @@ import UserProfilePage from '../components/userComponents/UserProfilePage';
 import UserProfilesLayout from '../pages/userPages/UserProfilesLayout';
 import SecurityPage from '../pages/userPages/SecurityPage';
 import AppoinmentPage from '../pages/userPages/AppoinmentPage';
+import PaymentSuccess from '../components/common/PaymentSuccess';
 
 
 
@@ -50,6 +51,8 @@ function UserRoutes() {
                      
 
                 </Route>
+
+                <Route path="/confirmPayment/:appointmentId/:doctorId" element={<PaymentSuccess/>} />       
       
       
       

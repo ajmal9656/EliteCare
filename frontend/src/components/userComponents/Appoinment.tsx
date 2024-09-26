@@ -1,12 +1,14 @@
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Button from '../common/userCommon/Button';
 import axiosUrl from '../../utils/axios';
+import { toast } from 'sonner';
 
 
 
 function Appointment() {
   const location = useLocation();
+  const navigate = useNavigate()
   const appointmentData = location.state?.appointmentData;
   const doctor = location.state?.doctor;
   console.log("app",appointmentData);
@@ -15,29 +17,36 @@ function Appointment() {
   // Handle payment click
   const handleClick = async () => {
     try {
-     
-
       // Call your backend to create a Stripe checkout session
       const responses = await axiosUrl.post('/create-checkout-session', {
         appointment: appointmentData, // Pass appointmentData as part of the object
-                       // Pass doctor as part of the object
       });
-
-      console.log("session",responses.data)
-
-      if(responses.data.session){
-        window.location.href = responses.data.session.url
-            }
-
+  
+      console.log("session", responses.data.message);
+  
+      if (responses.data.session) {
+        window.location.href = responses.data.session.url;
+      }
+  
+    } catch (error: any) {
       
+      // Check if the error response contains data and handle it
+      if (error.response && error.response.data && error.response.data.message) {
+        console.error('Error in Stripe Checkout process:', error.response.data.message);
+        // You can display this message on the UI as well
+        toast.error(`${error.response.data.message}`)
+        navigate(`/doctorProfile/checkSlots`, {
+          state: { doctor }, // Passing the entire doctor object
+        });
+        
 
-      
-
-     
-    } catch (error:any) {
-      console.error('Error in Stripe Checkout process:', error);
+      } else {
+        console.error('Unexpected error:', error.message);
+        alert('An unexpected error occurred.');
+      }
     }
   };
+  
 
   useEffect(() => {
     if (appointmentData) {

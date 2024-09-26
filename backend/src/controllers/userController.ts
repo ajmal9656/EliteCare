@@ -208,6 +208,34 @@ export class userController {
         }
     }
 }
+async getDoctorDetails(req: Request, res: Response): Promise<void> {
+  try {
+     
+
+      const doctorId = req.params.doctorId
+
+    
+      const response = await this.userService.getDoctorData(doctorId);
+
+     
+      
+console.log("this is doc",response);
+
+     
+      res.status(200).json({ message: " successfully", response });
+      
+  } catch (error: any) {
+     
+     
+
+      if (error.message === "Something went wrong while creating the specialization.") {
+          res.status(400).json({ message: "Something went wrong while creating the specialization." });
+      } else {
+        
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+  }
+}
 async getDoctorSlots(req: Request, res: Response): Promise<void> {
   try {
       
@@ -321,13 +349,13 @@ async checkSlotStatus(req: Request, res: Response): Promise<void> {
 async createCheckoutSession(req: Request, res: Response): Promise<void> {
   try {
       const { appointment } = req.body;
-      console.log("app",appointment)
+      
 
     
 
       const session = await this.userService.createSession(appointment);
 
-      console.log("cintroller",session)
+      
 
       // Return the session ID and any other needed data
       res.status(200).json({ 
@@ -335,10 +363,11 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
           session 
       });
   } catch (error: any) {
-      console.error("Error checking slot status:", error.message);
+      console.error("Error checking slot statusssss:", error.message);
 
-      if (error.message.includes("Slot is locked")) {
-          res.status(400).json({ message: "The selected slot is already locked." });
+      if (error.message==="Session Timed Out") {
+        console.log("aaa")
+          res.status(409).json({ message: "Session Timed out" });
       } else {
           res.status(500).json({ message: "An unexpected error occurred", error: error.message });
       }
@@ -347,7 +376,9 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
 async confirmPayment(req: Request, res: Response): Promise<void> {
   try {
 
-    const appointmentId = req.params.appointmentId
+    const {appointmentId} = req.body
+
+    console.log("asjkfasdbvskjdvbsj")
 
     const confirmAppointment = await this.userService.confirmAppointment(appointmentId);
       
@@ -366,8 +397,10 @@ async confirmPayment(req: Request, res: Response): Promise<void> {
   } catch (error: any) {
       console.error("Error checking slot status:", error.message);
 
-      if (error.message.includes("Slot is locked")) {
-          res.status(400).json({ message: "The selected slot is already locked." });
+      if (error.message=="Session Timed Out") {
+        console.log("aaaaaaasvbshbfvs")
+        res.status(409).json({ message: "Session Timed Out" });
+          
       } else {
           res.status(500).json({ message: "An unexpected error occurred", error: error.message });
       }

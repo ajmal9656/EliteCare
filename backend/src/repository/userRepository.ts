@@ -118,6 +118,35 @@ export class userRepository {
           throw new Error(`Failed to fetch doctors for specialization ${specializationId}: ${error.message}`);
         }
       }
+    async getDoctor(doctorId: string) {
+        try {
+            
+          const doctor = await doctorModel
+            .findById(
+              doctorId,
+              {
+                name: 1,
+                _id: 1,
+                doctorId: 1,
+                email: 1,
+                department: 1,
+                fees: 1,
+                image: 1,
+              }
+            )
+            .populate('department','name').lean() 
+
+        
+        
+
+            
+      
+          return doctor;
+        } catch (error: any) {
+          console.error("Error getting doctor :", error.message);
+          throw new Error(`Failed to fetch doctor ${doctorId}: ${error.message}`);
+        }
+      }
       async getAllSlots(date: Date, doctorId: string) {
         try {
             // Find the doctor slots for the specified date and doctor ID
@@ -272,20 +301,34 @@ export class userRepository {
     }
     async createAppointment(patientData: any) {
         try {
-            // Extract necessary information from patientData
+            
+
+            console.log()
 
             const doctorSlot = await doctorSlotsModel.findOne({
-                doctorId: new mongoose.Types.ObjectId(patientData.doctor.doctorId as string),
+                doctorId: new mongoose.Types.ObjectId(patientData.doctor._id as string),
                 date: new Date(patientData.date)
             });
 
-
             
 
+            if (!doctorSlot) {
+                throw new Error('Slot not found or doctor does not exist.');
+            }
+            
 
+            if (doctorSlot && doctorSlot.slots ) {
+                const matchingSlot = doctorSlot.slots.find(slot => slot?._id?.toString() === patientData.slot._id.toString());
+                if(matchingSlot){
+                    if(matchingSlot.lockedBy==null || matchingSlot.lockedBy.toString()!==patientData.userId ){
+                        
+                            throw new Error('Session Timed Out')
+                       
 
+                    }
+                    if(matchingSlot.lockedBy.toString()===patientData.userId){
 
-            const { patientName, age, description, doctor, slot, date,userId } = patientData;
+                        const { patientName, age, description, doctor, slot, date,userId } = patientData;
             
             // Create a new appointment object
             const newAppointment = new appointmentModel({
@@ -301,15 +344,47 @@ export class userRepository {
                 fees: doctor.fees, // Convert fees to string as per your model
                 paymentMethod: "stripe", // Assuming payment method is stripe
                 paymentStatus: "payment pending", // Initial payment status
+                locked:userId
                 
             });
     
             // Save the appointment to the database
             const savedAppointment = await newAppointment.save();
+
+            setTimeout(async () => {
+                                
+                newAppointment.locked=null;
+
+                
+                await newAppointment.save();
+
+               
+            }, 1 * 60 * 1000);
+
             
-            return savedAppointment; // Return the saved appointment or necessary information
+            return savedAppointment; 
+
+                       
+                        
+
+                    }
+
+                }
+                console.log("Matching Slot:", matchingSlot);
+            } else {
+                console.log("No slots found for the doctor on the specified date.");
+            }
+            
+
+
+            
+
+
+
+
+            
         } catch (error: any) {
-            console.error("Repository error:", error.message);
+            console.error("Repository errorrrrr:", error.message);
             throw new Error(error.message); // Throw the error to be handled in the service layer
         }
     }
@@ -331,11 +406,24 @@ export class userRepository {
     async confirmAppointmentPayment(appointmentId: string) {
         try {
             // Find the appointment by ID and update it with the provided data
-            const updatedAppointment = await appointmentModel.findByIdAndUpdate(
-                appointmentId,  // The ID of the appointment to update
-                {paymentStatus:"payment completed"},     // The data to update the appointment with
-                { new: true }   // This option returns the updated document
-            );
+
+
+            const updatedAppointment= await appointmentModel.findById(appointmentId);
+            if(updatedAppointment?.locked==null ){
+
+                console.log("sbvshbvshbv")
+                throw new Error('Session Timed Out')
+
+                
+                
+
+            }
+
+            updatedAppointment.paymentStatus = "payment completed";
+            
+
+            await updatedAppointment.save()
+            
             
             return updatedAppointment; // Return the updated appointment
         } catch (error: any) {
