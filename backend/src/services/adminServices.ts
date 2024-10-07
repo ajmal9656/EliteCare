@@ -69,42 +69,42 @@ export class adminService{
         try {
             console.log("Entering addSpecialization method in adminService");
     
-            // Call the repository method to create a new specialization
+            
             const response = await this.adminRepository.createSpecialization(name, description);
     
-            // Check if the response is valid
+           
             if (response) {
                 console.log("Specialization successfully created:", response);
                 return response;
             } else {
-                // Handle the case where the response is not as expected
+              
                 console.error("Failed to create specialization: Response is invalid");
                 throw new Error("Something went wrong while creating the specialization.");
             }
         } catch (error: any) {
-            // Log the error and rethrow it with a message
+            
             console.error("Error in addSpecialization:", error.message);
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
     async getSpecialization() {
         try {
-            console.log("Entering getSpecialization method in adminService");
+            
     
             
             const response = await this.adminRepository.getAllSpecialization();
     
-            // Check if the response is valid
+          
             if (response) {
                 console.log("Specialization successfully fetched:", response);
                 return response;
             } else {
-                // Handle the case where the response is not as expected
+            
                 console.error("Failed to get specialization: Response is invalid");
                 throw new Error("Something went wrong while fetching the specialization.");
             }
         } catch (error: any) {
-            // Log the error and rethrow it with a message
+        
             console.error("Error in addSpecialization:", error.message);
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
@@ -116,18 +116,18 @@ export class adminService{
             
             const response = await this.adminRepository.updateSpecialization(id,name,description);
     
-            // Check if the response is valid
+           
             if (response) {
                 console.log("Specialization successfully edited:", response);
                 return response;
             } else {
-                // Handle the case where the response is not as expected
+               
                 console.error("Failed to edit specialization: Response is invalid");
                 throw new Error("Something went wrong while editing the specialization.");
             }
         } catch (error: any) {
-            // Log the error and rethrow it with a message
-            console.error("Error in editSpecialization:", error.message);
+            
+           
             throw new Error(`Failed to edit specialization: ${error.message}`);
         }
     }
@@ -139,19 +139,15 @@ export class adminService{
             
             const response = await this.adminRepository.changeSpecializationStatus(id);
     
-            // Check if the response is valid
+            
             if (response) {
-                console.log("Specialization successfully edited:", response);
+               
                 return response;
-            } else {
-                // Handle the case where the response is not as expected
-                console.error("Failed to edit specialization: Response is invalid");
-                throw new Error("Something went wrong while editing the specialization.");
-            }
+            } 
         } catch (error: any) {
-            // Log the error and rethrow it with a message
-            console.error("Error in editSpecialization:", error.message);
-            throw new Error(`Failed to edit specialization: ${error.message}`);
+            
+            
+            throw new Error(`Failed: ${error.message}`);
         }
     }
     async getApplication() {
@@ -161,14 +157,14 @@ export class adminService{
             
             const response = await this.adminRepository.getAllApplication();
     
-            // Check if the response is valid
+           
             if (response) {
-                console.log("Specialization successfully fetched:", response);
+                console.log("applicaton successfully fetched:", response);
                 return response;
             } else {
-                // Handle the case where the response is not as expected
-                console.error("Failed to get specialization: Response is invalid");
-                throw new Error("Something went wrong while fetching the specialization.");
+                
+                console.error("Failed to get applicatons: Response is invalid");
+                throw new Error("Something went wrong while fetching the applicatons.");
             }
         } catch (error: any) {
             // Log the error and rethrow it with a message
@@ -178,7 +174,7 @@ export class adminService{
     }
     async getDoctorApplication(applicationId:string) {
         try {
-            console.log("Entering getSpecialization method in adminService");
+           
     
             
             const response = await this.adminRepository.getApplication(applicationId);
@@ -188,7 +184,7 @@ export class adminService{
 
 
     
-            // Check if the response is valid
+            
             if (response) {
                 console.log("data successfully fetched:", response);
                 documents.push(response.image);
@@ -209,14 +205,13 @@ export class adminService{
                  const files = signedFiles
                 return {response,files};
             } else {
-                // Handle the case where the response is not as expected
-                console.error("Failed to get specialization: Response is invalid");
-                throw new Error("Something went wrong while fetching the specialization.");
+               
+                
+                throw new Error("Something went wrong while fetching the data");
             }
         } catch (error: any) {
-            // Log the error and rethrow it with a message
-            console.error("Error in addSpecialization:", error.message);
-            throw new Error(`Failed to add specialization: ${error.message}`);
+            
+            throw new Error(`Failed : ${error.message}`);
         }
     }
     
@@ -246,9 +241,9 @@ export class adminService{
     
            
         } catch (error: any) {
-            // Log the error and rethrow it with a message
-            console.error("Error in addSpecialization:", error.message);
-            throw new Error(`Failed to add specialization: ${error.message}`);
+            
+           
+            throw new Error(`Failed : ${error.message}`);
         }
     }
     async rejectApplication(doctorId:string,reason:string) {

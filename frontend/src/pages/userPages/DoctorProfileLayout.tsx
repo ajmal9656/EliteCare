@@ -14,9 +14,9 @@ function DoctorProfileLayout() {
   console.log("Appointment Data:", appointmentData);
 
   return (
-    <div className='w-[100%] h-[2000px] md:h-[1000px] flex flex-col bg-gray-100'>
+    <div className='w-[100%]  flex flex-col bg-gray-100'>
       {/* Doctor's Profile Image */}
-      <div className='w-[100%] h-[410px] bg-gradient-to-r from-[#D2EFEA] to-[#ADE9DC] flex place-content-center'>
+      <div className='w-[100%] h-[300px] bg-gradient-to-r from-[#D2EFEA] to-[#ADE9DC] flex place-content-center'>
         <div className='w-[13%] h-[200px] mt-16 relative '>
           {/* Render the doctor's image only if doctor data is available */}
           {doctor ? (

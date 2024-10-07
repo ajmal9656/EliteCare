@@ -1,6 +1,6 @@
 
 
-import UserProfile from './UserProfile'
+import UserProfile from "../../components/userComponents/UserProfile"
 
 function UserProfilePage() {
   return (

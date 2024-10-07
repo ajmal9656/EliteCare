@@ -6,20 +6,20 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { updateUserProfile,updateUserProfileImage } from "../../Redux/Action/userActions";
 import { useNavigate } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+
 
 function UserProfile() {
   const userData = useSelector((state: RootState) => state.user.userInfo);
 
-  // State to control modals
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null); // New state for image preview
+  const [previewImage, setPreviewImage] = useState<string | null>(null); 
 
   const dispatch: any = useDispatch();
   const navigate = useNavigate();
 
-  // Formik setup for profile info
+  
   const formik = useFormik({
     initialValues: {
       name: userData?.name || "",
@@ -51,25 +51,25 @@ function UserProfile() {
     },
   });
 
-  // Handle opening and closing modals
+  
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const openImageModal = () => setIsImageModalOpen(true);
   const closeImageModal = () => {
     setIsImageModalOpen(false);
-    setPreviewImage(null); // Reset preview when modal closes
+    setPreviewImage(null); 
   };
 
-  // Formik for image upload
+ 
   const formikImage = useFormik({
     initialValues: {
       image: null,
     },
   
-    // Optional: Yup schema validation
+   
     validationSchema: Yup.object({
-      image: Yup.mixed().required("An image is required."), // Ensures image is not empty
+      image: Yup.mixed().required("An image is required."), 
     }),
   
     onSubmit: async (values) => {
@@ -78,14 +78,14 @@ function UserProfile() {
           console.log(userData);
           console.log(values.image)
           console.error("Image not selected or user data is missing.");
-          return; // Ensure image is selected
+          return; 
         }
   
         const formData = new FormData();
-        formData.append("image", values.image); // Append the image
-        formData.append("_id", userData._id); // Append user ID
+        formData.append("image", values.image); 
+        formData.append("_id", userData._id); 
   
-        // Log formData key-value pairs
+       
         for (const pair of formData.entries()) {
           console.log(`${pair[0]}: ${pair[1]}`);
         }
@@ -101,26 +101,26 @@ function UserProfile() {
   });
   
 
-  // Handle image selection and preview
+
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       formikImage.setFieldValue("image", file);
       const previewURL = URL.createObjectURL(file);
-      setPreviewImage(previewURL); // Set preview image
+      setPreviewImage(previewURL); 
     }
   };
   const handleLogout = () => {
-    // Clear localStorage
+    
     localStorage.clear();
 
-    // Navigate to login page
+    
     navigate("/login");
   };
 
   return (
     <div className="w-[75%] h-screen mt-10 pr-14">
-      <div className="bg-white h-[88%] rounded-lg border flex flex-col">
+      <div className="bg-white h-[92%] rounded-lg border flex flex-col">
         <div className="w-[100%] h-[25%] rounded-md border bg-gradient-to-r from-[#D2EFEA] to-[#ADE9DC] flex place-content-center">
         <div className="w-[15%] h-[165px] mt-16 relative flex">
   <img
@@ -170,7 +170,7 @@ function UserProfile() {
         </div>
       </div>
 
-      {/* Profile Edit Modal */}
+      
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
           <div className="bg-white p-8 rounded-lg w-[400px]">
@@ -242,7 +242,7 @@ function UserProfile() {
         </div>
       )}
 
-      {/* Image Upload Modal */}
+      
       {isImageModalOpen && (
   <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
     <div className="bg-white p-8 rounded-lg w-[400px]">
@@ -255,11 +255,11 @@ function UserProfile() {
             type="file"
             name="image"
             accept="image/*" // Accept only image files
-            onChange={handleImageChange} // Updated to handle image change
+            onChange={handleImageChange} 
             className="border border-gray-300 rounded-md p-2 w-full"
           />
           {formikImage.errors.image && formikImage.touched.image && (
-            <p className="text-red-600 text-sm">{formikImage.errors.image}</p> // Error message for validation
+            <p className="text-red-600 text-sm">{formikImage.errors.image}</p> 
           )}
           {previewImage && (
             <div className="mt-4">

@@ -10,6 +10,7 @@ import appointmentModel from "../model/AppoinmentModel";
 
 
 
+
 const ObjectId = mongoose.Types.ObjectId;
 
 
@@ -187,13 +188,13 @@ export class userRepository {
                 throw new Error("User not found");
             }
     
-            // Update user fields
-            Object.assign(user, updateData); // Update with the new data
+            
+            Object.assign(user, updateData); 
     
-            // Save the updated user back to the database
+            
             const updatedUser = await user.save();
     
-            // Return the updated user data
+            
             return updatedUser;
         } catch (error: any) {
             console.error("Error updating profile:", error.message);
@@ -202,26 +203,26 @@ export class userRepository {
     }
     async uploadProfileImage(userID: string, imageData: userImage) {
         try {
-            // Find the user by userID
+            
             const user = await userModel.findById(userID);
             
             if (!user) {
                 throw new Error('User not found');
             }
     
-            // Update the user's profile image data
+           
             user.image.url = imageData.profileUrl.url;
             user.image.type = imageData.profileUrl.type
     
-            // Save the updated user document
+          
             const updatedUser = await user.save();
     
-            // Optionally, return the updated user data or a success message
-            return updatedUser;  // or return { message: 'Profile image updated successfully' };
+           
+            return updatedUser;  
             
         } catch (error: any) {
             console.error("Repository error:", error.message);
-            throw new Error(error.message);  // Throw the error to be handled in the service layer
+            throw new Error(error.message); 
         }
     }
     
@@ -231,7 +232,7 @@ export class userRepository {
             
             
     
-            // Find the doctor's slot information by doctorId and date
+           
             const doctorSlot = await doctorSlotsModel.findOne({
                 doctorId: new mongoose.Types.ObjectId(doctorId),
                 date: new Date(date)
@@ -291,12 +292,12 @@ export class userRepository {
                 }
             }
     
-            // If no matching slot was found
+            
             throw new Error('Slot not found.');
     
         } catch (error: any) {
             console.error("Repository error:", error.message);
-            throw new Error(error.message); // Throw the error to be handled in the service layer
+            throw new Error(error.message); 
         }
     }
     async createAppointment(patientData: any) {
@@ -330,25 +331,25 @@ export class userRepository {
 
                         const { patientName, age, description, doctor, slot, date,userId } = patientData;
             
-            // Create a new appointment object
+       
             const newAppointment = new appointmentModel({
-                userId: userId, // Assuming you have userId in the session
-                docId: doctor._id, // Doctor ID from the patientData
+                userId: userId, 
+                docId: doctor._id, 
                 patientNAme: patientName,
                 age: age,
                 description: description,
-                date: new Date(date), // Ensure date is in Date format
-                start: new Date(slot.start), // Ensure start time is in Date format
-                end: new Date(slot.end), // Ensure end time is in Date format
-                status: "pending", // Initial status
-                fees: doctor.fees, // Convert fees to string as per your model
-                paymentMethod: "stripe", // Assuming payment method is stripe
-                paymentStatus: "payment pending", // Initial payment status
+                date: new Date(date), 
+                start: new Date(slot.start),
+                end: new Date(slot.end), 
+                status: "pending", 
+                fees: doctor.fees, 
+                paymentMethod: "stripe", 
+                paymentStatus: "payment pending", 
                 locked:userId
                 
             });
     
-            // Save the appointment to the database
+           
             const savedAppointment = await newAppointment.save();
 
             setTimeout(async () => {
@@ -405,7 +406,7 @@ export class userRepository {
     }
     async confirmAppointmentPayment(appointmentId: string) {
         try {
-            // Find the appointment by ID and update it with the provided data
+          
 
 
             const updatedAppointment= await appointmentModel.findById(appointmentId);
@@ -422,16 +423,128 @@ export class userRepository {
             updatedAppointment.paymentStatus = "payment completed";
             
 
-            await updatedAppointment.save()
+            await updatedAppointment.save();
+            console.log("updatedAppoinment",updatedAppointment)
+
+            if(updatedAppointment){
+                const SlotUpdation = await doctorSlotsModel.findOne({
+                    doctorId:updatedAppointment.docId,
+                    date:updatedAppointment.date,
+                    
+                })
+
+                console.log("slotupdation",SlotUpdation);
+
+                if(SlotUpdation){
+                    console.log("inside slotup");
+                    
+                   const matchingSlot = SlotUpdation.slots.find(slot=>new Date(slot.start).getTime() === new Date(updatedAppointment.start).getTime())
+                   if(matchingSlot){
+                    console.log("match",matchingSlot)
+                    matchingSlot.availability = false;
+                    matchingSlot.bookedBy = updatedAppointment.userId;
+                    await SlotUpdation.save();
+
+
+                    console.log("doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+                   }
+                }
+                
+            }
             
             
-            return updatedAppointment; // Return the updated appointment
+            return updatedAppointment;
         } catch (error: any) {
             console.error("Repository error:", error.message);
-            throw new Error(error.message); // Throw the error to be handled in the service layer
+            throw new Error(error.message); 
         }
     }
+    async getAllAppointments(userId:string,status:string){
+        try {
+            console.log(userId);
+            console.log(status);
+            
+            let appointments =[]
+
+            if(status == "All"){
+                appointments = await appointmentModel.find({ userId: userId })
+  .populate("docId");
+
+            }else{
+                console.log("ssssssssssssss");
+                
+                appointments = await appointmentModel.find({ userId: userId,status:status })
+  .populate("docId");
+            }
+            
+            
+            
     
+           
+    
+            
+            return appointments
+        } catch (error: any) {
+            console.error("Error getting application:", error.message);
+            throw new Error(error.message);
+        }
+    }
+
+    async cancelAppointment(applicationId: string): Promise<any> {
+        try {
+          // Find and update the appointment by ID, setting the status to "cancelled"
+          const appointment = await appointmentModel.findOneAndUpdate(
+            { _id: applicationId },
+            { status: "cancelled" },
+            { new: true } // Returns the updated document
+          );
+      
+          // If no appointment was found, return a meaningful message
+          if (!appointment) {
+            throw new Error(`Appointment with ID ${applicationId} not found`);
+          }
+      
+          if (appointment) {
+            const slotUpdation = await doctorSlotsModel.findOne({
+              doctorId: appointment.docId,
+              date: appointment.date,
+            });
+      
+            console.log("slotUpdation", slotUpdation);
+      
+            if (slotUpdation) {
+              console.log("inside slotUp");
+      
+              // Find the matching slot
+              const matchingSlot = slotUpdation.slots.find(
+                (slot) => new Date(slot.start).getTime() === new Date(appointment.start).getTime()
+              );
+      
+              if (matchingSlot) {
+                console.log("match", matchingSlot);
+      
+                // Update slot availability and clear booking details
+                matchingSlot.availability = true;
+                matchingSlot.bookedBy = null as any; // To handle null assignment
+                matchingSlot.lockedBy = null as any; // To handle null assignment
+                matchingSlot.locked = false;
+                matchingSlot.lockExpiration = null as any; // To handle null assignment
+      
+                await slotUpdation.save();
+                console.log("Slot updated successfully");
+              }
+            }
+          }
+      
+          // Return the updated appointment
+          return appointment;
+        } catch (error: any) {
+          console.error("Error canceling appointment:", error.message);
+          throw new Error(error.message);
+        }
+      }
+      
+      
     
     
     

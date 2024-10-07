@@ -154,9 +154,9 @@ function TimeSlots() {
   const selectedSlotDetails = slots.find(slot => slot._id === selectedSlot?._id);
 
   return (
-    <div className='w-full h-[1000px] flex justify-center'>
+    <div className='w-full  flex justify-center object-cover '>
       <div className='w-[70%] h-[400px] flex flex-col justify-center items-center'>
-        <div className='w-[80%] h-[600px] bg-white mt-5 shadow-lg shadow-gray-200 flex flex-col'>
+        <div className='w-[80%] h-[700px] bg-white my-10 shadow-lg shadow-gray-200 flex flex-col'>
           <div className='w-full h-[90px] flex flex-row'>
             <div className='w-[50%] h-[90px]'></div>
             <div className='w-[50%] h-[90px] flex items-center justify-end '>

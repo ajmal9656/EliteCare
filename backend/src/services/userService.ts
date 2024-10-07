@@ -285,19 +285,19 @@ export class userService{
             
             const response = await this.userRepository.getAllSpecialization();
     
-            // Check if the response is valid
+           
             if (response) {
                 
                 return response;
             } else {
-                // Handle the case where the response is not as expected
+               
                 console.error("Failed to get specialization: Response is invalid");
                 throw new Error("Something went wrong while fetching the specialization.");
             }
         } catch (error: any) {
-            // Log the error and rethrow it with a message
-            console.error("Error in addSpecialization:", error.message);
-            throw new Error(`Failed to add specialization: ${error.message}`);
+            
+            console.error("Error in get Specialization:", error.message);
+            throw new Error(`Failed to get specialization: ${error.message}`);
         }
     }
     async getDoctorsWithSpecialization(specializationId: string) {
@@ -306,7 +306,7 @@ export class userService{
       
           const response = await this.userRepository.getAllDoctorsWithSpecialization(specializationId);
       
-          // Check if the response is valid and it's an array
+        
           if (response && Array.isArray(response)) {
             
       
@@ -347,16 +347,16 @@ export class userService{
             const folderPath = this.getFolderPathByFileType(response.image.type);
             const signedUrl = await this.S3Services.getFile(response.image.url, folderPath);
 
-            // Append signed URL to the response object
+           
             return {
               ...response,
-              signedImageUrl: signedUrl, // Include signed URL for the image
+              signedImageUrl: signedUrl, 
             };
           }
       
           
         } catch (error: any) {
-          console.error("Error in getDoctorsWithSpecialization:", error.message);
+          console.error("Error in getDoctor:", error.message);
           throw new Error(`Failed to get specialization: ${error.message}`);
         }
       }
@@ -400,7 +400,7 @@ export class userService{
     
     async updateProfile(_id: string, updateData: { name: string; DOB: Date; address: string }): Promise<any> {
         try {
-            // Update the user profile in the repository
+            
             const updatedUser = await this.userRepository.updateProfile(_id, updateData);
 
             if(updatedUser.image!=null){
@@ -423,7 +423,7 @@ export class userService{
                 _id:updatedUser._id
             };
     
-            // Return the updated user profile
+            
             return {userInfo};
         } catch (error: any) {
             console.error("Error in updateProfile:", error.message);
@@ -491,7 +491,7 @@ if (file) {
     }
     async checkSlotLocked(doctorId: string, slotId: Slot,date:string,userId:string): Promise< boolean > {
         try {
-          // Call userRepository to check the availability of the slot
+          
           const availability = await this.userRepository.checkSlotAvailability(doctorId, slotId,date,userId);
       
           return availability;
@@ -541,7 +541,7 @@ if (file) {
 
             
 
-            // Call repository to create Stripe session
+            
             
             
 
@@ -555,14 +555,14 @@ if (file) {
 
             
             const confirmAppointment =await this.userRepository.confirmAppointmentPayment(appointmentId);
-            console.log("appointment",confirmAppointment)
+            
 
             return confirmAppointment
 
 
             
 
-            // Call repository to create Stripe session
+           
             
             
 
@@ -571,6 +571,45 @@ if (file) {
             throw new Error(error.message);
         }
     }
+
+    async getAppointments(userId: string,status:string) {
+        try {
+            // Fetch appointments for the given userId from the userRepository
+            const response = await this.userRepository.getAllAppointments(userId,status);
+    
+            if (response) {
+                return response; // Return the appointments if the response is valid
+            } else {
+                // Log and throw an error if the response is invalid
+                console.error("Failed to get appointments: Response is invalid");
+                throw new Error("Something went wrong while fetching the appointments.");
+            }
+        } catch (error: any) {
+            // Log the error with a descriptive message and rethrow it
+            console.error("Error in getAppointments:", error.message);
+            throw new Error(`Failed to get appointments: ${error.message}`);
+        }
+    }
+    async cancelAppointment(appointmentId: string): Promise<any> {
+        try {
+          // Call the repository to cancel the appointment using the provided appointmentId
+          const response = await this.userRepository.cancelAppointment(appointmentId);
+      
+          // Check if the repository returned a valid response
+          if (response) {
+            return response; // Return the updated appointment if successful
+          } else {
+            // Throw an error if the response is undefined or invalid
+            throw new Error("Failed to cancel the appointment: Invalid response");
+          }
+        } catch (error: any) {
+          // Log the error and rethrow it with a more specific message
+          console.error("Error in cancelAppointment:", error.message);
+          throw new Error(`Failed to cancel appointment: ${error.message}`);
+        }
+      }
+      
+    
       
     
     

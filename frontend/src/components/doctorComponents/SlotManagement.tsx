@@ -17,7 +17,7 @@ import withReactContent from 'sweetalert2-react-content';
 
 function SlotManagement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); // Set today's date as default
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); 
   const [availableSlots, setAvailableSlots] = useState<{ start: string, end: string, availability: boolean, _id: string,date:Date,doctorId:string }[]>([]);
 
   const MySwal = withReactContent(Swal);
@@ -60,10 +60,14 @@ function SlotManagement() {
     }),
     onSubmit: async (values) => {
       try {
+        console.log("before utc",values.selectedDate);
+        
         const selectedDateUTC = moment(values.selectedDate)
           .utc()
           .startOf('day').add(1,'days')
-          .toISOString(); 
+          .toISOString();
+          
+          console.log("after utc",selectedDateUTC);
 
         const slotsWithDates = values.selectedSlots.map((slot) => {
           const [startTime, endTime] = slot.split(' to ');
@@ -129,12 +133,12 @@ function SlotManagement() {
       return;
     }
   
-    // Check if the slot is available by calling the backend API
+  
     const isAvailable = await checkSlotAvailability(slot);
     
     if (!isAvailable) {
       toast.error('This time slot is already booked for the selected date');
-      return; // Do not update selectedSlots if the slot is taken
+      return; 
     }
   
     const selectedSlots = formik.values.selectedSlots;
@@ -146,7 +150,7 @@ function SlotManagement() {
     );
   };
   
-  // Function to check slot availability from the backend
+ 
   const checkSlotAvailability = async (slot: string) => {
     const [startTime, endTime] = slot.split(' to ');
   
@@ -205,7 +209,7 @@ function SlotManagement() {
 
         const response = await axiosUrl.get(`/doctor/getSlots`, {
           params: {
-            date: date, // Pass date in the correct format
+            date: date, 
             doctorId: doctorId,
           },
         });
@@ -236,7 +240,7 @@ function SlotManagement() {
     
     var selectedDateUTC = moment(date).utc().startOf('day').add(1,'days').toISOString(); 
 
-    fetchSlotsForDate(selectedDateUTC); // Fetch slots for the selected date
+    fetchSlotsForDate(selectedDateUTC); 
   };
 
   const handleDeleteSlot = async (slotId: string, date: Date, doctorId: string) => {
@@ -255,17 +259,17 @@ function SlotManagement() {
       if (result.isConfirmed) {
         
   
-        // Send delete request with query parameters
+       
         await axiosUrl.delete(`/doctor/deleteSlot`, {
           params: { slotId, date, doctorId }
         });
   
-        // Update available slots in the state
+        
         setAvailableSlots(prevSlots => prevSlots.filter(slot => slot._id !== slotId));
   
        
   
-        // SweetAlert success dialog
+       
         await MySwal.fire('Deleted!', 'The slot has been deleted.', 'success');
       }
     } catch (error: any) {
@@ -275,12 +279,12 @@ function SlotManagement() {
   };
   
 
-  // Automatically load today's slots when the component mounts
+ 
   useEffect(() => {
     const date = new Date()
     var selectedDateUTC = moment(date).utc().startOf('day').toISOString();
     fetchSlotsForDate(selectedDateUTC);
-  }, []); // Runs only once when the component mounts
+  }, []); 
 
   return (
     <div className="flex flex-col w-full mx-auto pl-64 p-4 ml-3 mt-14">

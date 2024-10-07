@@ -185,29 +185,25 @@ export class doctorController {
         } catch (error: any) {
             
             
-            if (error.message === "Otp not send") {
-              res.status(500).json({ message: "OTP not sent" });
-            } else {
+            
             res.status(500).json({ message: "Something went wrong, please try again later" });
-          }
+          
         }
       }
       async createTimeSlot(req: Request, res: Response): Promise<void> {
         try {
-            // Log incoming request data for debugging
-            console.log("Control");
-            console.log("Form data:", req.body);
+            
 
-            // Call the service layer to create the slot
+            
             const response = await this.doctorService.createSlot(req.body);
 
-            // Send success response
+          
             res.status(200).json({ status: true, message: "Slot created successfully", data: response });
         } catch (error: any) {
-            // Log the error for debugging
+          
            
 
-            // Handle different types of errors
+           
             if (error.message === "Failed to create slot. No response received.") {
                 res.status(500).json({ message: "Failed to create slot. No response received." });
             } else {
@@ -219,19 +215,19 @@ export class doctorController {
       try {
          
     
-          // Access query parameters (they come as strings, so convert if necessary)
+          
           const { date, doctorId } = req.query;
-          console.log("date",date)
+          
           
           if (!date || !doctorId) {
               res.status(400).json({ message: "Missing required query parameters: date or doctorId" });
           }
     
-          // Call the service with query parameters
+       
           const response = await this.doctorService.getSlots(date as string, doctorId as string);
           
     
-          // Send success response
+         
           res.status(200).json({ status: true, message: "Slot retrieved successfully", data: response });
       } catch (error: any) {
           
@@ -243,23 +239,20 @@ export class doctorController {
       try {
          
     
-          // Access query parameters (they come as strings, so convert if necessary)
+         
           const { date, doctorId,start,end } = req.body;
-          console.log("dates",date)
-          console.log("d",doctorId)
-          console.log("s",start)
-          console.log("e",end)
+         
           
           if (!date || !doctorId) {
               res.status(400).json({ message: "Missing required query parameters: date or doctorId" });
           }
     
-          // Call the service with query parameters
+          
           const response = await this.doctorService.checkAvailability(date as string, doctorId as string,start as string,end as string);
           
-    console.log(response)
-          // Send success response
-          res.status(200).json({ status: true, message: "Slot retrieved successfully", data: response });
+   
+          
+          res.status(200).json({ status: true, data: response });
       } catch (error: any) {
           
     
@@ -270,43 +263,193 @@ export class doctorController {
       try {
         const { slotId, date, doctorId } = req.query;
     
-        // Log the incoming query parameters
-        console.log("Date:", date);
-        console.log("Doctor ID:", doctorId);
-        console.log("Slot ID:", slotId);
+        
+        
     
-        // Validate query parameters
+        
         if (!date || !doctorId || !slotId) {
            res.status(400).json({
             message: "Missing required query parameters: date, doctorId, or slotId"
           });
         }
     
-        // Optional: Convert `date` to a Date object (if required by your service logic)
+       
         const parsedDate = new Date(date as string);
-        console.log("Date:", parsedDate);
+        
     
-        // Call the service with validated query parameters
+       
         const response = await this.doctorService.deleteSlot(parsedDate as Date, doctorId as string, slotId as string);
     
-        console.log("Service response:", response);
+        
     
-        // Send success response
+        
         res.status(200).json({ 
           status: true, 
           message: "Slot deleted successfully", 
           data: response 
         });
       } catch (error: any) {
-        // Log the error for debugging
+        
         console.error("Error deleting slot:", error.message);
     
-        // Send generic error response
+        
         res.status(500).json({
           message: "Something went wrong, please try again later"
         });
       }
     }
+
+    async getAllAppointments(req: Request, res: Response): Promise<void> {
+  try {
+      const doctorId = req.params.doctorId;
+      const {status} = req.query
+      
+      
+
+      // // Fetch appointments using the doctorId
+      const response = await this.doctorService.getAppointments(doctorId,status as string);
+
+      
+      
+
+      // If successful, send a 200 status with the fetched appointments
+      res.status(200).json({ message: "Appointments fetched successfully", data: response});
+  } catch (error: any) {
+      console.error("Error fetching appointments:", error.message);
+
+      // Send a 400 response if the error is known, else send a 500 for an unexpected error
+      if (error.message.includes("Failed to get appointments")) {
+          res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+      } else {
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+  }
+}
+
+async cancelAppointment(req: Request, res: Response): Promise<void> {
+  try {
+    // Extract appointmentId and Reason from the request body
+    const { appointmentId, reason } = req.body;
+
+    // Log the received values for debugging
+    console.log("Received appointmentId:", appointmentId);
+    console.log("Received Reason:", reason);
+
+    // Call the service to cancel the appointment using the appointmentId and Reason
+    const response = await this.doctorService.cancelAppointment(appointmentId, reason);
+
+    // Log the response for debugging
+    console.log("Cancel Appointment Response:", response);
+
+    // If successful, send a 200 status with the updated appointment
+    res.status(200).json({ message: "Appointment canceled successfully", data: response });
+  } catch (error: any) {
+    console.error("Error canceling appointment:", error.message);
+
+    // If the error message is related to the cancellation process, return a 400 status
+    if (error.message.includes("Failed to cancel appointment")) {
+      res.status(400).json({ message: `Failed to cancel appointment: ${error.message}` });
+    } else {
+      // Otherwise, send a 500 status for unexpected errors
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+async addPrescription(req: Request, res: Response): Promise<void> {
+  try {
+    // Extract appointmentId and prescription from the request body
+    const { appointmentId, prescription } = req.body;
+
+    // Log the received values for debugging
+    console.log("Received appointmentId:", appointmentId);
+    console.log("Received prescription:", prescription);
+
+    // Call the service to add a prescription to the appointment
+    const response = await this.doctorService.addPrescription(appointmentId, prescription);
+
+    // Log the response for debugging
+    console.log("Add Prescription Response:", response);
+
+    // If successful, send a 200 status with the updated appointment data
+    res.status(200).json({ message: "Prescription added successfully", data: response });
+  } catch (error: any) {
+    console.error("Error adding prescription:", error.message);
+
+    // If the error is related to the prescription process, return a 400 status
+    if (error.message.includes("Failed to add prescription")) {
+      res.status(400).json({ message: `Failed to add prescription: ${error.message}` });
+    } else {
+      // Otherwise, send a 500 status for unexpected errors
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+
+async getWallet(req: Request, res: Response): Promise<void> {
+  try {
+      const doctorId = req.params.doctorId;
+      const { status } = req.query;
+
+      // Validate the presence of doctorId
+      if (!doctorId) {
+          res.status(400).json({ message: "Doctor ID is required." });
+          return;
+      }
+
+      // Fetch wallet data using the doctorId and status
+      const response = await this.doctorService.getWallet(doctorId, status as string);
+
+      // If successful, send a 200 status with the fetched wallet data
+      res.status(200).json({ success: true, message: "Wallet data fetched successfully", response });
+  } catch (error: any) {
+      console.error("Error fetching wallet data:", error.message);
+
+      // Send a 400 response for known errors, else send a 500 for unexpected errors
+      if (error.message.includes("Failed to get wallet details")) {
+          res.status(400).json({ success: false, message: `Failed to get wallet details: ${error.message}` });
+      } else {
+          res.status(500).json({ success: false, message: "An unexpected error occurred." });
+      }
+  }
+}
+async withdraw(req: Request, res: Response): Promise<void> {
+  try {
+      const doctorId = req.params.doctorId;
+      const withdrawalAmount = req.body.withdrawAmount; // Access the withdrawal amount correctly from the request body
+console.log(req.body);
+console.log(withdrawalAmount);
+console.log(typeof withdrawalAmount);
+
+      // Validate the presence of doctorId and withdrawalAmount
+      if (!doctorId) {
+          res.status(400).json({ success: false, message: "Doctor ID is required." });
+          return;
+      }
+      if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
+          res.status(400).json({ success: false, message: "A valid withdrawal amount is required." });
+          return;
+      }
+
+      // Fetch wallet data using the doctorId and withdrawalAmount
+      const response = await this.doctorService.withdraw(doctorId, withdrawalAmount);
+
+      // If successful, send a 200 response with the fetched wallet data
+      res.status(200).json({ success: true, message: "Withdrawal successful", response });
+  } catch (error: any) {
+      console.error("Error fetching wallet data:", error.message);
+
+      // Send a 400 response for known errors, else send a 500 for unexpected errors
+      if (error.message.includes("Failed to get wallet details")) {
+          res.status(400).json({ success: false, message: `Failed to get wallet details: ${error.message}` });
+      } else {
+          res.status(500).json({ success: false, message: "An unexpected error occurred." });
+      }
+  }
+}
+
+
+
+
     
     
   

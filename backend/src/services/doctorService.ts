@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 import { doctorType ,DoctorData,DoctorFiles,docDetails,TimeSlot} from '../interface/doctorInterface/doctorInterface';
 import { S3Service } from '../config/s3client';
+import moment from 'moment';
 
 
 
@@ -134,7 +135,7 @@ export class doctorService{
 
                 }
             }else{
-                console.log("skjgvjsk")
+                
                 throw new Error("OTP has expired");
 
             }
@@ -163,15 +164,15 @@ export class doctorService{
 
     async resendOtpCheck(doctorToken: string) {
         try {
-            console.log("resendService")
+            
            
             const decoded: any = jwt.decode(doctorToken);
-            console.log("decoded",decoded)
+            
 
             
             
             const email = decoded.doctorData.email
-            console.log("resend email",email);
+            
             const Generated_OTP: string = Math.floor(1000 + Math.random() * 9000).toString();
             let saltRounds:number =10;
             const hashedOTP:string = await bcrypt.hash(Generated_OTP, saltRounds);
@@ -223,7 +224,7 @@ export class doctorService{
     
     async verifyDoctor(email: string, password: string) {
         try {
-            console.log("login doctorService");
+            
             const doctorData = await this.doctorRepository.doctorCheck(email);
             if (doctorData) {
                 const result = await bcrypt.compare(password, doctorData.password);
@@ -262,7 +263,7 @@ export class doctorService{
                     refreshToken
                 };
             } else {
-                console.log("doctordata not found")
+                
                 throw new Error("doctor Doesn't exist");
             }
         } catch (error: any) {
@@ -362,7 +363,7 @@ if (files.qualificationImage) {
     }
     async getSlots(date: string, doctorId: string) {
         try {
-            // Assuming doctorRepository is correctly handling the date and doctorId
+          
             const response = await this.doctorRepository.getSlots(date, doctorId);
       
             if (response) {
@@ -377,7 +378,7 @@ if (files.qualificationImage) {
       }
     async checkAvailability(date: string, doctorId: string,start:string,end:string) {
         try {
-            // Assuming doctorRepository is correctly handling the date and doctorId
+            
             const response = await this.doctorRepository.checkSlots(date, doctorId,start,end);
       
             if (response) {
@@ -392,30 +393,125 @@ if (files.qualificationImage) {
       }
       async deleteSlot(date: Date, doctorId: string, slotId: string) {
         try {
-            // Log the input parameters for better traceability
-            console.log("Deleting slot with parameters:", { date, doctorId, slotId });
+            
+            
     
             const response = await this.doctorRepository.deleteTimeSlot(date, doctorId, slotId);
     
-            // Check if the response is valid
+          
             if (response) {
                 return response;
             } else {
                 throw new Error('Failed to delete slot. No response received from the repository.');
             }
         } catch (error: any) {
-            // Log the error with more context
-            console.error("Service error during slot deletion:", {
-                message: error.message,
-                date,
-                doctorId,
-                slotId
-            });
             
-            // Rethrow the error with additional context
+            
+            
+            
             throw new Error(`Error deleting slot: ${error.message}`);
         }
     }
+
+    async getAppointments(doctorId: string, status: string) {
+        try {
+            // Fetch appointments for the given doctorId from the doctorRepository
+            const response = await this.doctorRepository.getAllAppointments(doctorId, status);
+    
+           
+    
+            // Validate the response if it matches the expected structure
+            if (Array.isArray(response)) {
+                // Map through the appointments and convert start and end times
+                const formattedAppointments = response.map(appointment => {
+                    return {
+                        ...appointment,
+                        start: this.getTime(appointment.start),
+                        end: this.getTime(appointment.end)
+                    };
+                });
+    
+                return formattedAppointments; // Return the formatted appointments
+            } else {
+                // Log and throw an error if the response is invalid
+                console.error("Failed to get appointments: Response is invalid", response);
+                throw new Error("Something went wrong while fetching the appointments.");
+            }
+        } catch (error: any) {
+            // Log the error with a descriptive message and rethrow it
+            console.error("Error in getAppointments:", error.stack || error.message);
+            throw new Error(`Failed to get appointments: ${error.message}`);
+        }
+    }
+
+    getTime(slot:any){
+        return moment(slot).tz('UTC').format('h:mm A')
+      }
+
+      async cancelAppointment(appointmentId: string,reason:string): Promise<any> {
+        try {
+          // Call the repository to cancel the appointment using the provided appointmentId
+          const response = await this.doctorRepository.cancelAppointment(appointmentId,reason);
+      
+          // Check if the repository returned a valid response
+          if (response) {
+            return response; // Return the updated appointment if successful
+          } else {
+            // Throw an error if the response is undefined or invalid
+            throw new Error("Failed to cancel the appointment: Invalid response");
+          }
+        } catch (error: any) {
+          // Log the error and rethrow it with a more specific message
+          console.error("Error in cancelAppointment:", error.message);
+          throw new Error(`Failed to cancel appointment: ${error.message}`);
+        }
+      }
+      async addPrescription(appointmentId: string, prescription: string): Promise<any> {
+        try {
+          // Call the repository to complete the appointment using the provided appointmentId and prescription
+          const response = await this.doctorRepository.completeAppointment(appointmentId, prescription);
+          
+          // Check if the repository returned a valid response
+          if (response) {
+            return response; // Return the updated appointment if successful
+          } else {
+            // Throw an error if the response is undefined or invalid
+            throw new Error("Failed to complete the appointment: Invalid response from repository");
+          }
+        } catch (error: any) {
+          // Log the error and rethrow it with a more specific message
+          console.error("Error in addPrescription:", error.message);
+          throw new Error(`Failed to add prescription: ${error.message}`);
+        }
+      }
+      
+      async getWallet(doctorId: string, status: string) {
+        try {
+            // Fetch wallet details for the given doctorId from the doctorRepository
+            const response = await this.doctorRepository.getWalletDetails(doctorId, status);
+            
+            // Return the response, ensuring it contains success status if needed
+            return response
+        } catch (error: any) {
+            // Log the error with a descriptive message and rethrow it
+            console.error("Error in getWallet:", error.stack || error.message);
+            throw new Error(`Failed to get wallet details: ${error.message}`);
+        }
+    }
+    async withdraw(doctorId: string, withdrawalAmount: number) {
+        try {
+            // Fetch wallet details for the given doctorId from the doctorRepository
+            const response = await this.doctorRepository.withdrawMoney(doctorId, withdrawalAmount);
+            
+            // Return the response, ensuring it contains success withdrawalAmount if needed
+            return response;  // Assuming the response contains updated wallet details
+        } catch (error: any) {
+            // Log the error with a descriptive message and rethrow it
+            console.error("Error in withdraw:", error.stack || error.message);
+            throw new Error(`Failed to withdraw: ${error.message}`);
+        }
+    }
+    
     
       
     

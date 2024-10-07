@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, model } from "mongoose";
 
 // Define the interface for the Appointment document
-interface IAppointment extends Document {
+export interface IAppointment extends Document {
   userId: mongoose.Types.ObjectId;
   docId: mongoose.Types.ObjectId;
   patientNAme:string,
@@ -11,14 +11,13 @@ interface IAppointment extends Document {
   start: Date;
   end: Date;
   locked:mongoose.Types.ObjectId | null;
-  status: "pending" | "completed" | "cancelled";
+  status: "pending" | "prescription pending" | "completed" | "cancelled" |"cancelled by Dr";
   fees: number;
   paymentMethod: "stripe" | "wallet";
   paymentStatus: "payment pending" | "payment completed" | "payment failed" | "refunded" | "anonymous";
   paymentId?: string | null; // Optional since it can be null
   prescription?: string | null; // Optional since it can be null
   reason?: string | null; // Optional since it can be null
-  cancelledBy?: "user" | "doctor" | null; // Optional since it can be null
   medicalRecords?: string[]; // Optional list of medical records
   createdAt?: Date;
   updatedAt?: Date;
@@ -101,11 +100,6 @@ const AppointmentSchema = new Schema<IAppointment>(
     },
     reason: {
       type: String,
-      default: null,
-    },
-    cancelledBy: {
-      type: String,
-      enum: ["user", "doctor"],
       default: null,
     },
     medicalRecords: [String],

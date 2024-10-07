@@ -34,16 +34,15 @@ export class adminRepository {
     }
     async createSpecialization(name:string,description:string){
         try {
-            // Create a new specialization document
+          
             const newSpecialization = new specializationModel({
                 name,
                 description,
             });
     
-            // Save the document to the database
+          
             const savedSpecialization = await newSpecialization.save();
     
-            // Optionally, return the saved document or some confirmation
             return savedSpecialization;
         } catch (error: any) {
             console.error("Error creating specialization:", error.message);
@@ -74,7 +73,7 @@ export class adminRepository {
             
             return specializations
         } catch (error: any) {
-            console.error("Error getting specialization:", error.message);
+            console.error("Error update specialization:", error.message);
             throw new Error(error.message);
         }
     }
@@ -126,7 +125,7 @@ export class adminRepository {
     }
     async approveDoctorApplication(doctorId: string) {
         try {
-            // Fetch the doctor application by doctorId
+            
             const application = await doctorApplicationModel.findOne({ doctorId: doctorId });
             if (!application) {
                 throw new Error("Doctor application not found");
@@ -134,7 +133,7 @@ export class adminRepository {
             
             console.log("Doctor application:", application);
             
-            // Update the doctor model with the details from the application, including setting KYC status to "approved"
+          
             const updatedDoctor = await doctorModel.findByIdAndUpdate(
                 doctorId,
                 {
@@ -145,9 +144,9 @@ export class adminRepository {
                     image: application.image,
                     fees: application.fees,
                     kycDetails: application.kycDetails,
-                    kycStatus: "approved", // Set the KYC status to "approved"
+                    kycStatus: "approved", 
                 },
-                { new: true } // This option returns the updated document
+                { new: true } 
             );
     
             if (!updatedDoctor) {
@@ -156,7 +155,7 @@ export class adminRepository {
             
             console.log("Updated doctor details:", updatedDoctor);
             
-            // Delete the approved doctor application
+            
             await doctorApplicationModel.deleteOne({ doctorId: doctorId });
             console.log("Doctor application deleted");
     

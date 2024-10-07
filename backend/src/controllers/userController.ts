@@ -168,13 +168,13 @@ export class userController {
        
 
        
-        res.status(200).json({ message: "Specialization added successfully", response });
+        res.status(200).json({ message: "Specialization fetched successfully", response });
         
     } catch (error: any) {
       
 
-        if (error.message === "Something went wrong while creating the specialization.") {
-            res.status(400).json({ message: "Something went wrong while creating the specialization." });
+        if (error.message === `Failed to get specialization: ${error.message}`) {
+            res.status(400).json({ message: `Failed to get specialization: ${error.message}` });
         } else {
           
             res.status(500).json({ message: "An unexpected error occurred", error: error.message });
@@ -194,18 +194,16 @@ export class userController {
         
 
        
-        res.status(200).json({ message: "Specialization added successfully", response });
+        res.status(200).json({ message: "Fetched successfully", response });
         
     } catch (error: any) {
        
        
 
-        if (error.message === "Something went wrong while creating the specialization.") {
-            res.status(400).json({ message: "Something went wrong while creating the specialization." });
-        } else {
+        
           
             res.status(500).json({ message: "An unexpected error occurred", error: error.message });
-        }
+        
     }
 }
 async getDoctorDetails(req: Request, res: Response): Promise<void> {
@@ -222,7 +220,7 @@ async getDoctorDetails(req: Request, res: Response): Promise<void> {
 console.log("this is doc",response);
 
      
-      res.status(200).json({ message: " successfully", response });
+      res.status(200).json({ message: "successfully", response });
       
   } catch (error: any) {
      
@@ -242,23 +240,23 @@ async getDoctorSlots(req: Request, res: Response): Promise<void> {
 
       const { date, doctorId } = req.query;
 
-      // Check if both date and doctorId are provided
+      
       if (!date || !doctorId) {
           res.status(400).json({ message: "Date and doctorId are required." });
       }
 
    
 
-      // Fetch the slots from the service
+      
       const response = await this.userService.getSlots(date as string, doctorId as string);
 
-      // Send a success response
+     
       res.status(200).json({ message: "Doctor slots fetched successfully", response });
       
   } catch (error: any) {
       
 
-      // Handle specific error messages if necessary
+    
       if (error.message.includes("something went wrong")) {
           res.status(400).json({ message: "Error fetching doctor slots." });
       } else {
@@ -268,18 +266,18 @@ async getDoctorSlots(req: Request, res: Response): Promise<void> {
 }
 async updateUserProfile(req: Request, res: Response): Promise<void> {
   try {
-    // Extract the user data from the request body
+    
     const { _id, name, DOB, address } = req.body;
 
-    // Pass the data to the service to update the profile
+    
     const response = await this.userService.updateProfile(_id, { name, DOB, address });
 
-    // Send a success response
+    
     res.status(200).json({ message: "Profile updated successfully", response });
   } catch (error: any) {
     console.error("Error updating profile:", error.message);
 
-    // Handle specific error messages if necessary
+   
     if (error.message.includes("something went wrong")) {
       res.status(400).json({ message: "Error updating profile." });
     } else {
@@ -289,13 +287,13 @@ async updateUserProfile(req: Request, res: Response): Promise<void> {
 }
 async updateProfileImage(req: Request, res: Response): Promise<void> {
   try {
-    // Check if the request has a file
+  
     if (!req.file) {
       res.status(400).json({ message: "No image file provided." });
       return;
     }
 
-    // Extract user ID from the request (assuming it's sent in the request body)
+   
     const userId = req.body._id;
     if (!userId) {
       res.status(400).json({ message: "User ID is required." });
@@ -303,17 +301,17 @@ async updateProfileImage(req: Request, res: Response): Promise<void> {
     }
     
 
-    // Call the userService to update the image with the provided userId and file
+    
     const response = await this.userService.updateImage(userId, req.file);
 
-    // Send a success response
+   
     res.status(200).json({ message: "Profile image updated successfully" ,response});
   } catch (error: any) {
-    console.error("Error updating profile:", error.message);
+    console.error("Error updating profile Image:", error.message);
 
-    // Handle specific error messages if necessary
+   
     if (error.message.includes("something went wrong")) {
-      res.status(400).json({ message: "Error updating profile." });
+      res.status(400).json({ message: "Error updating profile image." });
     } else {
       res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
@@ -326,10 +324,10 @@ async checkSlotStatus(req: Request, res: Response): Promise<void> {
     const date = req.body.date
     const userId = req.body.userId
 
-    // Call the userService to check if the slot is locked
+   
     const response = await this.userService.checkSlotLocked(doctorId, slotId,date,userId);
 
-    // Return a success response with the slot status
+    
     res.status(200).json({ 
       message: "Slot status retrieved successfully", 
       data: response 
@@ -338,7 +336,7 @@ async checkSlotStatus(req: Request, res: Response): Promise<void> {
   } catch (error: any) {
     console.error("Error checking slot status:", error.message);
 
-    // Handle specific error messages based on the logic
+   
     if (error.message.includes("Slot is locked")) {
       res.status(400).json({ message: "The selected slot is already locked." });
     } else {
@@ -357,7 +355,7 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
 
       
 
-      // Return the session ID and any other needed data
+     
       res.status(200).json({ 
           message: "Checkout session created successfully", 
           session 
@@ -387,9 +385,9 @@ async confirmPayment(req: Request, res: Response): Promise<void> {
 
       
 
-      // console.log("cintroller",response)
+      
 
-      // Return the response ID and any other needed data
+      
       res.status(200).json({ 
           message: "Checkout response created successfully", 
           confirmAppointment
@@ -406,6 +404,59 @@ async confirmPayment(req: Request, res: Response): Promise<void> {
       }
   }
 }
+
+async getAllAppointments(req: Request, res: Response): Promise<void> {
+  try {
+      const userId = req.params.userId;
+      const {status} = req.query
+      console.log("stat",status);
+      
+
+      // Fetch appointments using the userId
+      const response = await this.userService.getAppointments(userId,status as string);
+
+      console.log("response app",response);
+      
+
+      // If successful, send a 200 status with the fetched appointments
+      res.status(200).json({ message: "Appointments fetched successfully", data: response });
+  } catch (error: any) {
+      console.error("Error fetching appointments:", error.message);
+
+      // Send a 400 response if the error is known, else send a 500 for an unexpected error
+      if (error.message.includes("Failed to get appointments")) {
+          res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+      } else {
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+  }
+}
+async cancelAppointment(req: Request, res: Response): Promise<void> {
+  try {
+    const appointmentId = req.params.appointmentId;
+
+    // Call the service to cancel the appointment using the appointmentId
+    const response = await this.userService.cancelAppointment(appointmentId);
+
+    // Log the response for debugging
+    console.log("Cancel Appointment Response:", response);
+
+    // If successful, send a 200 status with the updated appointment
+    res.status(200).json({ message: "Appointment canceled successfully", data: response });
+  } catch (error: any) {
+    console.error("Error canceling appointment:", error.message);
+
+    // If the error message is related to the cancellation process, return a 400 status
+    if (error.message.includes("Failed to cancel appointment")) {
+      res.status(400).json({ message: `Failed to cancel appointment: ${error.message}` });
+    } else {
+      // Otherwise, send a 500 status for unexpected errors
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+
+
 
 
 

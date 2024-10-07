@@ -5,12 +5,12 @@ import { doctorRepository } from "../repository/doctorRepository";
 import { doctorService } from "../services/doctorService";
 import { S3Service } from "../config/s3client";
 
-// Configure multer for memory storage
+
 const storage = multer.memoryStorage();
 
 const upload = multer({ storage: storage });
 
-// Define the middleware for handling file uploads
+
 const uploadDoctorDataFiles = upload.fields([
   { name: 'image', maxCount: 1 },
   { name: 'aadhaarFrontImage', maxCount: 1 },
@@ -35,5 +35,10 @@ route.post('/createSlot', doctorControllerInstance.createTimeSlot.bind(doctorCon
 route.get('/getSlots', doctorControllerInstance.getTimeSlot.bind(doctorControllerInstance));
 route.post('/checkSlotAvailability', doctorControllerInstance.checkSlotAvailability.bind(doctorControllerInstance));
 route.delete('/deleteSlot', doctorControllerInstance.deleteSlot.bind(doctorControllerInstance));
+route.get('/getAppointments/:doctorId', doctorControllerInstance.getAllAppointments.bind(doctorControllerInstance));
+route.put('/cancelAppointment', doctorControllerInstance.cancelAppointment.bind(doctorControllerInstance));
+route.put('/addPrescription', doctorControllerInstance.addPrescription.bind(doctorControllerInstance));
+route.get('/getWallet/:doctorId', doctorControllerInstance.getWallet.bind(doctorControllerInstance));
+route.post('/withdraw/:doctorId', doctorControllerInstance.withdraw.bind(doctorControllerInstance));
 
 export default route;

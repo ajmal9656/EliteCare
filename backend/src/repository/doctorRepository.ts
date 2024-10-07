@@ -1,10 +1,13 @@
 import doctorModel from "../model/doctorModel";
-import { Document } from "mongoose";
+import { Document,ObjectId } from "mongoose";
 import { doctorType,DoctorData,DoctorFiles,docDetails, TimeSlot } from "../interface/doctorInterface/doctorInterface";
 import doctorApplicationModel from "../model/doctorApplicationModel";
 import RejectDoctorModel from "../model/RejectDoctorSchema";
 import doctorSlotsModel from "../model/doctorSlotModel";
 import moment from 'moment-timezone';
+import appointmentModel from "../model/AppoinmentModel";
+import WalletModel, { ITransaction} from "../model/walletModel";
+import { log } from "console";
 
 
 
@@ -39,7 +42,7 @@ export class doctorRepository {
     async createDoctor(doctorData:doctorType):Promise<Document>{
         try {
         
-            console.log(doctorData)
+            
             const newDoctor = new doctorModel(doctorData);
             return await newDoctor.save()
 
@@ -53,7 +56,7 @@ export class doctorRepository {
 
     async doctorCheck(email: string) {
         try {
-          console.log("login doctorrep");
+          
           const doctorData = await doctorModel.findOne({ email: email });
       
           if (doctorData) {
@@ -101,11 +104,11 @@ export class doctorRepository {
                     },
                     
                 };
-                console.log("doctorrep",details);
+                
 
                 const newDoctorApplication = await doctorApplicationModel.create(details);
 
-                console.log("new",newDoctorApplication)
+                
 
                 return true
 
@@ -160,23 +163,25 @@ export class doctorRepository {
     
     async getSlots(date: string, doctorId: string) {
       try {
-        // Convert the input date string to the start of the day in UTC
+        
         const formattedDate = new Date(date);
         
-        // Query the database for doctor slots based on the doctorId and date
+        
         const doctorSlots = await doctorSlotsModel.findOne({
           doctorId: doctorId,
-          date: formattedDate // Assuming date field is of type Date in the DB and stored in UTC
+          date: formattedDate 
         });
-        console.log("docarry",doctorSlots)
+        
+
+         
     
-        // Check if any slots were found
+      
         if (doctorSlots && doctorSlots.slots) {
-          // Map over each slot, converting start and end times to a readable format
+          
           const slotsArray = doctorSlots.slots.map((slot: any) => {
             return {
-              start: moment(slot.start).tz('UTC').format('h:mm A'), // Converts start time to 'h:mm A' format in UTC or your preferred timezone
-              end: moment(slot.end).tz('UTC').format('h:mm A'), // Converts end time to 'h:mm A' format in UTC or your preferred timezone
+              start: this.getTime(slot.start), 
+              end: this.getTime(slot.end), 
               availability: slot.availability,
               _id:slot._id,
               date:doctorSlots.date,
@@ -184,7 +189,9 @@ export class doctorRepository {
              
             };
           });
-          console.log(slotsArray)
+          
+
+          
     
           return slotsArray;
         } else {
@@ -195,6 +202,10 @@ export class doctorRepository {
         throw new Error(error.message);
       }
     }
+
+     getTime(slot:any){
+      return moment(slot).tz('UTC').format('h:mm A')
+    }
    
 
     async checkSlots(date: string, doctorId: string, start: string, end: string) {
@@ -203,11 +214,9 @@ export class doctorRepository {
         const startTime = new Date(start);
         const endTime = new Date(end);
     
-        console.log("date", parsedDate);
-        console.log("start", startTime);
-        console.log("end", endTime);
         
-        // Find the doctor slots for the given date and doctor ID
+        
+       
         const slots = await doctorSlotsModel.findOne({
           doctorId: doctorId,
           date: parsedDate,
@@ -218,51 +227,48 @@ export class doctorRepository {
             const slotStart = new Date(slot.start);
             const slotEnd = new Date(slot.end);
     
-            // Check if the start and end times exactly match any existing slot
+            
             if (slotStart.getTime() === startTime.getTime() && slotEnd.getTime() === endTime.getTime()) {
-              console.log("ssssss")
-              return false; // Slot is not available
+              
+              return false; 
             }
           }
     
-          // If no exact match is found, return true (slot is available)
+          
           return true;
         }
     
-        // If no slots exist for that date, return true (available)
+       
         return true;
     
       } catch (error: any) {
-        console.error("Error retrieving slots:", error.message);
+        console.error("Error checking availability slots:", error.message);
         throw new Error(error.message);
       }
     }
     async deleteTimeSlot(date: Date, doctorId: string, slotId: string) {
       try {
-        console.log("qqqqqqqqqqqqqqq")
-        console.log("Ddate:", date);
-        console.log("Ddoctor ID:", doctorId);
-        console.log("Sslot ID:", slotId);
-        // Find the document for the specific doctor and date
+        
+        
         const doctorSlots = await doctorSlotsModel.findOne({
           doctorId: doctorId,
           date: date,
         });
-        console.log("aaaa",doctorSlots)
+        
     
         if (doctorSlots) {
-          // Check if the slot exists in the slots array
+          
           
           const slotIndex = doctorSlots.slots.findIndex(slot => slot._id?.toString() === slotId);
     
           if (slotIndex !== -1) {
-            // Use Mongoose's array manipulation to remove the slot
-            doctorSlots.slots.splice(slotIndex, 1); // Remove the slot at the found index
+            
+            doctorSlots.slots.splice(slotIndex, 1); 
     
-            // Save the updated document
+         
             await doctorSlots.save();
     
-            return true; // Indicate success
+            return true; 
           } else {
             throw new Error('Slot not found.');
           }
@@ -274,6 +280,217 @@ export class doctorRepository {
         throw new Error(error.message);
       }
     }
+
+    async getAllAppointments(doctorId: string, status: string) {
+      try {
+        
+        
+        let appointments = [];
+    
+        // Query all appointments if status is 'All'
+        if (status === "All") {
+          appointments = await appointmentModel.find({ docId: doctorId }).populate("userId").lean();
+        } else {
+          
+          appointments = await appointmentModel.find({ docId: doctorId, status: status }).populate("userId").lean();
+        }
+    
+        
+        
+        // Return the appointments
+        return appointments;
+      } catch (error: any) {
+        console.error("Error getting appointments:", error.message);
+        throw new Error(error.message);
+      }
+    }
+
+    async cancelAppointment(appointmentId: string,reason:string): Promise<any> {
+      try {
+        // Find and update the appointment by ID, setting the status to "cancelled"
+        const appointment = await appointmentModel.findOneAndUpdate(
+          { _id: appointmentId },
+          { status: "cancelled by Dr",reason:reason },
+          { new: true } // Returns the updated document
+        );
+    
+        // If no appointment was found, return a meaningful message
+        if (!appointment) {
+          throw new Error(`Appointment with ID ${appointmentId} not found`);
+        }
+    
+        if (appointment) {
+          const slotUpdation = await doctorSlotsModel.findOne({
+            doctorId: appointment.docId,
+            date: appointment.date,
+          });
+    
+          
+    
+          if (slotUpdation) {
+            
+    
+            // Find the matching slot
+            const matchingSlot = slotUpdation.slots.find(
+              (slot) => new Date(slot.start).getTime() === new Date(appointment.start).getTime()
+            );
+    
+            if (matchingSlot) {
+              
+    
+              // Update slot availability and clear booking details
+              matchingSlot.availability = true;
+              matchingSlot.bookedBy = null as any; // To handle null assignment
+              matchingSlot.lockedBy = null as any; // To handle null assignment
+              matchingSlot.locked = false;
+              matchingSlot.lockExpiration = null as any; // To handle null assignment
+    
+              await slotUpdation.save();
+             
+            }
+          }
+        }
+    
+        // Return the updated appointment
+        return appointment;
+      } catch (error: any) {
+        console.error("Error canceling appointment:", error.message);
+        throw new Error(error.message);
+      }
+    }
+    async completeAppointment(appointmentId: string, prescription: string): Promise<any> {
+      try {
+        // Find the appointment by ID and update its status to "completed" and add the prescription
+        const appointment = await appointmentModel.findOneAndUpdate(
+          { _id: appointmentId }, // Match the appointment ID
+          { status: "completed", prescription: prescription }, // Update status and prescription
+          { new: true } // Return the updated document
+        );
+    
+        // If the appointment was not found, throw an error
+        if (!appointment) {
+          throw new Error("Appointment not found");
+        }
+    
+        // Find the doctor's wallet
+        let wallet = await WalletModel.findOne({ doctorId: appointment.docId });
+    
+        // Generate a unique transaction ID
+        const transactionId = 'txn_' + Date.now() + Math.floor(Math.random() * 10000);
+        const transactionAmount = 0.9 * appointment.fees; // 90% of the appointment fee
+    
+        // Create the transaction object
+        const transaction:ITransaction = {
+          amount: transactionAmount,
+          transactionId: transactionId,
+          transactionType: 'credit', // Assuming it's a credit transaction
+          appointmentId: appointmentId,
+        };
+    
+        // If the wallet exists, update it; otherwise, create a new one
+        if (wallet) {
+          // Add the transaction to the wallet and update the balance
+          wallet.transactions.push(transaction);
+          wallet.balance += transactionAmount;
+          await wallet.save();
+        } else {
+          // Create a new wallet for the doctor
+          wallet = new WalletModel({
+            doctorId: appointment.docId,
+            balance: transactionAmount,
+            transactions: [transaction],
+          });
+          await wallet.save();
+        }
+    
+        return appointment;
+      } catch (error: any) {
+        console.error("Error completing appointment:", error.message);
+        throw new Error(error.message); // Propagate the error
+      }
+    }
+    async getWalletDetails(doctorId: string, status: string) {
+      try {
+        // Query all wallet transactions if status is 'All'
+        let wallet;
+        console.log("status", status);
+        
+        if (status === "All") {
+          wallet = await WalletModel.findOne({ doctorId:doctorId }).lean();
+          console.log('re',wallet);
+          
+          if(!wallet){
+            wallet = { transactions: [] };
+          }
+        } else {
+          // Get wallet first and then filter transactions by type
+          wallet = await WalletModel.findOne({ doctorId }).lean();
+          
+          // If the wallet exists, filter the transactions
+          if (wallet) {
+            wallet.transactions = wallet.transactions.filter(transaction => transaction.transactionType === status);
+          } else {
+            wallet = { transactions: [] }; // Return an empty transactions array if no wallet is found
+          }
+        }
+    
+        // Return the wallet transactions
+        
+        
+        return wallet;
+      } catch (error: any) {
+        console.error("Error getting wallet details:", error.message);
+        throw new Error(error.message);
+      }
+    }
+    async withdrawMoney(doctorId: string, withdrawalAmount: number) {
+      try {
+          // Step 1: Fetch the doctor's wallet details from the database
+          const wallet = await WalletModel.findOne({ doctorId });
+  
+          if (!wallet) {
+              throw new Error('Wallet not found for the specified doctor.');
+          }
+  
+          // Step 2: Check if the withdrawal amount is valid
+          if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
+              throw new Error('A valid withdrawal amount is required.');
+          }
+          if (wallet.balance < withdrawalAmount) {
+              throw new Error('Insufficient balance for withdrawal.');
+          }
+  
+          // Step 3: Deduct the withdrawal amount from the wallet
+          wallet.balance -= withdrawalAmount;
+  
+          // Step 4: Create the transaction object
+          const transactionId = 'txn_' + Date.now() + Math.floor(Math.random() * 10000);
+          const transaction: ITransaction = {
+              amount: withdrawalAmount,
+              transactionId: transactionId,
+              transactionType: 'debit',
+              
+          };
+  
+          // Step 5: Push the transaction to the wallet's transactions array
+          wallet.transactions.push(transaction);
+  
+          // Step 6: Save the updated wallet back to the database
+          await wallet.save();
+  
+          // Step 7: Return the updated wallet details (new balance) and transaction details
+          return wallet
+      } catch (error: any) {
+          console.error("Error processing withdrawal:", error.message);
+          throw new Error(error.message);
+      }
+  }
+  
+    
+    
+    
+    
+    
     
     
     

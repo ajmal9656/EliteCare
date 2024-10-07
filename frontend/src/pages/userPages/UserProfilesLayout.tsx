@@ -18,8 +18,8 @@ function UserProfilesLayout() {
   };
   console.log("kjsvbkjsbvs")
   return (
-    <div className="bg-gray-100 h-screen flex ">
-      <div className="w-[25%] h-screen pl-20 mt-10 ">
+    <div className="bg-gray-100 h-screen flex overflow-hidden">
+      <div className="w-[25%] h-full pl-20 mt-10 ">
       <div className="object-cover p-3 space-y-2 w-60 bg-white text-gray-100 border rounded-lg">
           <div className="flex items-center p-2 space-x-4">
             <img
@@ -32,7 +32,7 @@ function UserProfilesLayout() {
               className="w-12 h-12 rounded-full bg-gray-500"
             />
             <div>
-              <h2 className="text-lg font-semibold">{userData?.name}</h2>
+              <h2 className="text-lg font-semibold text-black">{userData?.name}</h2>
               
             </div>
           </div>
@@ -66,7 +66,7 @@ function UserProfilesLayout() {
               {/* Search NavLink */}
               <li>
                 <NavLink
-                  to="/search"
+                  to="/userProfile/appointments"
                   className={({ isActive }) =>
                     `flex items-center p-2 space-x-3 rounded-md ${
                       isActive

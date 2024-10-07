@@ -8,6 +8,9 @@ import DashboardPage from '../pages/doctorPages/DashboardPage';
 import VerificationProcessingPage from '../pages/doctorPages/VerificationProcessingPage';
 import DoctorLayout from '../pages/doctorPages/DoctorLayout';
 import SlotManagementPage from '../pages/doctorPages/SlotManagementPage';
+import AppointmentsPage from '../pages/doctorPages/AppointmentsPage';
+import AppointmentDetailsPage from '../pages/doctorPages/AppointmentDetailsPage';
+import WalletPage from '../pages/doctorPages/WalletPage';
 
 
 
@@ -26,6 +29,9 @@ function doctorRoutes() {
       <Route path='/' element={<DoctorLayout/>}>
                    <Route index path="dashboard" element={<DashboardPage/>} />
                    <Route  path="slotManagement" element={<SlotManagementPage/>} />
+                   <Route  path="appointments" element={<AppointmentsPage/>} />
+                   <Route  path="appointmentDetails" element={<AppointmentDetailsPage/>} />
+                   <Route  path="wallet" element={<WalletPage/>} />
                   
                    
                    

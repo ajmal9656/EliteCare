@@ -13,11 +13,12 @@ import UserLayout from '../pages/userPages/UserLayout';
 import DoctorProfileLayout from '../pages/userPages/DoctorProfileLayout';
 import TimeSlotsPage from '../pages/userPages/TimeSlotsPage';
 
-import UserProfilePage from '../components/userComponents/UserProfilePage';
+import UserProfilePage from '../pages/userPages/UserProfilePage';
 import UserProfilesLayout from '../pages/userPages/UserProfilesLayout';
 import SecurityPage from '../pages/userPages/SecurityPage';
-import AppoinmentPage from '../pages/userPages/AppoinmentPage';
+import BookAppointmentPage from '../pages/userPages/BookAppointmentPage';
 import PaymentSuccess from '../components/common/PaymentSuccess';
+import AppointmentPage from '../pages/userPages/AppointmentPage';
 
 
 
@@ -39,7 +40,7 @@ function UserRoutes() {
                 <Route path='/doctorProfile' element={<DoctorProfileLayout/>} >
                     <Route path="profile" element={<DoctorProfilePage/>} />
                     <Route path="checkSlots" element={<TimeSlotsPage/>} />
-                    <Route path="appoinmentDetails" element={<AppoinmentPage/>} />
+                    <Route path="appoinmentDetails" element={<BookAppointmentPage/>} />
 
                 </Route>
                 
@@ -47,6 +48,7 @@ function UserRoutes() {
          <Route path='/userProfile' element={<UserProfilesLayout/>} >
                     <Route path="profile" element={<UserProfilePage/>} />
                     <Route path="security" element={<SecurityPage/>} />
+                    <Route path="appointments" element={<AppointmentPage/>} />
                 
                      
 

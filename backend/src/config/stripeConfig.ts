@@ -5,7 +5,7 @@ dotenv.config();
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2024-06-20', // Make sure this is the correct version
+  apiVersion: '2024-06-20', 
 });
 
 async function makeThePayment(
@@ -21,16 +21,16 @@ async function makeThePayment(
   const line_items = [
     {
       price_data: {
-        currency: 'inr', // Specify the currency
+        currency: 'inr', 
         product_data: {
-          name: doctorName, // Use doctorName
-          images: [imageUrl], // Include the image URL
-          description: `Consultation with Dr. ${doctorName}`, // Add a description (optional)
+          name: doctorName, 
+          images: [imageUrl], 
+          description: `Consultation with Dr. ${doctorName}`, 
           // metadata: {
           //   doctorId: doctorId, // Include doctorId as metadata
           // },
         },
-        unit_amount: amount * 100, // Convert amount to smallest currency unit (paisa)
+        unit_amount: amount * 100, 
       },
       quantity: 1,
     },
@@ -38,8 +38,8 @@ async function makeThePayment(
 
   try {
     const session = await stripe.checkout.sessions.create({
-      success_url: `http://localhost:5173/confirmPayment/${appointmentId}/${doctorId}`, // Replace with your actual frontend URL
-      cancel_url: `http://localhost:5000/paymentFailed`, // Replace with your actual frontend URL
+      success_url: `http://localhost:5173/confirmPayment/${appointmentId}/${doctorId}`, 
+      cancel_url: `http://localhost:5000/paymentFailed`, 
       line_items: line_items,
       mode: 'payment',
     });

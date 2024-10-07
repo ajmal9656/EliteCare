@@ -132,7 +132,7 @@ function Sidebar() {
   </li>
   <li>
     <NavLink
-      to="/doctor/doctorsList"
+      to="/doctor/appointments"
       className={({ isActive }) =>
         `flex items-center p-2 rounded-lg group ${
           isActive
@@ -150,7 +150,7 @@ function Sidebar() {
       >
         <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286C10 17.169 10.831 18 11.857 18h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
       </svg>
-      <span className="flex-1 ms-3 whitespace-nowrap">Doctors</span>
+      <span className="flex-1 ms-3 whitespace-nowrap">Appointments</span>
     </NavLink>
   </li>
   <li>
@@ -200,28 +200,28 @@ function Sidebar() {
     </NavLink>
   </li>
   <li>
-    <NavLink
-      to="/products"
-      className={({ isActive }) =>
-        `flex items-center p-2 rounded-lg group ${
-          isActive
-            ? "bg-gradient-to-l from-cyan-500 to-blue-500 text-white"
-            : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-cyan-200 to-blue-200"
-        }`
-      }
+  <NavLink
+    to="/doctor/wallet"
+    className={({ isActive }) =>
+      `flex items-center p-2 rounded-lg group ${
+        isActive
+          ? "bg-gradient-to-l from-cyan-500 to-blue-500 text-white"
+          : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-cyan-200 to-blue-200"
+      }`
+    }
+  >
+    <svg
+      className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+      viewBox="0 0 16 16"
     >
-      <svg
-        className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 18 20"
-      >
-        <path d="M15 4a3 3 0 0 0-5.829-1H6.83A3.001 3.001 0 0 0 1 6.17V17a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V6.17A3 3 0 0 0 15 4Zm-6-2a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM3 6.17A1.001 1.001 0 0 1 6.17 6h.661a3 3 0 0 0 5.34 0h.66A1.001 1.001 0 0 1 15 6.17V7H3V6.17ZM15 18H3V9h12v9Z" />
-      </svg>
-      <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
-    </NavLink>
-  </li>
+      <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm13 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+    </svg>
+    <span className="flex-1 ms-3 whitespace-nowrap">Wallet</span>
+  </NavLink>
+</li>
+
 </ul>
         </div>
       </aside>

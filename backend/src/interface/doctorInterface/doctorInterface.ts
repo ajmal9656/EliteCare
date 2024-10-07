@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export type doctorType={
     doctorId:string;
     name:string;
@@ -87,4 +89,15 @@ export interface DoctorState {
     selectedDate:string,
     selectedSlots:Time[],
     doctorId:string
+  }
+
+  export interface AppointmentSlot {
+    _id:mongoose.Types.ObjectId
+    start: Date;
+    end: Date;
+    locked: boolean;
+    availability: boolean;
+    lockedBy: mongoose.Types.ObjectId | null;
+    lockExpiration: Date | null;
+    bookedBy: mongoose.Types.ObjectId| null;
   }
