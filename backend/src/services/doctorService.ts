@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import { doctorType ,DoctorData,DoctorFiles,docDetails,TimeSlot} from '../interface/doctorInterface/doctorInterface';
 import { S3Service } from '../config/s3client';
 import moment from 'moment';
+import { refund } from '../config/stripeConfig';
 
 
 
@@ -448,14 +449,30 @@ if (files.qualificationImage) {
         return moment(slot).tz('UTC').format('h:mm A')
       }
 
-      async cancelAppointment(appointmentId: string,reason:string): Promise<any> {
+      async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
         try {
           // Call the repository to cancel the appointment using the provided appointmentId
-          const response = await this.doctorRepository.cancelAppointment(appointmentId,reason);
+          const response = await this.doctorRepository.cancelAppointment(appointmentId, reason);
       
           // Check if the repository returned a valid response
           if (response) {
-            return response; // Return the updated appointment if successful
+            console.log("Cancellation response:", response);
+      
+            // Assuming the response contains a paymentId for the appointment
+            const paymentId = response.paymentId; // Adjust this according to your response structure
+      
+            // Proceed to refund if a valid paymentId is available
+            if (paymentId) {
+                console.log("paymentid",paymentId);
+                
+              // Call the refund function and await the result
+              const refundResponse = await refund(paymentId); // Ensure the refund method is available in the class
+      
+              // Return the updated appointment and refund details
+              return response;
+            } else {
+              throw new Error("No payment ID available for refund");
+            }
           } else {
             // Throw an error if the response is undefined or invalid
             throw new Error("Failed to cancel the appointment: Invalid response");
@@ -473,6 +490,8 @@ if (files.qualificationImage) {
           
           // Check if the repository returned a valid response
           if (response) {
+            
+            
             return response; // Return the updated appointment if successful
           } else {
             // Throw an error if the response is undefined or invalid

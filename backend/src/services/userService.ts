@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 import { S3Service} from '../config/s3client';
 import { Appointment } from "../interface/userInterface/interface";
-import makeThePayment from "../config/stripeConfig";
+import makeThePayment, { refund } from "../config/stripeConfig";
 
 dotenv.config()
 
@@ -597,11 +597,23 @@ if (file) {
       
           // Check if the repository returned a valid response
           if (response) {
-            return response; // Return the updated appointment if successful
-          } else {
-            // Throw an error if the response is undefined or invalid
-            throw new Error("Failed to cancel the appointment: Invalid response");
-          }
+            console.log("Cancellation response:", response);
+      
+            // Assuming the response contains a paymentId for the appointment
+            const paymentId = response.paymentId; // Adjust this according to your response structure
+      
+            // Proceed to refund if a valid paymentId is available
+            if (paymentId) {
+                console.log("paymentid",paymentId);
+                
+              // Call the refund function and await the result
+              const refundResponse = await refund(paymentId); // Ensure the refund method is available in the class
+      
+              // Return the updated appointment and refund details
+              return response;
+            } else {
+              throw new Error("No payment ID available for refund");
+            }}
         } catch (error: any) {
           // Log the error and rethrow it with a more specific message
           console.error("Error in cancelAppointment:", error.message);

@@ -6,6 +6,8 @@ import doctorApplicationModel from "../model/doctorApplicationModel";
 import doctorModel from "../model/doctorModel";
 import RejectDoctorModel from "../model/RejectDoctorSchema";
 import userModel from "../model/userModel";
+import appointmentModel from "../model/AppoinmentModel";
+import { MonthlyStats } from "../interface/adminInterface/adminInterface";
 
 
 
@@ -257,6 +259,130 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
+    async getAllStatistics() {
+        try {
+            // Fetch the count of total doctors
+            const totalDoctors = await doctorModel.countDocuments();
+        
+            // Fetch the count of total users
+            const totalUsers = await userModel.countDocuments();
+        
+            // Count active users (unblocked users)
+            const activeUsers = await userModel.countDocuments({ isBlocked: false });
+        
+            // Count active doctors (unblocked doctors)
+            const activeDoctors = await doctorModel.countDocuments({ isBlocked: false });
+        
+            // Sum of fees for completed appointments, calculating revenue split (90% to doctor, 10% to admin)
+            const revenueData = await appointmentModel.aggregate([
+                { $match: { status: "completed" } },  // Only consider completed appointments
+                { 
+                    $group: { 
+                        _id: null,  // No grouping by fields, just sum total
+                        totalFees: { $sum: "$fees" },  // Total fees
+                        doctorRevenue: { $sum: { $multiply: ["$fees", 0.9] } },  // 90% to doctors
+                        adminRevenue: { $sum: { $multiply: ["$fees", 0.1] } }  // 10% to admin
+                    }
+                }
+            ]);
+        
+            // Extract the total revenue or default to 0 if no completed appointments
+            const totalFees = revenueData.length > 0 ? revenueData[0].totalFees : 0;
+            const doctorRevenue = revenueData.length > 0 ? revenueData[0].doctorRevenue : 0;
+            const adminRevenue = revenueData.length > 0 ? revenueData[0].adminRevenue : 0;
+    
+            // Fetch registration data for users and doctors for the second chart
+            const usersAndDoctorsRegistrationData = await Promise.all([
+                userModel.aggregate([
+                    { $group: { _id: { $month: "$createdAt" }, count: { $sum: 1 } } },  // Group by month and count users
+                    { $sort: { "_id": 1 } }  // Sort by month
+                ]),
+                doctorModel.aggregate([
+                    { $group: { _id: { $month: "$createdAt" }, count: { $sum: 1 } } },  // Group by month and count doctors
+                    { $sort: { "_id": 1 } }  // Sort by month
+                ])
+            ]);
+        
+            // Create a map to hold the monthly statistics
+            const monthlyStatistics: { [key: number]: MonthlyStats } = {}; // Use the defined interface here
+        
+            // Initialize each month with zero values
+            for (let month = 1; month <= 12; month++) {
+                monthlyStatistics[month] = {
+                    users: 0,
+                    doctors: 0,
+                    revenue: 0,
+                    totalFees: 0,
+                    doctorRevenue: 0,
+                    adminRevenue: 0,
+                };
+            }
+    
+            // Fill in registration data for users
+            usersAndDoctorsRegistrationData[0].forEach(userData => {
+                monthlyStatistics[userData._id].users = userData.count;
+            });
+        
+            // Fill in registration data for doctors
+            usersAndDoctorsRegistrationData[1].forEach(doctorData => {
+                monthlyStatistics[doctorData._id].doctors = doctorData.count;
+            });
+        
+            // Fill in revenue data for completed appointments
+            const revenueByMonth = await appointmentModel.aggregate([
+                { $match: { status: "completed" } },  // Only consider completed appointments
+                { 
+                    $group: { 
+                        _id: { $month: "$date" },  // Group by month of the appointment date
+                        totalFees: { $sum: "$fees" },  // Total fees
+                        doctorRevenue: { $sum: { $multiply: ["$fees", 0.9] } },  // 90% to doctors
+                        adminRevenue: { $sum: { $multiply: ["$fees", 0.1] } }  // 10% to admin
+                    }
+                },
+                { $sort: { "_id": 1 } }  // Sort by month
+            ]);
+    
+            // Update monthly statistics with revenue data
+            revenueByMonth.forEach(revenueData => {
+                monthlyStatistics[revenueData._id].revenue = revenueData.totalFees;
+                monthlyStatistics[revenueData._id].totalFees = revenueData.totalFees;
+                monthlyStatistics[revenueData._id].doctorRevenue = revenueData.doctorRevenue;
+                monthlyStatistics[revenueData._id].adminRevenue = revenueData.adminRevenue;
+            });
+        
+            // Convert the object into an array for easier use in charts
+            const userDoctorChartData = Object.keys(monthlyStatistics).map(month => ({
+                month: parseInt(month, 10), // Convert month from string to number
+                users: monthlyStatistics[parseInt(month, 10)].users,
+                doctors: monthlyStatistics[parseInt(month, 10)].doctors,
+                revenue: monthlyStatistics[parseInt(month, 10)].revenue,
+                totalFees: monthlyStatistics[parseInt(month, 10)].totalFees,
+                doctorRevenue: monthlyStatistics[parseInt(month, 10)].doctorRevenue,
+                adminRevenue: monthlyStatistics[parseInt(month, 10)].adminRevenue,
+            }));
+    
+            // Return the object with all the statistics and chart data
+            return {
+                totalDoctors,
+                totalUsers,
+                activeDoctors,
+                activeUsers,
+                totalRevenue: totalFees,
+                doctorRevenue,  // Revenue credited to doctors
+                adminRevenue,   // Revenue credited to admin
+                userDoctorChartData  // Data for the user/doctor registration chart
+            };
+        
+        } catch (error: any) {
+            console.error("Error fetching statistics:", error.message);
+            throw new Error(error.message);
+        }
+    }
+    
+      
+      
+    
+    
     
     
     

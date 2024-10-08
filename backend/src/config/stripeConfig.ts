@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import dotenv from 'dotenv';
+import { log } from "util";
 
 dotenv.config();
 
@@ -51,5 +52,45 @@ async function makeThePayment(
     throw new Error(`Payment failed: ${error.message}`);
   }
 }
+
+
+export async function refund(paymentId: string): Promise<any> {
+  try {
+    // Retrieve the checkout session
+    const session = await stripe.checkout.sessions.retrieve(paymentId);
+    console.log("session",session);
+    console.log("payID",paymentId);
+    
+
+    // Ensure the paymentIntentId exists and is of the correct type
+    const paymentIntentId = session.payment_intent as string | null;
+    if (!paymentIntentId) {
+      throw new Error("No payment intent found in the session.");
+    }
+
+    // Retrieve the payment intent
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const chargeId = paymentIntent.latest_charge as string | null;
+    if (!chargeId) {
+      throw new Error("No charge found in the payment intent.");
+    }
+
+    // Create the refund
+    const refund = await stripe.refunds.create({
+      charge: chargeId,
+      amount: paymentIntent.amount, // Amount should be in cents
+    });
+
+    console.log("refund",refund);
+    
+
+    return refund; // Return the refund details
+  } catch (error: any) {
+    console.error("Error in processing refund:", error.message);
+    throw new Error(`Failed to process refund: ${error.message}`);
+  }
+}
+
+
 
 export default makeThePayment;

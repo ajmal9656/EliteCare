@@ -5,9 +5,8 @@ import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../Redux/store';
-import { addSpecialization,updateSpecialization,listUnlistSpecialization} from '../../Redux/Action/adminActions'; // Assuming you have an updateSpecialization action
+import { addSpecialization, updateSpecialization, listUnlistSpecialization } from '../../Redux/Action/adminActions';
 import { Specializations } from '../../interfaces/doctorinterface';
-
 import axiosUrl from '../../utils/axios';
 
 const validationSchema = Yup.object({
@@ -46,7 +45,7 @@ const Specialization: React.FC = () => {
   };
 
   const openEditModal = (category: Specializations) => {
-    setEditCategory(category);-
+    setEditCategory(category);
     toggleEditModal();
   };
 
@@ -71,12 +70,10 @@ const Specialization: React.FC = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        console.log(editCategory?._id);
-        console.log(values)
         const response = await dispatch(updateSpecialization({
-          id: editCategory?._id!,  
-          name: values.name,       
-          description: values.description  
+          id: editCategory?._id!,
+          name: values.name,
+          description: values.description
         }));
         setCategories((prevCategories) =>
           prevCategories.map((category) =>
@@ -93,10 +90,9 @@ const Specialization: React.FC = () => {
     },
   });
 
-  const toggleListState = async(id: number) => {
+  const toggleListState = async (id: number) => {
     const response = await dispatch(listUnlistSpecialization({
-      id: id,  
-       
+      id: id,
     }));
     setCategories((prevCategories) =>
       prevCategories.map((category) =>
@@ -108,44 +104,42 @@ const Specialization: React.FC = () => {
   return (
     <div className="flex flex-col w-full mx-auto pl-64 p-4 ml-3 mt-14">
       <div className='flex flex-row justify-between'>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Categories</h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Categories</h1>
+        </div>
+
+        <div className="">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+            onClick={toggleAddModal}
+          >
+            Add Category
+          </button>
+        </div>
       </div>
 
-      <div className="">
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-          onClick={toggleAddModal}
-        >
-          Add Category
-        </button>
-      </div>
-      </div>
-
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead>
+      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden">
+        <thead className="bg-gray-100">
           <tr>
-            <th className="py-2 px-4 border-b border-gray-300 text-center">Name</th>
-            
-            <th className="py-2 px-4 border-b border-gray-300 text-center">Actions</th>
+            <th className="py-2 px-4 border-b border-gray-300 text-center  text-gray-700">Name</th>
+            <th className="py-2 px-4 border-b border-gray-300 text-center  text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody>
           {categories.map((category) => (
-            <tr key={category._id}>
+            <tr key={category._id} className={`hover:bg-gray-50 transition-colors 'bg-white'}`}>
               <td className="py-2 px-4 border-b border-gray-300 text-center">
                 {category.name}
               </td>
-              
               <td className="py-2 px-4 border-b border-gray-300 text-center">
                 <button
-                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+                  className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 transition hover:bg-yellow-600"
                   onClick={() => openEditModal(category)}
                 >
                   Edit
                 </button>
                 <button
-                  className={`${category.isListed ? 'bg-green-500' : 'bg-red-500'} text-white px-2 py-1 rounded`}
+                  className={`${category.isListed ? 'bg-green-500' : 'bg-red-500'} text-white px-2 py-1 rounded transition hover:bg-opacity-80`}
                   onClick={() => toggleListState(category._id)}
                 >
                   {category.isListed ? 'List' : 'Unlist'}

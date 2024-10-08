@@ -64,7 +64,11 @@ function AppointmentsList() {
           .put(`/cancelAppointment/${appointmentId}`) // Assuming you're using PUT for canceling
           .then(() => {
             toast.success("Appointment cancelled");
-            Swal.fire("Cancelled!", "The appointment has been cancelled.", "success");
+            Swal.fire(
+              "Cancelled!",
+              "The appointment has been cancelled. Your money will be refunded to your bank account.",
+              "success"
+            );
             // Refresh the appointments list
             fetchAppointments(status); // Fetch appointments again after cancellation
           })
