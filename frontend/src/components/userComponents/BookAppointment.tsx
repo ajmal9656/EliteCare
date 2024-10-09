@@ -83,60 +83,55 @@ function BookAppointment() {
   return (
     <div className='w-full object-cover flex justify-center '>
       <div className='w-[90%] object-cover flex flex-col justify-center items-center '>
-        <div className='w-[80%] object-cover bg-white my-5 shadow-lg shadow-gray-200'>
-          <div className='w-[100%] object-cover flex flex-col'>
-            <div className='w-[100%] h-[150px] flex flex-col pt-14 '>
-              <div className='w-[100%] h-[45px] flex place-content-center items-center'>
-                <h1 className='text-2xl font-semibold font-serif text-backgroundColor'>
-                  Dr. {appointmentData.doctor.name}
-                </h1>
-              </div>
-              <div className='w-[100%] h-[25px] flex place-content-center items-center'>
-                <h1 className='text-xl font-semibold font-serif text-backgroundColor'>
-                  {appointmentData.doctor.department.name}
-                </h1>
-              </div>
+        <div className='w-[80%] object-cover bg-white my-5 shadow-lg shadow-gray-300 rounded-lg overflow-hidden'>
+          <div className='w-full object-cover flex flex-col p-6'>
+            <div className='w-full h-auto flex flex-col items-center mb-5 mt-9'>
+              <h1 className='text-2xl font-semibold font-serif text-backgroundColor'>
+                Dr. {appointmentData.doctor.name}
+              </h1>
+              <h2 className='text-xl font-semibold font-serif text-gray-600'>
+                {appointmentData.doctor.department.name}
+              </h2>
             </div>
 
             {/* Patient Info */}
-            <div className='w-[100%] h-[235px]  '>
-              <div className='w-[100%] h-[25px] flex place-content-start items-center pl-5'>
+            <div className='w-full'>
+              <div className='w-full flex justify-start items-center mb-2'>
                 <h2 className='text-lg font-semibold font-serif text-gray-700'>
-                  Patient Name: {appointmentData.patientName}
+                  Patient Name: <span className='font-normal'>{appointmentData.patientName}</span>
                 </h2>
               </div>
-              <div className='w-[100%] h-[25px] flex place-content-start items-center pl-5'>
+              <div className='w-full flex justify-start items-center mb-2'>
                 <h2 className='text-lg font-semibold font-serif text-gray-700'>
-                  Age: {appointmentData.age}
+                  Age: <span className='font-normal'>{appointmentData.age}</span>
                 </h2>
               </div>
-              <div className='w-[100%] h-[25px] flex place-content-start items-center pl-5'>
+              <div className='w-full flex justify-start items-center mb-2'>
                 <h2 className='text-lg font-semibold font-serif text-gray-700'>
-                  Date: {formatDate(appointmentData.date)}
+                  Date: <span className='font-normal'>{formatDate(appointmentData.date)}</span>
                 </h2>
               </div>
-              <div className='w-[100%] h-[25px] flex place-content-start items-center pl-5'>
+              <div className='w-full flex justify-start items-center mb-2'>
                 <h2 className='text-lg font-semibold font-serif text-gray-700'>
-                  Slot: {formatTime(appointmentData.slot.start, appointmentData.slot.end)}
+                  Slot: <span className='font-normal'>{formatTime(appointmentData.slot.start, appointmentData.slot.end)}</span>
                 </h2>
               </div>
               
-              <div className='w-[100%] object-cover flex flex-col place-content-center items-center '>
-                <h2 className='w-[100%] text-base font-semibold font-serif text-gray-700 pl-5'>
+              <div className='w-full flex flex-col items-start mb-3'>
+                <h2 className='text-base font-semibold font-serif text-gray-700'>
                   Description:
                 </h2>
-                <div className='overflow-y-auto px-6 w-[95%] h-[100px] bg-gray-100 rounded-lg mt-3'>
-                  <p className='w-[100%] text-lg font-serif text-gray-700 break-words'>
+                <div className='overflow-y-auto px-6 w-full h-[100px] bg-gray-100 rounded-lg mt-3'>
+                  <p className='text-lg font-serif text-gray-700'>
                     {appointmentData.description}
                   </p>
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* Pay now button */}
-          <div className='w-[100%] flex flex-col place-content-center place-items-center  h-[80px] '>
+          <div className='w-full flex flex-col justify-center items-center h-[80px] bg-white  '>
             <Button title="Pay now" onClick={handleClick} />
           </div>
         </div>

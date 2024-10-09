@@ -9,6 +9,8 @@ import dotenv from 'dotenv';
 import { S3Service} from '../config/s3client';
 import { Appointment } from "../interface/userInterface/interface";
 import makeThePayment, { refund } from "../config/stripeConfig";
+import { log } from "console";
+import moment from "moment";
 
 dotenv.config()
 
@@ -337,11 +339,11 @@ export class userService{
           throw new Error(`Failed to get specialization: ${error.message}`);
         }
       }
-    async getDoctorData(doctorId: string) {
+    async getDoctorData(doctorId: string,reviewData:any) {
         try {
           
       
-          const response = await this.userRepository.getDoctor(doctorId);
+          const response = await this.userRepository.getDoctor(doctorId,reviewData);
 
           if (response?.image && response.image.url && response.image.type) {
             const folderPath = this.getFolderPathByFileType(response.image.type);
@@ -572,13 +574,25 @@ if (file) {
         }
     }
 
-    async getAppointments(userId: string,status:string) {
+    async getAppointments(userId: string, status: string) {
         try {
             // Fetch appointments for the given userId from the userRepository
-            const response = await this.userRepository.getAllAppointments(userId,status);
+            const response = await this.userRepository.getAllAppointments(userId, status);
     
             if (response) {
-                return response; // Return the appointments if the response is valid
+                console.log("appointments", response);
+    
+                // Map over the appointments to transform start and end times
+                const updatedAppointments = response.map((appointment: any) => ({
+                    ...appointment,
+                    start: this.getTime(appointment.start),
+                    end: this.getTime(appointment.end)
+                }));
+
+                console.log("up",updatedAppointments);
+                
+    
+                return updatedAppointments; // Return the updated appointments
             } else {
                 // Log and throw an error if the response is invalid
                 console.error("Failed to get appointments: Response is invalid");
@@ -590,6 +604,11 @@ if (file) {
             throw new Error(`Failed to get appointments: ${error.message}`);
         }
     }
+    
+    getTime(slot: any) {
+        return moment(slot).tz('UTC').format('h:mm A');
+    }
+    
     async cancelAppointment(appointmentId: string): Promise<any> {
         try {
           // Call the repository to cancel the appointment using the provided appointmentId
@@ -597,14 +616,14 @@ if (file) {
       
           // Check if the repository returned a valid response
           if (response) {
-            console.log("Cancellation response:", response);
+            
       
             // Assuming the response contains a paymentId for the appointment
             const paymentId = response.paymentId; // Adjust this according to your response structure
       
             // Proceed to refund if a valid paymentId is available
             if (paymentId) {
-                console.log("paymentid",paymentId);
+                
                 
               // Call the refund function and await the result
               const refundResponse = await refund(paymentId); // Ensure the refund method is available in the class
@@ -620,6 +639,59 @@ if (file) {
           throw new Error(`Failed to cancel appointment: ${error.message}`);
         }
       }
+      async addReview(appointmentId: string, rating: number, review: string): Promise<any> {
+        try {
+          // Call the repository to add the review for the given appointment ID
+          const response = await this.userRepository.addReview(appointmentId, rating, review);
+      
+          // Check if the repository returned a valid response
+          if (!response) {
+            throw new Error('Appointment not found or review could not be added');
+          }
+      
+          // Return the updated appointment (including the review)
+          return response;
+        } catch (error: any) {
+          // Log the error for debugging purposes
+          console.error("Error in addReview:", error.message);
+      
+          // Throw a more specific error message to the caller
+          throw new Error(`Failed to add review: ${error.message}`);
+        }
+      }
+
+      async getAppointment(appointmentId: string) {
+        try {
+            // Fetch appointment from the repository
+            const response = await this.userRepository.getAppointment(appointmentId);
+    
+            if (response) {
+                console.log("appointments", response);
+    
+                // Update start and end times using helper function
+                const updatedAppointment = {
+                    ...response,
+                    start: this.getTime(response.start), // Use default value if missing
+                    end: this.getTime(response.end)      // Use default value if missing
+                };
+    
+                console.log("updated appointment", updatedAppointment);
+                
+                return updatedAppointment; // Return the updated appointment
+            } else {
+                // Log and throw an error if response is invalid
+                console.error("Failed to get appointment: Response is invalid");
+                throw new Error("Something went wrong while fetching the appointment.");
+            }
+        } catch (error: any) {
+            // Log the error with more details
+            console.error("Error in getAppointment:", error.message);
+            throw new Error(`Failed to get appointment: ${error.message}`);
+        }
+    }
+    
+      
+      
       
     
       

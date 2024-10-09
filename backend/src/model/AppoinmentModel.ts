@@ -17,6 +17,10 @@ export interface IAppointment extends Document {
   paymentStatus: "payment pending" | "payment completed" | "payment failed" | "refunded" | "anonymous";
   paymentId?: string | null; // Optional since it can be null
   prescription?: string | null; // Optional since it can be null
+  review?: {  // Adding the review property
+    rating?: number;    // Optional since rating can be undefined
+    description?: string; // Optional since description can be undefined
+  };
   reason?: string | null; // Optional since it can be null
   medicalRecords?: string[]; // Optional list of medical records
   createdAt?: Date;
@@ -79,6 +83,18 @@ const AppointmentSchema = new Schema<IAppointment>(
     fees: {
       type: Number,
       required: true,
+    },
+    review:{
+      rating:{
+        type:Number,
+        default:0
+      },
+      description:{
+        type:String,
+        default:""
+
+      }
+
     },
     paymentMethod: {
       type: String,

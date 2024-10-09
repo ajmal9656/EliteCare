@@ -33,6 +33,8 @@ route.post('/checkSessionStatus', userControllerInstance.confirmPayment.bind(use
 route.get('/doctordetails/:doctorId', userControllerInstance.getDoctorDetails.bind(userControllerInstance));
 route.get('/getAppointments/:userId', userControllerInstance.getAllAppointments.bind(userControllerInstance));
 route.put('/cancelAppointment/:appointmentId', userControllerInstance.cancelAppointment.bind(userControllerInstance));
+route.post('/addReview', userControllerInstance.addReview.bind(userControllerInstance));
+route.get('/getAppointment/:appointmentId', userControllerInstance.getAppointment.bind(userControllerInstance));
 
 export default route;
 

@@ -1,7 +1,7 @@
-import { log } from "console";
+
 import { userService } from "../services/userService";
 import { Request, Response } from "express";
-import cookieParser from 'cookie-parser';
+
 
 export class userController {
   private userService: userService;
@@ -211,13 +211,15 @@ async getDoctorDetails(req: Request, res: Response): Promise<void> {
      
 
       const doctorId = req.params.doctorId
+      const reviewData = req.query.reviewData;
+      console.log("revi",typeof reviewData);
+      
 
     
-      const response = await this.userService.getDoctorData(doctorId);
+      const response = await this.userService.getDoctorData(doctorId,reviewData);
 
      
-      
-console.log("this is doc",response);
+    
 
      
       res.status(200).json({ message: "successfully", response });
@@ -364,7 +366,7 @@ async createCheckoutSession(req: Request, res: Response): Promise<void> {
       console.error("Error checking slot statusssss:", error.message);
 
       if (error.message==="Session Timed Out") {
-        console.log("aaa")
+        
           res.status(409).json({ message: "Session Timed out" });
       } else {
           res.status(500).json({ message: "An unexpected error occurred", error: error.message });
@@ -376,7 +378,7 @@ async confirmPayment(req: Request, res: Response): Promise<void> {
 
     const {appointmentId} = req.body
 
-    console.log("asjkfasdbvskjdvbsj")
+   
 
     const confirmAppointment = await this.userService.confirmAppointment(appointmentId);
       
@@ -396,7 +398,7 @@ async confirmPayment(req: Request, res: Response): Promise<void> {
       console.error("Error checking slot status:", error.message);
 
       if (error.message=="Session Timed Out") {
-        console.log("aaaaaaasvbshbfvs")
+      
         res.status(409).json({ message: "Session Timed Out" });
           
       } else {
@@ -409,13 +411,12 @@ async getAllAppointments(req: Request, res: Response): Promise<void> {
   try {
       const userId = req.params.userId;
       const {status} = req.query
-      console.log("stat",status);
+      
       
 
       // Fetch appointments using the userId
       const response = await this.userService.getAppointments(userId,status as string);
 
-      console.log("response app",response);
       
 
       // If successful, send a 200 status with the fetched appointments
@@ -439,7 +440,7 @@ async cancelAppointment(req: Request, res: Response): Promise<void> {
     const response = await this.userService.cancelAppointment(appointmentId);
 
     // Log the response for debugging
-    console.log("Cancel Appointment Response:", response);
+    
 
     // If successful, send a 200 status with the updated appointment
     res.status(200).json({ message: "Appointment canceled successfully", data: response });
@@ -455,6 +456,55 @@ async cancelAppointment(req: Request, res: Response): Promise<void> {
     }
   }
 }
+async addReview(req: Request, res: Response): Promise<void> {
+  try {
+    const { appointmentId, rating, reviewText } = req.body;
+
+    console.log(rating);
+    console.log(typeof rating);
+    
+
+    // Call the service to add the review to the appointment using the appointmentId
+    const response = await this.userService.addReview(appointmentId, rating, reviewText);
+
+    // If successful, send a 200 status with the updated appointment
+    res.status(200).json({ message: "Review added successfully", data: response });
+  } catch (error: any) {
+    console.error("Error adding review:", error.message);
+
+    // Return a 400 status if there's an issue with adding the review
+    if (error.message.includes("Failed to add review")) {
+      res.status(400).json({ message: `Failed to add review: ${error.message}` });
+    } else {
+      // Otherwise, send a 500 status for unexpected errors
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+
+async getAppointment(req: Request, res: Response): Promise<void> {
+  try {
+      const appointmentId = req.params.appointmentId;
+
+      // Fetch appointment using the service
+      const response = await this.userService.getAppointment(appointmentId);
+
+      // If successful, send the fetched appointment
+      res.status(200).json({ message: "Appointment fetched successfully", data: response });
+  } catch (error: any) {
+      console.error(`Error fetching appointment with ID ${req.params.appointmentId}:`, error.message);
+
+      // If the error is related to fetching appointments, respond with a 400 status
+      if (error.message.includes("Failed to get appointments")) {
+          res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+      } else {
+          // Handle unexpected errors
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+  }
+}
+
+
 
 
 

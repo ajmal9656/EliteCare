@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
 import { User } from '../../interfaces/userInterface';
+import { MdOutlineAccessTime } from 'react-icons/md';
 
 interface Slot {
   _id: string;
@@ -156,7 +157,7 @@ function TimeSlots() {
   return (
     <div className='w-full  flex justify-center object-cover '>
       <div className='w-[70%] h-[400px] flex flex-col justify-center items-center'>
-        <div className='w-[80%] h-[700px] bg-white my-10 shadow-lg shadow-gray-200 flex flex-col'>
+        <div className='w-[80%] h-[700px] bg-white my-10 shadow-lg shadow-gray-200 flex flex-col  rounded-lg border border-gray-200'>
           <div className='w-full h-[90px] flex flex-row'>
             <div className='w-[50%] h-[90px]'></div>
             <div className='w-[50%] h-[90px] flex items-center justify-end '>
@@ -184,7 +185,7 @@ function TimeSlots() {
                       disabled={!slot.availability}
                       onChange={() => setSelectedSlot(slot)}
                     />
-                    <span className="flex-1">{formatTimeRange(slot.start, slot.end)}</span>
+                    <span className="flex-1">{formatTimeRange(slot.start, slot.end)}<MdOutlineAccessTime className="inline ml-1" /></span>
                   </label>
                 ))
               ) : (

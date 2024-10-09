@@ -4,6 +4,8 @@ import { RootState } from "../../Redux/store";
 import axiosUrl from "../../utils/axios";
 import Swal from "sweetalert2";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
 
 interface Appointment {
   _id: string;
@@ -11,12 +13,18 @@ interface Appointment {
   appointmentTime: string;
   doctorName: string;
   status: string;
+  date:any
+  start:string,
+  end:string
+  docId:any
 }
 
 function AppointmentsList() {
   const userData = useSelector((state: RootState) => state.user.userInfo);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [status, setStatus] = useState<string>("All"); // Default status is 'All'
+
+  const navigate = useNavigate()
 
   // Function to fetch appointments based on status
   const fetchAppointments = (status: string) => {
@@ -28,7 +36,7 @@ function AppointmentsList() {
           params: { status }, // Send status as a query parameter
         })
         .then((response) => {
-          console.log(response.data.data);
+          console.log("aaaaaaaaaaaaaa",response.data.data);
           setAppointments(response.data.data); // Assuming response contains appointments data
         })
         .catch((error) => {
@@ -78,11 +86,18 @@ function AppointmentsList() {
           });
       }
     });
+
+
   };
+
+  const handleViewAppointment = (appointment: any) => {
+    navigate("/userProfile/viewAppointment", { state: { appointmentId:appointment._id } });
+  };
+  
 
   return (
     <div className="w-[75%] mt-10 pr-10 pb-5">
-      <div className="bg-white h-full rounded-lg border flex flex-col justify-around p-5">
+      <div className="bg-white object-cover rounded-lg border flex flex-col justify-around p-5">
         {/* Buttons for sorting */}
         <div className="flex justify-end items-center space-x-2 mb-2">
           <button
@@ -119,9 +134,9 @@ function AppointmentsList() {
           </button>
           <button
             className={`px-3 py-1 border border-transparent text-sm font-medium ${
-              status === "cancelled by doctor" ? "bg-red-500 text-white" : "bg-white text-gray-500"
+              status === "cancelled by Dr" ? "bg-red-500 text-white" : "bg-white text-gray-500"
             } rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500`}
-            onClick={() => handleStatusChange("cancelled by doctor")}
+            onClick={() => handleStatusChange("cancelled by Dr")}
           >
             Cancelled by Dr
           </button>
@@ -136,25 +151,32 @@ function AppointmentsList() {
                   Patient: {appointment.patientNAme}
                 </div>
                 <p className="block mt-1 text-lg leading-tight font-medium text-black">
-                  Appointment Time: {appointment.appointmentTime}
-                </p>
-                <p className="mt-2 text-gray-500">Doctor: Dr. {appointment.doctorName}</p>
+  Appointment Time: <span className="font-normal">{moment(appointment.date).format('MMMM Do YYYY')} from {appointment.start} to {appointment.end}</span>
+</p>
+
+
+                <p className="mt-2 text-gray-500">Doctor: Dr. {appointment.docId.name}</p>
               </div>
               <div className="flex flex-row p-8 space-x-3">
-                <button className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <button className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:bg-indigo-500 transition bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 "
+                onClick={() => handleViewAppointment(appointment)}>
                   View Details
                 </button>
                 {/* Conditionally render Cancel button or 'Cancelled' label */}
-                {appointment.status === "cancelled" ? (
-                  <span className="px-4 py-2 text-sm font-medium text-red-500">Cancelled</span>
-                ) : (
-                  <button
-                    className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    onClick={() => handleCancelAppointment(appointment._id)}
-                  >
-                    Cancel
-                  </button>
-                )}
+                {appointment.status === "cancelled" || appointment.status === "cancelled by Dr" ? (
+  <span className="px-4 py-2 text-sm font-medium text-red-500">Cancelled</span>
+) : appointment.status === "completed" ? (
+  <span className="px-4 py-2 text-sm font-medium text-green-500">Completed</span>
+) : (
+  <button
+    className="px-7 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:ring-offset-2"
+    onClick={() => handleCancelAppointment(appointment._id)}
+  >
+    Cancel
+  </button>
+)}
+
+
               </div>
             </div>
           </div>

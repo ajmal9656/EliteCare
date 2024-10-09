@@ -3,7 +3,7 @@ import { GrMoney } from "react-icons/gr";
 import { FaUsers, FaUserDoctor } from "react-icons/fa6";
 import axiosUrl from "../../utils/axios";
 import RevenueChart from "./RevenueChart";
-import UserDoctorChart from "./userDoctorChart";
+import UserDoctorChart from "./UserDoctorChart";
 
 function Dashboard() {
   const [dashboardData, setDashboardData] = useState({

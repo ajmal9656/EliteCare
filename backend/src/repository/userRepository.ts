@@ -72,7 +72,7 @@ export class userRepository {
              
             
         } catch (error:any) {
-            console.log("rep error")
+            
             throw new Error(error.message)
         }
     }
@@ -86,7 +86,7 @@ export class userRepository {
             
             return specializations
         } catch (error: any) {
-            console.error("Error getting specialization:", error.message);
+            
             throw new Error(error.message);
         }
     }
@@ -119,13 +119,30 @@ export class userRepository {
           throw new Error(`Failed to fetch doctors for specialization ${specializationId}: ${error.message}`);
         }
       }
-    async getDoctor(doctorId: string) {
+      async getDoctor(doctorId: string, reviewData: any) {
         try {
+            console.log(doctorId);
+            console.log(reviewData);
+
+            const isReviewDataPresent = reviewData === "true";
+            console.log(isReviewDataPresent);
             
-          const doctor = await doctorModel
-            .findById(
-              doctorId,
-              {
+            
+            
+          const doctor = await doctorModel.aggregate([
+            {
+              $match: { _id: new mongoose.Types.ObjectId(doctorId) }, // Match the doctor by ID
+            },
+            {
+              $lookup: {
+                from: 'appointments', // The name of the appointments collection
+                localField: '_id',    // The field from the doctor model
+                foreignField: 'docId', // The field in the appointments model
+                as: 'appointments',     // The name of the array to store the results
+              },
+            },
+            {
+              $project: {
                 name: 1,
                 _id: 1,
                 doctorId: 1,
@@ -133,21 +150,47 @@ export class userRepository {
                 department: 1,
                 fees: 1,
                 image: 1,
-              }
-            )
-            .populate('department','name').lean() 
-
-        
-        
-
-            
+                appointments: {
+                  $cond: [
+                    { $eq: [isReviewDataPresent, true] },
+                    {
+                        $map: {
+                            input: {
+                                $filter: {
+                                    input: '$appointments', // Input array to filter
+                                    as: 'appointment',      // Variable name for each element
+                                    cond: {                 // Condition to filter
+                                        $gt: [{ $ifNull: ['$$appointment.review.rating', 0] }, 0] // Access rating
+                                    }
+                                }
+                            },
+                            as: 'appointment',
+                            in: {
+                                review: '$$appointment.review', // Include only the review
+                                patientName: '$$appointment.patientNAme' // Include the patient name
+                            }
+                        }
+                    },
+                    [] // Set to empty array if reviewData is not true
+                ],
+                },
+              },
+            },
+          ]);
       
-          return doctor;
+          // If doctor not found, return null
+          if (doctor.length === 0) {
+            return null;
+          }
+      console.log("review",doctor[0]);
+      
+          return doctor[0]; // Return the doctor object along with appointments if any
         } catch (error: any) {
-          console.error("Error getting doctor :", error.message);
+          console.error("Error getting doctor:", error.message);
           throw new Error(`Failed to fetch doctor ${doctorId}: ${error.message}`);
         }
       }
+      
       async getAllSlots(date: Date, doctorId: string) {
         try {
             // Find the doctor slots for the specified date and doctor ID
@@ -304,7 +347,7 @@ export class userRepository {
         try {
             
 
-            console.log()
+           
 
             const doctorSlot = await doctorSlotsModel.findOne({
                 doctorId: new mongoose.Types.ObjectId(patientData.doctor._id as string),
@@ -371,7 +414,7 @@ export class userRepository {
                     }
 
                 }
-                console.log("Matching Slot:", matchingSlot);
+                
             } else {
                 console.log("No slots found for the doctor on the specified date.");
             }
@@ -412,7 +455,7 @@ export class userRepository {
             const updatedAppointment= await appointmentModel.findById(appointmentId);
             if(updatedAppointment?.locked==null ){
 
-                console.log("sbvshbvshbv")
+               
                 throw new Error('Session Timed Out')
 
                 
@@ -424,7 +467,7 @@ export class userRepository {
             
 
             await updatedAppointment.save();
-            console.log("updatedAppoinment",updatedAppointment)
+            
 
             if(updatedAppointment){
                 const SlotUpdation = await doctorSlotsModel.findOne({
@@ -433,20 +476,20 @@ export class userRepository {
                     
                 })
 
-                console.log("slotupdation",SlotUpdation);
+                
 
                 if(SlotUpdation){
-                    console.log("inside slotup");
+                    
                     
                    const matchingSlot = SlotUpdation.slots.find(slot=>new Date(slot.start).getTime() === new Date(updatedAppointment.start).getTime())
                    if(matchingSlot){
-                    console.log("match",matchingSlot)
+                    
                     matchingSlot.availability = false;
                     matchingSlot.bookedBy = updatedAppointment.userId;
                     await SlotUpdation.save();
 
 
-                    console.log("doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+                    
                    }
                 }
                 
@@ -461,20 +504,19 @@ export class userRepository {
     }
     async getAllAppointments(userId:string,status:string){
         try {
-            console.log(userId);
-            console.log(status);
+            
             
             let appointments =[]
 
             if(status == "All"){
                 appointments = await appointmentModel.find({ userId: userId })
-  .populate("docId");
+  .populate("docId").lean();
 
             }else{
-                console.log("ssssssssssssss");
+               
                 
                 appointments = await appointmentModel.find({ userId: userId,status:status })
-  .populate("docId");
+  .populate("docId").lean();
             }
             
             
@@ -510,10 +552,10 @@ export class userRepository {
               date: appointment.date,
             });
       
-            console.log("slotUpdation", slotUpdation);
+           
       
             if (slotUpdation) {
-              console.log("inside slotUp");
+              
       
               // Find the matching slot
               const matchingSlot = slotUpdation.slots.find(
@@ -521,7 +563,7 @@ export class userRepository {
               );
       
               if (matchingSlot) {
-                console.log("match", matchingSlot);
+              
       
                 // Update slot availability and clear booking details
                 matchingSlot.availability = true;
@@ -531,7 +573,7 @@ export class userRepository {
                 matchingSlot.lockExpiration = null as any; // To handle null assignment
       
                 await slotUpdation.save();
-                console.log("Slot updated successfully");
+                
               }
             }
           }
@@ -543,6 +585,54 @@ export class userRepository {
           throw new Error(error.message);
         }
       }
+      async addReview(appointmentId: string, rating: number, reviewText: string): Promise<any> {
+        try {
+          // Find the appointment by its ID and update the review fields (rating and description)
+          const updatedAppointment = await appointmentModel.findOneAndUpdate(
+            { _id: appointmentId }, // Find appointment by ID
+            { 
+              $set: { 
+                "review.rating": rating, 
+                "review.description": reviewText 
+              } // Update the review fields
+            },
+            { new: true } // Return the updated document
+          );
+      
+          // Check if the appointment exists
+          if (!updatedAppointment) {
+            throw new Error('Appointment not found');
+          }
+      
+          // Return the updated appointment with the review
+          return updatedAppointment;
+        } catch (error: any) {
+          console.error("Error adding review:", error.message);
+          throw new Error(error.message);
+        }
+      }
+
+      async getAppointment(appointmentId: string) {
+        try {
+            // Fetch the appointment and populate the 'docId' field
+            const appointment = await appointmentModel.findById(appointmentId)
+                .populate("docId")  // Populate doctor details based on reference
+                .lean();
+    
+            // Check if appointment exists
+            if (!appointment) {
+                throw new Error(`Appointment with ID ${appointmentId} not found`);
+            }
+    
+            return appointment;  // Return the populated appointment data
+    
+        } catch (error: any) {
+            console.error("Error getting appointment:", error.message); // Log the error
+            throw new Error(error.message);  // Re-throw the error for further handling
+        }
+    }
+    
+      
       
       
     

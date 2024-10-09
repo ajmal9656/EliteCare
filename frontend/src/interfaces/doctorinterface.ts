@@ -83,6 +83,7 @@ export interface Specializations {
 
  
   export interface DoctorDataWithSpecialization {
+    appointments: any;
     _id: string;
     doctorId: string;
     name: string;
@@ -91,6 +92,7 @@ export interface Specializations {
     fees: number;
     image: IImage; 
     signedImageUrl:string
+    
    
   }
   
