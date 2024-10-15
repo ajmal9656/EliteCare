@@ -10,6 +10,8 @@ export interface AdminState {
     adminInfo: Admin | null;
     loading: boolean;
     error: string | null;
+    accessToken: string | null;
+    
   }
 
 

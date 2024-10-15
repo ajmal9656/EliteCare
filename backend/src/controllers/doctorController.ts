@@ -108,9 +108,18 @@ export class doctorController {
           }
          
           
-          res.cookie('refreshToken', loginResponse.refreshToken, {
-            httpOnly: true,  
-            maxAge: 7 * 24 * 60 * 60 * 1000,  
+          
+          res.cookie('doctorRefreshToken', loginResponse.refreshToken, {
+            httpOnly: true,  // Makes the cookie inaccessible to JavaScript
+            secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
+            sameSite: 'strict',  // Protects against CSRF attacks
+            maxAge: 21 * 24 * 60 * 60 * 1000,  // 21 days
+          });
+          res.cookie('doctorAccessToken', loginResponse.accessToken, {
+            httpOnly: true,  // Makes the cookie inaccessible to JavaScript
+            secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
+            sameSite: 'strict',  // Protects against CSRF attacks
+            maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
           });
          
           res.status(200).json({ message: "Login successful", response});
@@ -130,6 +139,19 @@ export class doctorController {
     
         }
            
+        }
+      }
+      async logoutDoctor(req: Request, res: Response): Promise<void> {
+        try {
+          // Clear the access token and refresh token cookies
+          res.cookie('doctorAccessToken', '', { httpOnly: true, expires: new Date(0) });
+          res.cookie('doctorRefreshToken', '', { httpOnly: true, expires: new Date(0) });
+      
+          // Send success response
+          res.status(200).json({ message: "Logout successful" });
+        } catch (error: any) {
+          console.error('Logout error:', error);
+          res.status(500).json({ message: "Logout failed" });
         }
       }
 
@@ -306,18 +328,17 @@ export class doctorController {
       
       
 
-      // // Fetch appointments using the doctorId
+   
       const response = await this.doctorService.getAppointments(doctorId,status as string);
 
       
       
 
-      // If successful, send a 200 status with the fetched appointments
       res.status(200).json({ message: "Appointments fetched successfully", data: response});
   } catch (error: any) {
       console.error("Error fetching appointments:", error.message);
 
-      // Send a 400 response if the error is known, else send a 500 for an unexpected error
+  
       if (error.message.includes("Failed to get appointments")) {
           res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
       } else {
@@ -328,58 +349,58 @@ export class doctorController {
 
 async cancelAppointment(req: Request, res: Response): Promise<void> {
   try {
-    // Extract appointmentId and Reason from the request body
+ 
     const { appointmentId, reason } = req.body;
 
-    // Log the received values for debugging
+
     console.log("Received appointmentId:", appointmentId);
     console.log("Received Reason:", reason);
 
-    // Call the service to cancel the appointment using the appointmentId and Reason
+
     const response = await this.doctorService.cancelAppointment(appointmentId, reason);
 
-    // Log the response for debugging
+  
     console.log("Cancel Appointment Response:", response);
 
-    // If successful, send a 200 status with the updated appointment
+  
     res.status(200).json({ message: "Appointment canceled successfully", data: response });
   } catch (error: any) {
     console.error("Error canceling appointment:", error.message);
 
-    // If the error message is related to the cancellation process, return a 400 status
+    
     if (error.message.includes("Failed to cancel appointment")) {
       res.status(400).json({ message: `Failed to cancel appointment: ${error.message}` });
     } else {
-      // Otherwise, send a 500 status for unexpected errors
+      
       res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
   }
 }
 async addPrescription(req: Request, res: Response): Promise<void> {
   try {
-    // Extract appointmentId and prescription from the request body
+    
     const { appointmentId, prescription } = req.body;
 
-    // Log the received values for debugging
+
     console.log("Received appointmentId:", appointmentId);
     console.log("Received prescription:", prescription);
 
-    // Call the service to add a prescription to the appointment
+   
     const response = await this.doctorService.addPrescription(appointmentId, prescription);
 
-    // Log the response for debugging
+ 
     console.log("Add Prescription Response:", response);
 
-    // If successful, send a 200 status with the updated appointment data
+  
     res.status(200).json({ message: "Prescription added successfully", data: response });
   } catch (error: any) {
     console.error("Error adding prescription:", error.message);
 
-    // If the error is related to the prescription process, return a 400 status
+   
     if (error.message.includes("Failed to add prescription")) {
       res.status(400).json({ message: `Failed to add prescription: ${error.message}` });
     } else {
-      // Otherwise, send a 500 status for unexpected errors
+    
       res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
   }
@@ -390,21 +411,21 @@ async getWallet(req: Request, res: Response): Promise<void> {
       const doctorId = req.params.doctorId;
       const { status } = req.query;
 
-      // Validate the presence of doctorId
+   
       if (!doctorId) {
           res.status(400).json({ message: "Doctor ID is required." });
           return;
       }
 
-      // Fetch wallet data using the doctorId and status
+    
       const response = await this.doctorService.getWallet(doctorId, status as string);
 
-      // If successful, send a 200 status with the fetched wallet data
+     
       res.status(200).json({ success: true, message: "Wallet data fetched successfully", response });
   } catch (error: any) {
       console.error("Error fetching wallet data:", error.message);
 
-      // Send a 400 response for known errors, else send a 500 for unexpected errors
+    
       if (error.message.includes("Failed to get wallet details")) {
           res.status(400).json({ success: false, message: `Failed to get wallet details: ${error.message}` });
       } else {
@@ -415,12 +436,12 @@ async getWallet(req: Request, res: Response): Promise<void> {
 async withdraw(req: Request, res: Response): Promise<void> {
   try {
       const doctorId = req.params.doctorId;
-      const withdrawalAmount = req.body.withdrawAmount; // Access the withdrawal amount correctly from the request body
+      const withdrawalAmount = req.body.withdrawAmount; 
 console.log(req.body);
 console.log(withdrawalAmount);
 console.log(typeof withdrawalAmount);
 
-      // Validate the presence of doctorId and withdrawalAmount
+      
       if (!doctorId) {
           res.status(400).json({ success: false, message: "Doctor ID is required." });
           return;
@@ -430,19 +451,50 @@ console.log(typeof withdrawalAmount);
           return;
       }
 
-      // Fetch wallet data using the doctorId and withdrawalAmount
+      
       const response = await this.doctorService.withdraw(doctorId, withdrawalAmount);
 
-      // If successful, send a 200 response with the fetched wallet data
+   
       res.status(200).json({ success: true, message: "Withdrawal successful", response });
   } catch (error: any) {
       console.error("Error fetching wallet data:", error.message);
 
-      // Send a 400 response for known errors, else send a 500 for unexpected errors
+    
       if (error.message.includes("Failed to get wallet details")) {
           res.status(400).json({ success: false, message: `Failed to get wallet details: ${error.message}` });
       } else {
           res.status(500).json({ success: false, message: "An unexpected error occurred." });
+      }
+  }
+}
+
+async getDoctorDetails(req: Request, res: Response): Promise<void> {
+  try {
+     
+
+      const doctorId = req.params.doctorId
+      const reviewData = req.query.reviewData;
+      console.log("revi",typeof reviewData);
+      
+
+    
+      const response = await this.doctorService.getDoctorData(doctorId,reviewData);
+
+     
+    
+
+     
+      res.status(200).json({ message: "successfully", response });
+      
+  } catch (error: any) {
+     
+     
+
+      if (error.message === "Something went wrong while creating the specialization.") {
+          res.status(400).json({ message: "Something went wrong while creating the specialization." });
+      } else {
+        
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
       }
   }
 }

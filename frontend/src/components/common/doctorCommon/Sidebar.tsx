@@ -1,6 +1,33 @@
 import { Link,NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutDoctor } from "../../../Redux/Action/doctorActions";
+
+
 
 function Sidebar() {
+  const navigate = useNavigate();
+  const dispatch:any = useDispatch()
+
+  const handleLogout = async () => {
+    
+  
+    try {
+      await dispatch(logoutDoctor());
+     
+      // await axiosUrl.post('/logout', {}, { 
+      //   withCredentials: true 
+      // });
+  
+      // Remove user info from localStorage
+      localStorage.removeItem('doctorInfo');
+  
+      // Redirect to login page
+      navigate("/doctor/login");
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
   return (
     <>
       <nav className="fixed top-0 z-50 w-full bg-white border-b bg-gradient-to-l from-cyan-500 to-blue-500 ">
@@ -88,7 +115,7 @@ function Sidebar() {
           <button
             type="button"
             className="ml-4 text-sm text-gray-900 dark:text-white"
-            onClick={() => console.log('Logout')}
+            onClick={handleLogout}
           >
             Logout
           </button>
@@ -128,6 +155,29 @@ function Sidebar() {
         <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
       </svg>
       <span className="ms-3">Dashboard</span>
+    </NavLink>
+  </li>
+  <li>
+    <NavLink
+      to="/doctor/profile"
+      className={({ isActive }) =>
+        `flex items-center p-2 rounded-lg group ${
+          isActive
+            ? "bg-gradient-to-l from-cyan-500 to-blue-500 text-white"
+            : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-cyan-200 to-blue-200"
+        }`
+      }
+    >
+      <svg
+        className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 18 18"
+      >
+        <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286C10 17.169 10.831 18 11.857 18h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
+      </svg>
+      <span className="flex-1 ms-3 whitespace-nowrap">Profile</span>
     </NavLink>
   </li>
   <li>
@@ -176,29 +226,7 @@ function Sidebar() {
       <span className="flex-1 ms-3 whitespace-nowrap">Slot Management</span>
     </NavLink>
   </li>
-  <li>
-    <NavLink
-      to="/specializations"
-      className={({ isActive }) =>
-        `flex items-center p-2 rounded-lg group ${
-          isActive
-            ? "bg-gradient-to-l from-cyan-500 to-blue-500 text-white"
-            : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-cyan-200 to-blue-200"
-        }`
-      }
-    >
-      <svg
-        className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-      >
-        <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
-      </svg>
-      <span className="flex-1 ms-3 whitespace-nowrap">Specializations</span>
-    </NavLink>
-  </li>
+  
   <li>
   <NavLink
     to="/doctor/wallet"

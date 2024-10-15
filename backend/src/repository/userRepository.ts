@@ -131,14 +131,14 @@ export class userRepository {
             
           const doctor = await doctorModel.aggregate([
             {
-              $match: { _id: new mongoose.Types.ObjectId(doctorId) }, // Match the doctor by ID
+              $match: { _id: new mongoose.Types.ObjectId(doctorId) }, 
             },
             {
               $lookup: {
-                from: 'appointments', // The name of the appointments collection
-                localField: '_id',    // The field from the doctor model
-                foreignField: 'docId', // The field in the appointments model
-                as: 'appointments',     // The name of the array to store the results
+                from: 'appointments', 
+                localField: '_id',    
+                foreignField: 'docId', 
+                as: 'appointments',     
               },
             },
             {
@@ -166,8 +166,8 @@ export class userRepository {
                             },
                             as: 'appointment',
                             in: {
-                                review: '$$appointment.review', // Include only the review
-                                patientName: '$$appointment.patientNAme' // Include the patient name
+                                review: '$$appointment.review', 
+                                patientName: '$$appointment.patientNAme' 
                             }
                         }
                     },
@@ -178,13 +178,13 @@ export class userRepository {
             },
           ]);
       
-          // If doctor not found, return null
+          
           if (doctor.length === 0) {
             return null;
           }
       console.log("review",doctor[0]);
       
-          return doctor[0]; // Return the doctor object along with appointments if any
+          return doctor[0]; 
         } catch (error: any) {
           console.error("Error getting doctor:", error.message);
           throw new Error(`Failed to fetch doctor ${doctorId}: ${error.message}`);
@@ -193,30 +193,30 @@ export class userRepository {
       
       async getAllSlots(date: Date, doctorId: string) {
         try {
-            // Find the doctor slots for the specified date and doctor ID
+            
             const doctorSlots = await doctorSlotsModel.findOne({
                 doctorId: doctorId,
                 date: {
-                    $eq: date, // Match the exact date
+                    $eq: date, 
                 },
             })
             
     
-            // Check if slots were found
+           
             if (!doctorSlots) {
                 return []
             }
     
-            // Filter slots to return only those that are available
+            
             const availableSlots = doctorSlots.slots.filter(slot => slot.availability);
             
     
-            // Check if there are available slots
+            
             if (availableSlots.length === 0) {
                 return []
             }
     
-            // Return the available slots
+            
             return availableSlots;
         } catch (error: any) {
             console.error("Error getting slots:", error.message);
@@ -434,17 +434,17 @@ export class userRepository {
     }
     async updateAppointment(sessionId: any, appointmentId: any) {
         try {
-            // Find the appointment by ID and update it with the provided data
+            
             const updatedAppointment = await appointmentModel.findByIdAndUpdate(
-                appointmentId,  // The ID of the appointment to update
-                {paymentId:sessionId},     // The data to update the appointment with
-                { new: true }   // This option returns the updated document
+                appointmentId,  
+                {paymentId:sessionId},     
+                { new: true }   
             );
             
-            return updatedAppointment; // Return the updated appointment
+            return updatedAppointment; 
         } catch (error: any) {
             console.error("Repository error:", error.message);
-            throw new Error(error.message); // Throw the error to be handled in the service layer
+            throw new Error(error.message); 
         }
     }
     async confirmAppointmentPayment(appointmentId: string) {
@@ -534,14 +534,14 @@ export class userRepository {
 
     async cancelAppointment(applicationId: string): Promise<any> {
         try {
-          // Find and update the appointment by ID, setting the status to "cancelled"
+          
           const appointment = await appointmentModel.findOneAndUpdate(
             { _id: applicationId },
             { status: "cancelled" },
-            { new: true } // Returns the updated document
+            { new: true } 
           );
       
-          // If no appointment was found, return a meaningful message
+          
           if (!appointment) {
             throw new Error(`Appointment with ID ${applicationId} not found`);
           }
@@ -557,7 +557,7 @@ export class userRepository {
             if (slotUpdation) {
               
       
-              // Find the matching slot
+             
               const matchingSlot = slotUpdation.slots.find(
                 (slot) => new Date(slot.start).getTime() === new Date(appointment.start).getTime()
               );
@@ -565,12 +565,12 @@ export class userRepository {
               if (matchingSlot) {
               
       
-                // Update slot availability and clear booking details
+                
                 matchingSlot.availability = true;
-                matchingSlot.bookedBy = null as any; // To handle null assignment
-                matchingSlot.lockedBy = null as any; // To handle null assignment
+                matchingSlot.bookedBy = null as any; 
+                matchingSlot.lockedBy = null as any; 
                 matchingSlot.locked = false;
-                matchingSlot.lockExpiration = null as any; // To handle null assignment
+                matchingSlot.lockExpiration = null as any; 
       
                 await slotUpdation.save();
                 
@@ -578,7 +578,7 @@ export class userRepository {
             }
           }
       
-          // Return the updated appointment
+          
           return appointment;
         } catch (error: any) {
           console.error("Error canceling appointment:", error.message);
@@ -587,24 +587,24 @@ export class userRepository {
       }
       async addReview(appointmentId: string, rating: number, reviewText: string): Promise<any> {
         try {
-          // Find the appointment by its ID and update the review fields (rating and description)
+          
           const updatedAppointment = await appointmentModel.findOneAndUpdate(
-            { _id: appointmentId }, // Find appointment by ID
+            { _id: appointmentId }, 
             { 
               $set: { 
                 "review.rating": rating, 
                 "review.description": reviewText 
-              } // Update the review fields
+              }
             },
-            { new: true } // Return the updated document
+            { new: true } 
           );
       
-          // Check if the appointment exists
+          
           if (!updatedAppointment) {
             throw new Error('Appointment not found');
           }
       
-          // Return the updated appointment with the review
+          
           return updatedAppointment;
         } catch (error: any) {
           console.error("Error adding review:", error.message);
@@ -614,21 +614,21 @@ export class userRepository {
 
       async getAppointment(appointmentId: string) {
         try {
-            // Fetch the appointment and populate the 'docId' field
+            
             const appointment = await appointmentModel.findById(appointmentId)
-                .populate("docId")  // Populate doctor details based on reference
+                .populate("docId") 
                 .lean();
     
-            // Check if appointment exists
+            
             if (!appointment) {
                 throw new Error(`Appointment with ID ${appointmentId} not found`);
             }
     
-            return appointment;  // Return the populated appointment data
+            return appointment; 
     
         } catch (error: any) {
-            console.error("Error getting appointment:", error.message); // Log the error
-            throw new Error(error.message);  // Re-throw the error for further handling
+            console.error("Error getting appointment:", error.message); 
+            throw new Error(error.message);  
         }
     }
     

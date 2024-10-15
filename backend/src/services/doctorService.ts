@@ -12,6 +12,7 @@ import { refund } from '../config/stripeConfig';
 
 
 
+
 dotenv.config()
 
 
@@ -416,14 +417,14 @@ if (files.qualificationImage) {
 
     async getAppointments(doctorId: string, status: string) {
         try {
-            // Fetch appointments for the given doctorId from the doctorRepository
+            
             const response = await this.doctorRepository.getAllAppointments(doctorId, status);
     
            
     
-            // Validate the response if it matches the expected structure
+            
             if (Array.isArray(response)) {
-                // Map through the appointments and convert start and end times
+               
                 const formattedAppointments = response.map(appointment => {
                     return {
                         ...appointment,
@@ -432,14 +433,14 @@ if (files.qualificationImage) {
                     };
                 });
     
-                return formattedAppointments; // Return the formatted appointments
+                return formattedAppointments; 
             } else {
-                // Log and throw an error if the response is invalid
+                
                 console.error("Failed to get appointments: Response is invalid", response);
                 throw new Error("Something went wrong while fetching the appointments.");
             }
         } catch (error: any) {
-            // Log the error with a descriptive message and rethrow it
+            
             console.error("Error in getAppointments:", error.stack || error.message);
             throw new Error(`Failed to get appointments: ${error.message}`);
         }
@@ -451,54 +452,54 @@ if (files.qualificationImage) {
 
       async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
         try {
-          // Call the repository to cancel the appointment using the provided appointmentId
+          
           const response = await this.doctorRepository.cancelAppointment(appointmentId, reason);
       
-          // Check if the repository returned a valid response
+          
           if (response) {
             console.log("Cancellation response:", response);
       
-            // Assuming the response contains a paymentId for the appointment
-            const paymentId = response.paymentId; // Adjust this according to your response structure
+            
+            const paymentId = response.paymentId; 
       
-            // Proceed to refund if a valid paymentId is available
+           
             if (paymentId) {
                 console.log("paymentid",paymentId);
                 
-              // Call the refund function and await the result
-              const refundResponse = await refund(paymentId); // Ensure the refund method is available in the class
+              
+              const refundResponse = await refund(paymentId); 
       
-              // Return the updated appointment and refund details
+              
               return response;
             } else {
               throw new Error("No payment ID available for refund");
             }
           } else {
-            // Throw an error if the response is undefined or invalid
+            
             throw new Error("Failed to cancel the appointment: Invalid response");
           }
         } catch (error: any) {
-          // Log the error and rethrow it with a more specific message
+         
           console.error("Error in cancelAppointment:", error.message);
           throw new Error(`Failed to cancel appointment: ${error.message}`);
         }
       }
       async addPrescription(appointmentId: string, prescription: string): Promise<any> {
         try {
-          // Call the repository to complete the appointment using the provided appointmentId and prescription
+         
           const response = await this.doctorRepository.completeAppointment(appointmentId, prescription);
           
-          // Check if the repository returned a valid response
+         
           if (response) {
             
             
-            return response; // Return the updated appointment if successful
+            return response; 
           } else {
-            // Throw an error if the response is undefined or invalid
+            
             throw new Error("Failed to complete the appointment: Invalid response from repository");
           }
         } catch (error: any) {
-          // Log the error and rethrow it with a more specific message
+          
           console.error("Error in addPrescription:", error.message);
           throw new Error(`Failed to add prescription: ${error.message}`);
         }
@@ -506,28 +507,68 @@ if (files.qualificationImage) {
       
       async getWallet(doctorId: string, status: string) {
         try {
-            // Fetch wallet details for the given doctorId from the doctorRepository
+            
             const response = await this.doctorRepository.getWalletDetails(doctorId, status);
             
-            // Return the response, ensuring it contains success status if needed
+           
             return response
         } catch (error: any) {
-            // Log the error with a descriptive message and rethrow it
+           
             console.error("Error in getWallet:", error.stack || error.message);
             throw new Error(`Failed to get wallet details: ${error.message}`);
         }
     }
     async withdraw(doctorId: string, withdrawalAmount: number) {
         try {
-            // Fetch wallet details for the given doctorId from the doctorRepository
+            
             const response = await this.doctorRepository.withdrawMoney(doctorId, withdrawalAmount);
             
-            // Return the response, ensuring it contains success withdrawalAmount if needed
-            return response;  // Assuming the response contains updated wallet details
+          
+            return response; 
         } catch (error: any) {
-            // Log the error with a descriptive message and rethrow it
+            
             console.error("Error in withdraw:", error.stack || error.message);
             throw new Error(`Failed to withdraw: ${error.message}`);
+        }
+    }
+
+    async getDoctorData(doctorId: string,reviewData:any) {
+        try {
+          
+      
+          const response = await this.doctorRepository.getDoctor(doctorId,reviewData);
+
+          if (response?.image && response.image.url && response.image.type) {
+            const folderPath = this.getFolderPathByFileType(response.image.type);
+            const signedUrl = await this.S3Service.getFile(response.image.url, folderPath);
+
+           
+            return {
+              ...response,
+              signedImageUrl: signedUrl, 
+            };
+          }
+      
+          
+        } catch (error: any) {
+          console.error("Error in getDoctor:", error.message);
+          throw new Error(`Failed to get specialization: ${error.message}`);
+        }
+      }
+
+      private getFolderPathByFileType(fileType: string): string {
+        
+        
+        switch (fileType) {
+            case 'profile image':
+                return 'eliteCare/doctorProfileImages';
+            case 'document':
+                return 'eliteCare/doctorDocuments';
+            case 'user profile image':
+                return 'eliteCare/userProfileImages';
+            
+            default:
+                throw new Error(`Unknown file type: ${fileType}`);
         }
     }
     

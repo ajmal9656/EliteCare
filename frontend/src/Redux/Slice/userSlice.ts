@@ -1,7 +1,7 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-import { login, updateUserProfile,updateUserProfileImage } from "../Action/userActions";
+import { login, logoutUser, updateUserProfile,updateUserProfileImage } from "../Action/userActions";
 import { User,UserState } from "../../interfaces/userInterface";
-import { act } from "react";
+
 
 
 const initialState: UserState = {
@@ -72,7 +72,24 @@ const userSlice = createSlice({
         .addCase(updateUserProfileImage.rejected, (state, action) => {
             state.loading = false;
             state.error = (action.payload as string) || 'Login failed';
-        })
+        }).addCase(logoutUser.pending, (state) => {
+            state.loading = true;
+            state.error = null;
+          })
+          .addCase(logoutUser.fulfilled, (state) => {
+            // Reset the user state on logout
+            state.userInfo = null;
+            state.accessToken = null;
+            state.loading = false;
+    
+            // Remove user info from localStorage
+            localStorage.removeItem("userAccessToken");
+            localStorage.removeItem("userInfo");
+          })
+          .addCase(logoutUser.rejected, (state, action) => {
+            state.loading = false;
+            state.error = (action.payload as string) || "Logout failed";
+          });
     }
 })
 

@@ -1,20 +1,35 @@
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { RootState } from "../../Redux/store";
+import { logoutUser } from "../../Redux/Action/userActions";
+
 
 
 
 function UserProfilesLayout() {
     const navigate = useNavigate();
+    const dispatch:any = useDispatch()
   const userData = useSelector((state: RootState) => state.user.userInfo);
   console.log("User Data:", userData);
 
-  const handleLogout = () => {
-    // Clear localStorage
-    localStorage.clear();
-
-    // Navigate to login page
-    navigate("/login");
+  const handleLogout = async () => {
+    
+  
+    try {
+      await dispatch(logoutUser());
+     
+      // await axiosUrl.post('/logout', {}, { 
+      //   withCredentials: true 
+      // });
+  
+      // Remove user info from localStorage
+      localStorage.removeItem('userInfo');
+  
+      // Redirect to login page
+      navigate("/login");
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
   console.log("kjsvbkjsbvs")
   return (
@@ -86,51 +101,10 @@ function UserProfilesLayout() {
                 </NavLink>
               </li>
 
-              {/* Chat NavLink */}
-              <li>
-                <NavLink
-                  to="/chat"
-                  className={({ isActive }) =>
-                    `flex items-center p-2 space-x-3 rounded-md ${
-                      isActive
-                        ? "bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] text-slate-600"
-                        : "text-gray-500 hover:bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] hover:text-gray-600"
-                    }`
-                  }
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-5 h-5 fill-current"
-                  >
-                    <path d="M448.205,392.507c30.519-27.2,47.8-63.455,47.8-101.078,0-39.984-18.718-77.378-52.707-105.3C410.218,158.963,366.432,144,320,144s-90.218,14.963-123.293,42.131C162.718,214.051,144,251.445,144,291.429s18.718,77.378,52.707,105.3c33.075,27.168,76.861,42.13,123.293,42.13,6.187,0,12.412-.273,18.585-.816l10.546,9.141A199.849,199.849,0,0,0,480,496h16V461.943l-4.686-4.685A199.17,199.17,0,0,1,448.205,392.507ZM370.089,423l-21.161-18.341-7.056.865A180.275,180.275,0,0,1,320,406.857c-79.4,0-144-51.781-144-115.428S240.6,176,320,176s144,51.781,144,115.429c0,31.71-15.82,61.314-44.546,83.358l-9.215,7.071,4.252,12.035a231.287,231.287,0,0,0,37.882,67.817A167.839,167.839,0,0,1,370.089,423Z"></path>
-                  </svg>
-                  <span>Prescriptions</span>
-                </NavLink>
-              </li>
+              
 
-              {/* Add more NavLink items as needed */}
-              <li>
-                <NavLink
-                  to="/chat"
-                  className={({ isActive }) =>
-                    `flex items-center p-2 space-x-3 rounded-md ${
-                      isActive
-                        ? "bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] text-slate-600"
-                        : "text-gray-500 hover:bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] hover:text-gray-600"
-                    }`
-                  }
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-5 h-5 fill-current"
-                  >
-                    <path d="M448.205,392.507c30.519-27.2,47.8-63.455,47.8-101.078,0-39.984-18.718-77.378-52.707-105.3C410.218,158.963,366.432,144,320,144s-90.218,14.963-123.293,42.131C162.718,214.051,144,251.445,144,291.429s18.718,77.378,52.707,105.3c33.075,27.168,76.861,42.13,123.293,42.13,6.187,0,12.412-.273,18.585-.816l10.546,9.141A199.849,199.849,0,0,0,480,496h16V461.943l-4.686-4.685A199.17,199.17,0,0,1,448.205,392.507ZM370.089,423l-21.161-18.341-7.056.865A180.275,180.275,0,0,1,320,406.857c-79.4,0-144-51.781-144-115.428S240.6,176,320,176s144,51.781,144,115.429c0,31.71-15.82,61.314-44.546,83.358l-9.215,7.071,4.252,12.035a231.287,231.287,0,0,0,37.882,67.817A167.839,167.839,0,0,1,370.089,423Z"></path>
-                  </svg>
-                  <span>Wallet</span>
-                </NavLink>
-              </li>
+              
+
               <li>
                 <NavLink
                   to="/userProfile/security"
@@ -155,16 +129,9 @@ function UserProfilesLayout() {
 
               {/* Logout button */}
               <li> 
-  <NavLink
-    to="/logout"
+  <button
     onClick={handleLogout}
-    className={({ isActive }) =>
-      `flex items-center p-2 space-x-3 rounded-md ${
-        isActive
-          ? "bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] text-slate-600"
-          : "text-gray-500 hover:bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] hover:text-gray-600"
-      }`
-    }
+    className="flex items-center p-2 space-x-3 rounded-md text-gray-500 hover:bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] hover:text-gray-600"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -174,8 +141,9 @@ function UserProfilesLayout() {
       <path d="M256,48C141.124,48,48,141.124,48,256S141.124,464,256,464,464,370.876,464,256,370.876,48,256,48Zm0,32c93.732,0,176,76.476,176,176s-76.476,176-176,176S80,333.732,80,256,162.268,80,256,80ZM207.742,128.143a16,16,0,1,0-22.627,22.628L245.172,211H152a16,16,0,0,0,0,32h93.172l-60.057,60.057a16,16,0,1,0,22.628,22.627l80-80a16,16,0,0,0,0-22.628Z"/>
     </svg>
     <span>Logout</span>
-  </NavLink> 
+  </button> 
 </li>
+
             </ul>
           </div>
         </div>

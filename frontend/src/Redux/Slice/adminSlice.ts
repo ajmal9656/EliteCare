@@ -1,12 +1,13 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
 import { Admin,AdminState } from "../../interfaces/adminInterface";
-import { login } from "../Action/adminActions";
+import { login, logoutAdmin } from "../Action/adminActions";
 
 
 const initialState:AdminState = {
     adminInfo:null,
     error:null,
-    loading:false
+    loading:false,
+    accessToken: null
 
 
 }
@@ -36,7 +37,24 @@ const adminSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
             state.loading = false;
             state.error = (action.payload as string) || 'Login failed';
+          }).addCase(logoutAdmin.pending, (state) => {
+            state.loading = true;
+            state.error = null;
           })
+          .addCase(logoutAdmin.fulfilled, (state) => {
+            // Reset the Admin state on logout
+            state.adminInfo = null;
+            state.accessToken = null;
+            state.loading = false;
+    
+            // Remove Admin info from localStorage
+            localStorage.removeItem("adminAccessToken");
+            localStorage.removeItem("adminInfo");
+          })
+          .addCase(logoutAdmin.rejected, (state, action) => {
+            state.loading = false;
+            state.error = (action.payload as string) || "Logout failed";
+          });
 
     }
 })

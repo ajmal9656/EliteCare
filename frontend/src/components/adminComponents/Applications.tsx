@@ -48,7 +48,7 @@ function Applications() {
         </thead>
         <tbody >
           {applications.map((application) => (
-            <tr key={application._id} className="hover:bg-gray-100 transition duration-200">
+            <tr key={application._id} className="hover:bg-gray-100 transition duration-200 text-center">
               <td className="py-2 px-4 border-b border-gray-300">{`Dr. ${application.name}`}</td>
               <td className="py-2 px-4 border-b border-gray-300">{application.department}</td>
               <td className="py-2 px-4 border-b border-gray-300 text-center">

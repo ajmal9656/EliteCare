@@ -1,5 +1,5 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-import { login } from "../Action/doctorActions";
+import { login, logoutDoctor } from "../Action/doctorActions";
 import { Doctor,DoctorState } from "../../interfaces/doctorinterface";
 
 
@@ -39,7 +39,24 @@ const doctorSlice = createSlice({
         .addCase(login.rejected, (state, action) => {
             state.loading = false;
             state.error = (action.payload as string) || 'Login failed';
+          }).addCase(logoutDoctor.pending, (state) => {
+            state.loading = true;
+            state.error = null;
           })
+          .addCase(logoutDoctor.fulfilled, (state) => {
+            // Reset the Doctor state on logout
+            state.doctorInfo = null;
+            state.accessToken = null;
+            state.loading = false;
+    
+            // Remove Doctor info from localStorage
+            localStorage.removeItem("doctorAccessToken");
+            localStorage.removeItem("doctorInfo");
+          })
+          .addCase(logoutDoctor.rejected, (state, action) => {
+            state.loading = false;
+            state.error = (action.payload as string) || "Logout failed";
+          });
 
     }
 })

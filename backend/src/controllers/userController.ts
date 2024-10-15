@@ -95,7 +95,13 @@ export class userController {
         accessToken:loginResponse.accessToken,
         userInfo:loginResponse.userInfo
       }
-      res.cookie('refreshToken', loginResponse.refreshToken, {
+      res.cookie('userRefreshToken', loginResponse.refreshToken, {
+        httpOnly: true,  // Makes the cookie inaccessible to JavaScript
+        secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
+        sameSite: 'strict',  // Protects against CSRF attacks
+        maxAge: 21 * 24 * 60 * 60 * 1000,  // 21 days
+      });
+      res.cookie('userAccessToken', loginResponse.accessToken, {
         httpOnly: true,  // Makes the cookie inaccessible to JavaScript
         secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
         sameSite: 'strict',  // Protects against CSRF attacks
@@ -121,6 +127,22 @@ export class userController {
        
     }
   }
+  
+
+async logoutUser(req: Request, res: Response): Promise<void> {
+  try {
+    // Clear the access token and refresh token cookies
+    res.cookie('userAccessToken', '', { httpOnly: true, expires: new Date(0) });
+    res.cookie('userRefreshToken', '', { httpOnly: true, expires: new Date(0) });
+
+    // Send success response
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error: any) {
+    console.error('Logout error:', error);
+    res.status(500).json({ message: "Logout failed" });
+  }
+}
+
 
   async resendOtp(req: Request, res: Response): Promise<void> {
     try {
@@ -436,22 +458,22 @@ async cancelAppointment(req: Request, res: Response): Promise<void> {
   try {
     const appointmentId = req.params.appointmentId;
 
-    // Call the service to cancel the appointment using the appointmentId
+   
     const response = await this.userService.cancelAppointment(appointmentId);
 
-    // Log the response for debugging
+   
     
 
-    // If successful, send a 200 status with the updated appointment
+   
     res.status(200).json({ message: "Appointment canceled successfully", data: response });
   } catch (error: any) {
     console.error("Error canceling appointment:", error.message);
 
-    // If the error message is related to the cancellation process, return a 400 status
+ 
     if (error.message.includes("Failed to cancel appointment")) {
       res.status(400).json({ message: `Failed to cancel appointment: ${error.message}` });
     } else {
-      // Otherwise, send a 500 status for unexpected errors
+     
       res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
   }
@@ -464,19 +486,19 @@ async addReview(req: Request, res: Response): Promise<void> {
     console.log(typeof rating);
     
 
-    // Call the service to add the review to the appointment using the appointmentId
+   
     const response = await this.userService.addReview(appointmentId, rating, reviewText);
 
-    // If successful, send a 200 status with the updated appointment
+  
     res.status(200).json({ message: "Review added successfully", data: response });
   } catch (error: any) {
     console.error("Error adding review:", error.message);
 
-    // Return a 400 status if there's an issue with adding the review
+ 
     if (error.message.includes("Failed to add review")) {
       res.status(400).json({ message: `Failed to add review: ${error.message}` });
     } else {
-      // Otherwise, send a 500 status for unexpected errors
+    
       res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
   }
@@ -486,19 +508,19 @@ async getAppointment(req: Request, res: Response): Promise<void> {
   try {
       const appointmentId = req.params.appointmentId;
 
-      // Fetch appointment using the service
+    
       const response = await this.userService.getAppointment(appointmentId);
 
-      // If successful, send the fetched appointment
+     
       res.status(200).json({ message: "Appointment fetched successfully", data: response });
   } catch (error: any) {
       console.error(`Error fetching appointment with ID ${req.params.appointmentId}:`, error.message);
 
-      // If the error is related to fetching appointments, respond with a 400 status
+  
       if (error.message.includes("Failed to get appointments")) {
           res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
       } else {
-          // Handle unexpected errors
+      
           res.status(500).json({ message: "An unexpected error occurred", error: error.message });
       }
   }

@@ -1,5 +1,5 @@
 import doctorModel from "../model/doctorModel";
-import { Document,ObjectId } from "mongoose";
+import mongoose, { Document,ObjectId } from "mongoose";
 import { doctorType,DoctorData,DoctorFiles,docDetails, TimeSlot } from "../interface/doctorInterface/doctorInterface";
 import doctorApplicationModel from "../model/doctorApplicationModel";
 import RejectDoctorModel from "../model/RejectDoctorSchema";
@@ -287,7 +287,7 @@ export class doctorRepository {
         
         let appointments = [];
     
-        // Query all appointments if status is 'All'
+        
         if (status === "All") {
           appointments = await appointmentModel.find({ docId: doctorId }).populate("userId").lean();
         } else {
@@ -297,7 +297,7 @@ export class doctorRepository {
     
         
         
-        // Return the appointments
+        
         return appointments;
       } catch (error: any) {
         console.error("Error getting appointments:", error.message);
@@ -307,14 +307,14 @@ export class doctorRepository {
 
     async cancelAppointment(appointmentId: string,reason:string): Promise<any> {
       try {
-        // Find and update the appointment by ID, setting the status to "cancelled"
+        
         const appointment = await appointmentModel.findOneAndUpdate(
           { _id: appointmentId },
           { status: "cancelled by Dr",reason:reason },
-          { new: true } // Returns the updated document
+          { new: true } 
         );
     
-        // If no appointment was found, return a meaningful message
+        
         if (!appointment) {
           throw new Error(`Appointment with ID ${appointmentId} not found`);
         }
@@ -330,7 +330,7 @@ export class doctorRepository {
           if (slotUpdation) {
             
     
-            // Find the matching slot
+            
             const matchingSlot = slotUpdation.slots.find(
               (slot) => new Date(slot.start).getTime() === new Date(appointment.start).getTime()
             );
@@ -338,12 +338,12 @@ export class doctorRepository {
             if (matchingSlot) {
               
     
-              // Update slot availability and clear booking details
+            
               matchingSlot.availability = true;
-              matchingSlot.bookedBy = null as any; // To handle null assignment
-              matchingSlot.lockedBy = null as any; // To handle null assignment
+              matchingSlot.bookedBy = null as any; 
+              matchingSlot.lockedBy = null as any; 
               matchingSlot.locked = false;
-              matchingSlot.lockExpiration = null as any; // To handle null assignment
+              matchingSlot.lockExpiration = null as any; 
     
               await slotUpdation.save();
              
@@ -351,7 +351,7 @@ export class doctorRepository {
           }
         }
     
-        // Return the updated appointment
+        
         return appointment;
       } catch (error: any) {
         console.error("Error canceling appointment:", error.message);
@@ -360,41 +360,41 @@ export class doctorRepository {
     }
     async completeAppointment(appointmentId: string, prescription: string): Promise<any> {
       try {
-        // Find the appointment by ID and update its status to "completed" and add the prescription
+       
         const appointment = await appointmentModel.findOneAndUpdate(
-          { _id: appointmentId }, // Match the appointment ID
-          { status: "completed", prescription: prescription }, // Update status and prescription
-          { new: true } // Return the updated document
+          { _id: appointmentId }, 
+          { status: "completed", prescription: prescription }, 
+          { new: true } 
         );
     
-        // If the appointment was not found, throw an error
+        
         if (!appointment) {
           throw new Error("Appointment not found");
         }
     
-        // Find the doctor's wallet
+       
         let wallet = await WalletModel.findOne({ doctorId: appointment.docId });
     
-        // Generate a unique transaction ID
+       
         const transactionId = 'txn_' + Date.now() + Math.floor(Math.random() * 10000);
-        const transactionAmount = 0.9 * appointment.fees; // 90% of the appointment fee
+        const transactionAmount = 0.9 * appointment.fees; 
     
-        // Create the transaction object
+        
         const transaction:ITransaction = {
           amount: transactionAmount,
           transactionId: transactionId,
-          transactionType: 'credit', // Assuming it's a credit transaction
+          transactionType: 'credit',
           appointmentId: appointmentId,
         };
     
-        // If the wallet exists, update it; otherwise, create a new one
+       
         if (wallet) {
-          // Add the transaction to the wallet and update the balance
+          
           wallet.transactions.push(transaction);
           wallet.balance += transactionAmount;
           await wallet.save();
         } else {
-          // Create a new wallet for the doctor
+          
           wallet = new WalletModel({
             doctorId: appointment.docId,
             balance: transactionAmount,
@@ -411,7 +411,7 @@ export class doctorRepository {
     }
     async getWalletDetails(doctorId: string, status: string) {
       try {
-        // Query all wallet transactions if status is 'All'
+       
         let wallet;
         console.log("status", status);
         
@@ -423,18 +423,18 @@ export class doctorRepository {
             wallet = { transactions: [] };
           }
         } else {
-          // Get wallet first and then filter transactions by type
+          
           wallet = await WalletModel.findOne({ doctorId }).lean();
           
-          // If the wallet exists, filter the transactions
+          
           if (wallet) {
             wallet.transactions = wallet.transactions.filter(transaction => transaction.transactionType === status);
           } else {
-            wallet = { transactions: [] }; // Return an empty transactions array if no wallet is found
+            wallet = { transactions: [] }; 
           }
         }
     
-        // Return the wallet transactions
+        
         
         
         return wallet;
@@ -445,14 +445,14 @@ export class doctorRepository {
     }
     async withdrawMoney(doctorId: string, withdrawalAmount: number) {
       try {
-          // Step 1: Fetch the doctor's wallet details from the database
+          
           const wallet = await WalletModel.findOne({ doctorId });
   
           if (!wallet) {
               throw new Error('Wallet not found for the specified doctor.');
           }
   
-          // Step 2: Check if the withdrawal amount is valid
+        
           if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
               throw new Error('A valid withdrawal amount is required.');
           }
@@ -460,10 +460,10 @@ export class doctorRepository {
               throw new Error('Insufficient balance for withdrawal.');
           }
   
-          // Step 3: Deduct the withdrawal amount from the wallet
+         
           wallet.balance -= withdrawalAmount;
   
-          // Step 4: Create the transaction object
+         
           const transactionId = 'txn_' + Date.now() + Math.floor(Math.random() * 10000);
           const transaction: ITransaction = {
               amount: withdrawalAmount,
@@ -472,19 +472,106 @@ export class doctorRepository {
               
           };
   
-          // Step 5: Push the transaction to the wallet's transactions array
+          
           wallet.transactions.push(transaction);
   
-          // Step 6: Save the updated wallet back to the database
+          
           await wallet.save();
   
-          // Step 7: Return the updated wallet details (new balance) and transaction details
+          
           return wallet
       } catch (error: any) {
           console.error("Error processing withdrawal:", error.message);
           throw new Error(error.message);
       }
   }
+
+  async getDoctor(doctorId: string, reviewData: any) {
+    try {
+        console.log(doctorId);
+        console.log(reviewData);
+
+        const isReviewDataPresent = reviewData === "true";
+        console.log(isReviewDataPresent);
+        
+        const doctor = await doctorModel.aggregate([
+            {
+                $match: { _id: new mongoose.Types.ObjectId(doctorId) }, 
+            },
+            {
+                $lookup: {
+                    from: 'appointments', // Join appointments
+                    localField: '_id',    
+                    foreignField: 'docId', 
+                    as: 'appointments',     
+                },
+            },
+            {
+                $lookup: {
+                    from: 'specializations', // Name of the departments collection
+                    localField: 'department', // Field in the doctor document
+                    foreignField: '_id', // Field in the department document
+                    as: 'departmentInfo', // Name of the new array field
+                },
+            },
+            {
+                $unwind: { // Unwind the departmentInfo array to get a single object
+                    path: '$departmentInfo',
+                    preserveNullAndEmptyArrays: true // Optional: keeps doctors without a department
+                }
+            },
+            {
+                $project: {
+                    name: 1,
+                    _id: 1,
+                    doctorId: 1,
+                    email: 1,
+                    fees: 1,
+                    image: 1,
+                    DOB: 1,
+                    phone: 1,
+                    department: '$departmentInfo.name', // Populate department name
+                    appointments: {
+                        $cond: [
+                            { $eq: [isReviewDataPresent, true] },
+                            {
+                                $map: {
+                                    input: {
+                                        $filter: {
+                                            input: '$appointments', // Input array to filter
+                                            as: 'appointment',      // Variable name for each element
+                                            cond: {                 // Condition to filter
+                                                $gt: [{ $ifNull: ['$$appointment.review.rating', 0] }, 0] // Access rating
+                                            }
+                                        }
+                                    },
+                                    as: 'appointment',
+                                    in: {
+                                        review: '$$appointment.review', 
+                                        patientName: '$$appointment.patientName' // Corrected 'patientNAme' to 'patientName'
+                                    }
+                                }
+                            },
+                            [] // Set to empty array if reviewData is not true
+                        ],
+                    },
+                },
+            },
+        ]);
+  
+        if (doctor.length === 0) {
+            return null;
+        }
+        
+        console.log("review", doctor[0]);
+  
+        return doctor[0]; 
+    } catch (error: any) {
+        console.error("Error getting doctor:", error.message);
+        throw new Error(`Failed to fetch doctor ${doctorId}: ${error.message}`);
+    }
+}
+
   
     
     

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation ,useNavigate} from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
@@ -7,6 +7,7 @@ import axiosUrl from '../../utils/axios';
 
 function AppointmentDetails() {
   const location = useLocation();
+  const navigate = useNavigate()
   const { appointment } = location.state || {}; // Retrieve appointment data from location state
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,6 +80,13 @@ function AppointmentDetails() {
     },
   });
 
+  const navigateChat = () =>{
+
+    navigate("/doctor/chat")
+
+
+  }
+
   // Formik setup for prescription input
   const prescriptionFormik = useFormik({
     initialValues: {
@@ -130,7 +138,7 @@ function AppointmentDetails() {
       case 'pending':
         return (
           <>
-            <button className='bg-blue-500 w-[30%] h-[70%] rounded-md text-white'>
+            <button className='bg-blue-500 w-[30%] h-[70%] rounded-md text-white' onClick={navigateChat}>
               Chat
             </button>
             <button
@@ -177,54 +185,54 @@ function AppointmentDetails() {
 
         {/* Appointment details card */}
         <div className='w-[100%] h-[240px]  flex flex-col  '>
-          <div className='h-[240px] w-[100%] flex gap-3'>
-            {/* Left Section - Patient Info */}
-            <div className='w-[35%] h-[240px] bg-white rounded-md shadow-xl'>
-              <div className='h-[200px] w-[90%] flex ml-8 items-center space-x-2'>
-                <ul className='space-y-3 mt-10'>
-                  <li className='space-x-3 flex'>
-                    <h1 className='text-lg font-semibold'>Name: </h1>
-                    <p className='text-lg font-semibold'>{appointment?.patientName || 'N/A'}</p>
-                  </li>
-                  <li className='space-x-3 flex'>
-                    <h1 className='text-lg font-semibold'>Age: </h1>
-                    <p className='text-lg font-semibold'>{appointment?.viewDetails?.age || 'N/A'}</p>
-                  </li>
-                  <li className='space-x-3 flex'>
-                    <h1 className='text-lg font-semibold'>Date: </h1>
-                    <p className='text-lg font-semibold'>{appointment?.date || 'N/A'}</p>
-                  </li>
-                  <li className='space-x-3 flex'>
-                    <h1 className='text-lg font-semibold'>Time: </h1>
-                    <p className='text-lg font-semibold'>{appointment?.time || 'N/A'}</p>
-                  </li>
-                  <li className='space-x-3 flex'>
-                    <h1 className='text-lg font-semibold'>Fees: </h1>
-                    <p className='text-lg font-semibold'>{appointment?.viewDetails?.fees || 'N/A'}</p>
-                  </li>
-                </ul>
-              </div>
-            </div>
+        <div className='h-[240px] w-[100%] flex gap-3'>
+  {/* Left Section - Patient Info */}
+  <div className='w-[35%] h-[240px] bg-white rounded-lg shadow-md'>
+    <div className='h-[200px] w-[90%] flex ml-8 items-center space-x-2'>
+      <ul className='space-y-4 mt-10'>
+        <li className='space-x-3 flex'>
+          <h1 className='text-lg font-bold text-gray-800'>Name:</h1>
+          <p className='text-lg text-gray-700'>{appointment?.patientName || 'N/A'}</p>
+        </li>
+        <li className='space-x-3 flex'>
+          <h1 className='text-lg font-bold text-gray-800'>Age:</h1>
+          <p className='text-lg text-gray-700'>{appointment?.viewDetails?.age || 'N/A'}</p>
+        </li>
+        <li className='space-x-3 flex'>
+          <h1 className='text-lg font-bold text-gray-800'>Date:</h1>
+          <p className='text-lg text-gray-700'>{appointment?.date || 'N/A'}</p>
+        </li>
+        <li className='space-x-3 flex'>
+          <h1 className='text-lg font-bold text-gray-800'>Time:</h1>
+          <p className='text-lg text-gray-700'>{appointment?.time || 'N/A'}</p>
+        </li>
+        <li className='space-x-3 flex'>
+          <h1 className='text-lg font-bold text-gray-800'>Fees:</h1>
+          <p className='text-lg text-gray-700'>{appointment?.viewDetails?.fees || 'N/A'}</p>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-            {/* Right Section - Description */}
-            
-            <div className='w-[65%] h-[240px] flex flex-col items-center bg-white rounded-md shadow-xl gap-4'>
-              <div className='w-[95%] h-[45px] mt-4 flex items-center'>
-                <h1 className='text-xl font-semibold'>Description</h1>
-              </div>
-              <div className='overflow-y-auto px-6 w-[95%] h-[130px] bg-gray-100 rounded-lg  '>
-                <p className='w-[100%] text-lg font-serif text-gray-700 break-words'>
-                  {appointment?.viewDetails?.description || 'No description available'}
-                </p>
-              </div>
-              {/* Buttons Section */}
-          <div className='h-[70px] w-[100%] flex justify-end'>
-            <div className='w-[35%] flex space-x-5 justify-end mr-4 mt-1'>
-              {renderButtons()}
-            </div>
-          </div>
-            </div>
-          </div>
+  {/* Right Section - Description */}
+  <div className='w-[65%] h-[240px] flex flex-col items-center bg-white rounded-lg shadow-md gap-4'>
+    <div className='w-[95%] h-[45px] mt-4 flex items-center'>
+      <h1 className='text-xl font-bold text-gray-800'>Description</h1>
+    </div>
+    <div className='overflow-y-auto px-6 w-[95%] h-[130px] bg-gray-100 rounded-lg shadow-inner'>
+      <p className='w-[100%] text-lg font-serif text-gray-700 break-words'>
+        {appointment?.viewDetails?.description || 'No description available'}
+      </p>
+    </div>
+    {/* Buttons Section */}
+    <div className='h-[70px] w-[100%] flex justify-end'>
+      <div className='w-[35%] flex space-x-5 justify-end mr-4 mt-1'>
+        {renderButtons()}
+      </div>
+    </div>
+  </div>
+</div>
+
 
           
         </div>

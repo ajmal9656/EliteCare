@@ -20,6 +20,7 @@ import BookAppointmentPage from '../pages/userPages/BookAppointmentPage';
 import PaymentSuccess from '../components/common/PaymentSuccess';
 import AppointmentPage from '../pages/userPages/AppointmentPage';
 import AppointmentDetailsPage from '../pages/userPages/AppointmentDetailsPage';
+import ChatPage from '../pages/userPages/ChatPage';
 
 
 
@@ -51,6 +52,8 @@ function UserRoutes() {
                     <Route path="security" element={<SecurityPage/>} />
                     <Route path="appointments" element={<AppointmentPage/>} />
                     <Route path="viewAppointment" element={<AppointmentDetailsPage/>} />
+                    <Route path="chat" element={<ChatPage/>} />
+
                 
                      
 

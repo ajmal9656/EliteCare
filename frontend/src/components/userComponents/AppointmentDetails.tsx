@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation ,useNavigate} from "react-router-dom";
 import moment from "moment";
 import { Rating } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik"; 
 import * as Yup from "yup";
 import axiosUrl from "../../utils/axios";
 import { toast } from "sonner";
+import jsPDF from 'jspdf';
 
 
 interface ReviewFormValues {
@@ -26,10 +27,15 @@ interface Appointment {
   review?: { // Optional review field
     rating: number; // Ensure rating is a number
     reviewText?: string; // Optional field for review text
+    
   };
+  prescription:string;
+    fees:string
 }
+
 function AppointmentDetails() {
   const location = useLocation();
+  const navigate = useNavigate()
   const appointmentId = location.state?.appointmentId; // Only the ID
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,7 +46,7 @@ function AppointmentDetails() {
     const fetchAppointmentDetails = async () => {
       try {
         const response = await axiosUrl.get(`/getAppointment/${appointmentId}`);
-        console.log("ww", response.data);
+        console.log("Fetched appointment data:", response.data.data);
         
         setAppointment(response.data.data); // Assuming response.data contains appointment details
       } catch (error) {
@@ -48,9 +54,7 @@ function AppointmentDetails() {
       }
     };
 
-    
-      fetchAppointmentDetails();
-    
+    fetchAppointmentDetails();
   }, [appointmentId]);
 
   const openModal = () => {
@@ -81,10 +85,9 @@ function AppointmentDetails() {
         rating: values.rating,
         reviewText: values.reviewText,
       });
-      setAppointment(response.data.data)
-
+      setAppointment(response.data.data);
       console.log("Review submitted successfully:", response.data);
-      toast.success("Your Review Added Successfully")
+      toast.success("Your Review Added Successfully");
       resetForm();
       closeReviewModal();
     } catch (error) {
@@ -92,8 +95,87 @@ function AppointmentDetails() {
     }
   };
 
+  const downloadPrescription = async () => {
+    if (appointment?.prescription) {
+      const doc = new jsPDF();
+  
+      // Set fonts
+      doc.setFont("Helvetica", "normal");
+      doc.setFontSize(12);
+  
+      // Define Colors
+      const darkBlue = "rgb(0, 51, 102)";
+      const lightBlue = "rgb(0, 102, 204)";
+      const darkGrey = "rgb(50, 50, 50)";
+      const lightGrey = "rgb(150, 150, 150)";
+  
+      // Website Name
+      doc.setFontSize(18);
+      doc.setTextColor(darkBlue);
+      doc.text("EliteCare", 10, 15); // Position it at the top
+  
+      // Header
+      doc.setFontSize(22);
+      doc.setTextColor(lightBlue);
+      doc.text("Prescription", 10, 30); // Adjusted Y position to make room for website name
+  
+      // Draw a line under the header
+      doc.setDrawColor(0, 102, 204);
+      doc.setLineWidth(1);
+      doc.line(10, 35, 200, 35); // Adjusted line position
+  
+      // Patient Information
+      doc.setFontSize(14);
+      doc.setTextColor(darkGrey);
+      doc.text(`Patient Name: ${appointment.patientNAme}`, 10, 45);
+      doc.text(`Age: ${appointment.age.toString()}`, 10, 55);
+      doc.text(`Date: ${moment(appointment.date).format("MMMM Do YYYY")}`, 10, 65);
+      doc.text(`Time: ${appointment.start} - ${appointment.end}`, 10, 75);
+  
+      // Add some space
+      doc.setLineWidth(0.5);
+      doc.line(10, 80, 200, 80); // Separator line
+  
+      // Prescription Section
+      doc.setFontSize(16);
+      doc.setTextColor(darkBlue);
+      doc.text("Prescription Details:", 10, 90);
+  
+      // Increase spacing before prescription content
+      const prescriptionSpacing = 10; // Adjust this value to increase or decrease spacing
+      let yPosition = 90 + prescriptionSpacing; // Starting position for the content
+  
+      // Prescription Details in a structured format
+      const prescriptionLines = appointment.prescription.split('\n');
+      prescriptionLines.forEach((line) => {
+        doc.setTextColor(darkGrey);
+        doc.text(line, 10, yPosition);
+        yPosition += 8; // Move down for each line
+      });
+  
+      // Footer
+      doc.setFontSize(10);
+      doc.setTextColor(lightGrey);
+      doc.text("Thank you for choosing our service!", 10, 280);
+      doc.text("For any questions, please contact us.", 10, 285);
+      doc.text("EliteCare | elitecare@gmail.com", 10, 290); // Optional company details
+  
+      // Save the PDF
+      doc.save(`Prescription_${appointment.patientNAme}.pdf`);
+    }
+  };
+  
+  const navigateChat = () =>{
+
+    navigate("/userProfile/chat")
+
+
+  }
   
   
+  
+  
+
   return (
     <div className="w-[75%] mt-10 pr-10 pb-5">
       <div className="bg-white w-[100%] object-cover rounded-lg border flex flex-col justify-around p-5 space-y-6">
@@ -125,49 +207,67 @@ function AppointmentDetails() {
           </div>
         </div>
 
-        
-
-<div className="text-right">
+        <div className="text-right">
   {appointment?.status === "completed" && (
     <>
-      {appointment?.review?.rating === 0 ? ( // Check if the rating is 0
+      {appointment?.review?.rating === 0 ? (
         <button
-          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200"
+          className="px-6 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-full shadow-lg hover:from-green-500 hover:to-green-700 transform hover:scale-105 transition duration-300 ease-in-out"
           onClick={openReviewModal}
         >
           Add Review
         </button>
       ) : (
-        <p className="text-green-600 pb-2">Review Added: {appointment?.review?.rating} ⭐</p> // Show review added text
+        <p className="text-green-600 pb-2">Review Added: {appointment?.review?.rating} ⭐</p>
       )}
-      <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200 ml-2">
+      <button
+        className="px-6 py-2 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-full shadow-lg hover:from-indigo-500 hover:to-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+        onClick={downloadPrescription}
+      >
         Download Prescription
       </button>
     </>
   )}
+
   {appointment?.status === "cancelled" && (
     <p className="px-4 py-2 text-red-600 rounded-lg">Cancelled</p>
   )}
+
   {appointment?.status === "cancelled by Dr" && (
     <button
-      className="px-4 py-2 bg-red-600 text-white rounded-lg"
+      className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out"
       onClick={openModal}
     >
       Cancelled by Dr
     </button>
   )}
+
   {appointment?.status === "prescription pending" && (
+    <p className="text-lg italic text-yellow-600">
+      Prescription will be added soon...
+    </p>
+  )}
+
+  {appointment?.status === "pending" && (
     <>
-      <p className="text-lg italic text-yellow-600">Prescription will be added soon...</p>
-      
+      <button
+        className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
+        onClick={navigateChat}
+      >
+        Chat
+      </button>
+      <button
+        className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+        // onClick={cancelAppointment}
+      >
+        Cancel
+      </button>
     </>
   )}
 </div>
 
-
-
       </div>
-
+      
       {/* Review Modal */}
       {isReviewModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
@@ -209,16 +309,16 @@ function AppointmentDetails() {
                   </div>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200"
+                    className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 transition duration-200"
                   >
                     Submit Review
                   </button>
                   <button
                     type="button"
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 ml-2"
                     onClick={closeReviewModal}
+                    className="mt-2 w-full text-gray-500 hover:text-gray-700"
                   >
-                    Close
+                    Cancel
                   </button>
                 </Form>
               )}
@@ -227,13 +327,16 @@ function AppointmentDetails() {
         </div>
       )}
 
-      {/* Modal for Cancellation Reason */}
+      {/* Cancelled Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Cancellation Reason</h3>
-            <p>Reason: {appointment?.reason || "No reason provided."}</p>
-            <button className="mt-4 px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400" onClick={closeModal}>
+          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[80%] overflow-y-auto overflow-x-hidden">
+            <h3 className="text-lg font-semibold mb-4">Appointment Cancelled</h3>
+            <p>{appointment?.reason || "No reason provided."}</p>
+            <button
+              onClick={closeModal}
+              className="mt-4 w-full bg-gray-300 text-gray-700 rounded-lg py-2 hover:bg-gray-400 transition duration-200"
+            >
               Close
             </button>
           </div>

@@ -30,9 +30,17 @@ export class adminController {
           }
           console.log(res);
           
-          res.cookie('refreshToken', loginResponse.refreshToken, {
-            httpOnly: true,  
-            maxAge: 7 * 24 * 60 * 60 * 1000,  
+          res.cookie('adminRefreshToken', loginResponse.refreshToken, {
+            httpOnly: true,  // Makes the cookie inaccessible to JavaScript
+            secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
+            sameSite: 'strict',  // Protects against CSRF attacks
+            maxAge: 21 * 24 * 60 * 60 * 1000,  // 21 days
+          });
+          res.cookie('adminAccessToken', loginResponse.accessToken, {
+            httpOnly: true,  // Makes the cookie inaccessible to JavaScript
+            secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
+            sameSite: 'strict',  // Protects against CSRF attacks
+            maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
           });
           console.log("logindata",response)
           res.status(200).json({ message: "Login successful", response});
@@ -52,6 +60,19 @@ export class adminController {
     
         }
            
+        }
+      }
+      async logoutAdmin(req: Request, res: Response): Promise<void> {
+        try {
+          // Clear the access token and refresh token cookies
+          res.cookie('adminAccessToken', '', { httpOnly: true, expires: new Date(0) });
+          res.cookie('adminRefreshToken', '', { httpOnly: true, expires: new Date(0) });
+      
+          // Send success response
+          res.status(200).json({ message: "Logout successful" });
+        } catch (error: any) {
+          console.error('Logout error:', error);
+          res.status(500).json({ message: "Logout failed" });
         }
       }
       async addSpecialization(req: Request, res: Response): Promise<void> {
@@ -391,7 +412,7 @@ async getDashboardData(req: Request, res: Response): Promise<void> {
     } catch (error: any) {
         console.error("Error in getDashboardData controller:", error.message);
 
-        // Customize the error response based on the error message
+      
         if (error.message === "Something went wrong while retrieving dashboard data.") {
             res.status(400).json({ message: "Failed to retrieve dashboard data." });
         } else {

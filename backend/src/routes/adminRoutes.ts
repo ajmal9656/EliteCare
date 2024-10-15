@@ -29,6 +29,7 @@ route.put('/listUnlistUser/:userId',adminControllerInstance.listUnlistUser.bind(
 route.get('/getDoctors',adminControllerInstance.getDoctors.bind(adminControllerInstance));
 route.put('/listUnlistDoctor/:doctorId',adminControllerInstance.listUnlistDoctor.bind(adminControllerInstance));
 route.get('/dashboardData',adminControllerInstance.getDashboardData.bind(adminControllerInstance));
+route.post('/logout', adminControllerInstance.logoutAdmin.bind(adminControllerInstance));
 
 
 

@@ -35,6 +35,7 @@ route.get('/getAppointments/:userId', userControllerInstance.getAllAppointments.
 route.put('/cancelAppointment/:appointmentId', userControllerInstance.cancelAppointment.bind(userControllerInstance));
 route.post('/addReview', userControllerInstance.addReview.bind(userControllerInstance));
 route.get('/getAppointment/:appointmentId', userControllerInstance.getAppointment.bind(userControllerInstance));
+route.post('/logout', userControllerInstance.logoutUser.bind(userControllerInstance));
 
 export default route;
 

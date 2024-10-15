@@ -173,3 +173,26 @@ export const updateUserProfile = createAsyncThunk(
       }
     }
   );
+
+  export const logoutUser = createAsyncThunk(
+    'user/logoutUser',
+    async (_, { rejectWithValue }) => { // Include rejectWithValue in the argument list
+      try {
+        const response = await axiosUrl.post('/logout', {}, { 
+          withCredentials: true // Send cookies with the request
+        });
+  
+        return response.data;
+      } catch (error:any) {
+        if (error.response) {
+          const errorMessage = error.response.data.message || 'Logout failed';
+          console.error('Logout error:', errorMessage);
+          return rejectWithValue(errorMessage);
+        } else if (error.request) {
+          return rejectWithValue('No response from server.');
+        } else {
+          return rejectWithValue(error.message || 'Logout failed');
+        }
+      }
+    }
+  );

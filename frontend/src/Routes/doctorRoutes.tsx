@@ -11,6 +11,9 @@ import SlotManagementPage from '../pages/doctorPages/SlotManagementPage';
 import AppointmentsPage from '../pages/doctorPages/AppointmentsPage';
 import AppointmentDetailsPage from '../pages/doctorPages/AppointmentDetailsPage';
 import WalletPage from '../pages/doctorPages/WalletPage';
+import ChatPage from '../pages/doctorPages/ChatPage';
+import ProfilePage from '../pages/doctorPages/ProfilePage';
+
 
 
 
@@ -32,6 +35,8 @@ function doctorRoutes() {
                    <Route  path="appointments" element={<AppointmentsPage/>} />
                    <Route  path="appointmentDetails" element={<AppointmentDetailsPage/>} />
                    <Route  path="wallet" element={<WalletPage/>} />
+                   <Route  path="chat" element={<ChatPage/>} />
+                   <Route  path="profile" element={<ProfilePage/>} />
                   
                    
                    

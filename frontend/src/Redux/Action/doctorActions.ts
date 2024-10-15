@@ -118,3 +118,25 @@ export const resendOtp = ():any =>{
     }
 
 }
+export const logoutDoctor = createAsyncThunk(
+    'doctor/logoutDoctor',
+    async (_, { rejectWithValue }) => { // Include rejectWithValue in the argument list
+      try {
+        const response = await axiosUrl.post('/doctor/logout', {}, { 
+          withCredentials: true // Send cookies with the request
+        });
+  
+        return response.data;
+      } catch (error:any) {
+        if (error.response) {
+          const errorMessage = error.response.data.message || 'Logout failed';
+          console.error('Logout error:', errorMessage);
+          return rejectWithValue(errorMessage);
+        } else if (error.request) {
+          return rejectWithValue('No response from server.');
+        } else {
+          return rejectWithValue(error.message || 'Logout failed');
+        }
+      }
+    }
+  );

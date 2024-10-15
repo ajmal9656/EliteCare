@@ -40,5 +40,7 @@ route.put('/cancelAppointment', doctorControllerInstance.cancelAppointment.bind(
 route.put('/addPrescription', doctorControllerInstance.addPrescription.bind(doctorControllerInstance));
 route.get('/getWallet/:doctorId', doctorControllerInstance.getWallet.bind(doctorControllerInstance));
 route.post('/withdraw/:doctorId', doctorControllerInstance.withdraw.bind(doctorControllerInstance));
+route.post('/logout', doctorControllerInstance.logoutDoctor.bind(doctorControllerInstance));
+route.get('/getDoctorDetails/:doctorId', doctorControllerInstance.getDoctorDetails.bind(doctorControllerInstance));
 
 export default route;

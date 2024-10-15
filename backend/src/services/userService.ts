@@ -389,10 +389,10 @@ export class userService{
     
             const parsedDate = new Date(date);
     
-            // Get the available slots from the repository
+           
             const availableSlots = await this.userRepository.getAllSlots(parsedDate, doctorId);
     
-            // Return the available slots
+          
             return availableSlots;
         } catch (error: any) {
             console.error("Error in getSlots:", error.message);
@@ -576,13 +576,13 @@ if (file) {
 
     async getAppointments(userId: string, status: string) {
         try {
-            // Fetch appointments for the given userId from the userRepository
+          
             const response = await this.userRepository.getAllAppointments(userId, status);
     
             if (response) {
                 console.log("appointments", response);
     
-                // Map over the appointments to transform start and end times
+               
                 const updatedAppointments = response.map((appointment: any) => ({
                     ...appointment,
                     start: this.getTime(appointment.start),
@@ -592,14 +592,14 @@ if (file) {
                 console.log("up",updatedAppointments);
                 
     
-                return updatedAppointments; // Return the updated appointments
+                return updatedAppointments;
             } else {
-                // Log and throw an error if the response is invalid
+                
                 console.error("Failed to get appointments: Response is invalid");
                 throw new Error("Something went wrong while fetching the appointments.");
             }
         } catch (error: any) {
-            // Log the error with a descriptive message and rethrow it
+           
             console.error("Error in getAppointments:", error.message);
             throw new Error(`Failed to get appointments: ${error.message}`);
         }
@@ -611,80 +611,79 @@ if (file) {
     
     async cancelAppointment(appointmentId: string): Promise<any> {
         try {
-          // Call the repository to cancel the appointment using the provided appointmentId
+          
           const response = await this.userRepository.cancelAppointment(appointmentId);
       
-          // Check if the repository returned a valid response
           if (response) {
             
       
-            // Assuming the response contains a paymentId for the appointment
-            const paymentId = response.paymentId; // Adjust this according to your response structure
+           
+            const paymentId = response.paymentId; 
       
-            // Proceed to refund if a valid paymentId is available
+         
             if (paymentId) {
                 
                 
-              // Call the refund function and await the result
-              const refundResponse = await refund(paymentId); // Ensure the refund method is available in the class
+             
+              const refundResponse = await refund(paymentId); 
       
-              // Return the updated appointment and refund details
+             
               return response;
             } else {
               throw new Error("No payment ID available for refund");
             }}
         } catch (error: any) {
-          // Log the error and rethrow it with a more specific message
+          
           console.error("Error in cancelAppointment:", error.message);
           throw new Error(`Failed to cancel appointment: ${error.message}`);
         }
       }
       async addReview(appointmentId: string, rating: number, review: string): Promise<any> {
         try {
-          // Call the repository to add the review for the given appointment ID
+         
           const response = await this.userRepository.addReview(appointmentId, rating, review);
       
-          // Check if the repository returned a valid response
+         
           if (!response) {
             throw new Error('Appointment not found or review could not be added');
           }
       
-          // Return the updated appointment (including the review)
+         
           return response;
         } catch (error: any) {
-          // Log the error for debugging purposes
+         
           console.error("Error in addReview:", error.message);
       
-          // Throw a more specific error message to the caller
+        
           throw new Error(`Failed to add review: ${error.message}`);
         }
       }
 
       async getAppointment(appointmentId: string) {
         try {
-            // Fetch appointment from the repository
+         
             const response = await this.userRepository.getAppointment(appointmentId);
     
             if (response) {
                 console.log("appointments", response);
     
-                // Update start and end times using helper function
+                
                 const updatedAppointment = {
                     ...response,
-                    start: this.getTime(response.start), // Use default value if missing
-                    end: this.getTime(response.end)      // Use default value if missing
+                    start: this.getTime(response.start), 
+                    end: this.getTime(response.end)      
                 };
     
                 console.log("updated appointment", updatedAppointment);
                 
-                return updatedAppointment; // Return the updated appointment
+                return updatedAppointment; 
             } else {
-                // Log and throw an error if response is invalid
+                
                 console.error("Failed to get appointment: Response is invalid");
                 throw new Error("Something went wrong while fetching the appointment.");
             }
         } catch (error: any) {
-            // Log the error with more details
+           
             console.error("Error in getAppointment:", error.message);
             throw new Error(`Failed to get appointment: ${error.message}`);
         }

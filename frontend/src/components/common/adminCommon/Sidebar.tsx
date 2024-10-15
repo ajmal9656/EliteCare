@@ -1,6 +1,32 @@
 import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutAdmin } from "../../../Redux/Action/adminActions";
 
 function Sidebar() {
+  const navigate = useNavigate();
+  const dispatch:any = useDispatch()
+
+
+  const handleLogout = async () => {
+    
+  
+    try {
+      await dispatch(logoutAdmin());
+     
+      // await axiosUrl.post('/logout', {}, { 
+      //   withCredentials: true 
+      // });
+  
+      // Remove user info from localStorage
+      localStorage.removeItem('adminInfo');
+  
+      // Redirect to login page
+      navigate("/admin/login");
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
   return (
     <>
       <nav className=" fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -88,7 +114,7 @@ function Sidebar() {
           <button
             type="button"
             className="ml-4 text-sm text-gray-900 dark:text-white"
-            onClick={() => console.log('Logout')}
+            onClick={handleLogout}
           >
             Logout
           </button>
