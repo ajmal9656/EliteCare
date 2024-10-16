@@ -42,5 +42,7 @@ route.get('/getWallet/:doctorId', doctorControllerInstance.getWallet.bind(doctor
 route.post('/withdraw/:doctorId', doctorControllerInstance.withdraw.bind(doctorControllerInstance));
 route.post('/logout', doctorControllerInstance.logoutDoctor.bind(doctorControllerInstance));
 route.get('/getDoctorDetails/:doctorId', doctorControllerInstance.getDoctorDetails.bind(doctorControllerInstance));
+route.put('/updateDoctor', doctorControllerInstance.updateDoctorProfile.bind(doctorControllerInstance));
+route.get('/dashboardData',doctorControllerInstance.getDashboardData.bind(doctorControllerInstance));
 
 export default route;

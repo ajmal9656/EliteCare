@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { adminRepository } from '../repository/adminRepository';
 import { Admin,adminType } from '../interface/adminInterface/adminInterface';
 import { S3Service } from '../config/s3client';
+import moment from 'moment';
 
 
 
@@ -363,7 +364,7 @@ export class adminService{
     
            
             if (response) {
-                console.log("Dashboard data successfully retrieved:", response);
+                console.log("Dashboardsss data successfully retrieved:", response);
                 return response;
             } else {
                 
@@ -376,6 +377,40 @@ export class adminService{
             throw new Error(`Failed to retrieve dashboard data: ${error.message}`);
         }
     }
+
+    async getAppointments(status: string) {
+        try {
+            
+            const response = await this.adminRepository.getAllAppointments(status);
+    
+           
+    
+            
+            if (Array.isArray(response)) {
+               
+                const formattedAppointments = response.map(appointment => {
+                    return {
+                        ...appointment,
+                        start: this.getTime(appointment.start),
+                        end: this.getTime(appointment.end)
+                    };
+                });
+    
+                return formattedAppointments; 
+            } else {
+                
+                console.error("Failed to get appointments: Response is invalid", response);
+                throw new Error("Something went wrong while fetching the appointments.");
+            }
+        } catch (error: any) {
+            
+            console.error("Error in getAppointments:", error.stack || error.message);
+            throw new Error(`Failed to get appointments: ${error.message}`);
+        }
+    }
+    getTime(slot:any){
+        return moment(slot).tz('UTC').format('h:mm A')
+      }
     
 
 

@@ -474,7 +474,7 @@ async getDoctorDetails(req: Request, res: Response): Promise<void> {
 
       const doctorId = req.params.doctorId
       const reviewData = req.query.reviewData;
-      console.log("revi",typeof reviewData);
+      console.log("revi",doctorId);
       
 
     
@@ -494,6 +494,47 @@ async getDoctorDetails(req: Request, res: Response): Promise<void> {
           res.status(400).json({ message: "Something went wrong while creating the specialization." });
       } else {
         
+          res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
+  }
+}
+
+async updateDoctorProfile(req: Request, res: Response): Promise<void> {
+  try {
+    
+    const { _id, fees, DOB, phone } = req.body;
+
+    
+    const response = await this.doctorService.updateProfile(_id, { fees, DOB, phone });
+
+    
+    res.status(200).json({ message: "Profile updated successfully", response });
+  } catch (error: any) {
+    console.error("Error updating profile:", error.message);
+
+   
+    if (error.message.includes("something went wrong")) {
+      res.status(400).json({ message: "Error updating profile." });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+
+async getDashboardData(req: Request, res: Response): Promise<void> {
+  try {
+    const doctorId = req.query.doctorId;
+      const response = await this.doctorService.getDashboardData(doctorId as string);
+
+      res.status(200).json({ message: "Dashboard data retrieved successfully", response });
+      
+  } catch (error: any) {
+      console.error("Error in getDashboardData controller:", error.message);
+
+    
+      if (error.message === "Something went wrong while retrieving dashboard data.") {
+          res.status(400).json({ message: "Failed to retrieve dashboard data." });
+      } else {
           res.status(500).json({ message: "An unexpected error occurred", error: error.message });
       }
   }

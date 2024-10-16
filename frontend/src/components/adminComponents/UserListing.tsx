@@ -34,7 +34,7 @@ function UserListing() {
         <div className="flex flex-col pl-64 p-4 ml-3 mt-14">
             <div className='flex flex-row justify-between'>
                 <div className="flex justify-between items-center mb-4">
-                    <h1 className="text-2xl font-bold">Users</h1>
+                    
                 </div>
             </div>
 

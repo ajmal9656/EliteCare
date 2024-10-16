@@ -1,3 +1,4 @@
+import { UpdateDoctorProfilePayload } from '../../interfaces/doctorinterface';
 import axiosUrl from '../../utils/axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
@@ -136,6 +137,33 @@ export const logoutDoctor = createAsyncThunk(
           return rejectWithValue('No response from server.');
         } else {
           return rejectWithValue(error.message || 'Logout failed');
+        }
+      }
+    }
+  );
+
+  export const updateDoctorProfile = createAsyncThunk(
+    'doctor/updateDoctorProfile',
+    async ({ doctorId, DOB, fees, phone }: UpdateDoctorProfilePayload, { rejectWithValue }) => {
+      try {
+        const response = await axiosUrl.put('/doctor/updateDoctor', {
+          _id:doctorId,
+          DOB,
+          fees,
+          phone,
+        });
+  
+        console.log("Thunkkkk response:", response.data.response);
+        return response.data.response; // Adjust according to your API response structure
+      } catch (error: any) {
+        if (error.response) {
+          const errorMessage = error.response.data.message || 'Update failed';
+          console.log("Error response:", errorMessage);
+          return rejectWithValue(errorMessage);
+        } else if (error.request) {
+          return rejectWithValue('No response from server.');
+        } else {
+          return rejectWithValue(error.message || 'Update failed');
         }
       }
     }

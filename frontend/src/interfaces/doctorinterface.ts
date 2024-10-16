@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 export interface Doctor {
+  _id:string;
     doctorId: string;
     name: string;
     phone : string;
@@ -95,6 +96,14 @@ export interface Specializations {
     
    
   }
+
+  export interface UpdateDoctorProfilePayload {
+    doctorId: string | undefined;
+    DOB: string;
+    fees: number; // Adjust this if you want to handle a Date object
+    phone: string;
+  }
+
   
 
   

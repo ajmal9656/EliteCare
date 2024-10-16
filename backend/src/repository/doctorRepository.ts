@@ -572,6 +572,130 @@ export class doctorRepository {
     }
 }
 
+async updateProfile(doctorId: string, updateData:{ fees: number; DOB: Date; phone: string } ) {
+  try {
+      // Find the doctor by ID
+      const doctor = await doctorModel.findById(new mongoose.Types.ObjectId(doctorId));
+      if (!doctor) {
+          throw new Error("doctor not found");
+      }
+
+      
+      Object.assign(doctor, updateData); 
+
+      
+      const updatedDoctor = await doctor.save();
+
+      
+      return updatedDoctor;
+  } catch (error: any) {
+      console.error("Error updating profile:", error.message);
+      throw new Error(`Failed to update profile: ${error.message}`);
+  }
+}
+
+async getAllStatistics(doctorId: string) {
+  try {
+    // Get wallet details
+    const wallet = await WalletModel.findOne({ doctorId });
+
+    // Calculate total revenue from transactions
+    const totalRevenue = wallet
+      ? wallet.transactions.reduce((acc, transaction) => {
+          return transaction.transactionType === 'credit'
+            ? acc + transaction.amount
+            : acc; // Ignore debit amounts
+        }, 0)
+      : 0;
+
+    // Get current date and calculate the start of 12 months ago
+    const currentDate = new Date();
+    const startOfLastYear = new Date(currentDate);
+    startOfLastYear.setMonth(currentDate.getMonth() - 11); // 11 months back from current month
+
+    // Create an array of months for the last 12 months
+    const months = Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(startOfLastYear);
+      date.setMonth(startOfLastYear.getMonth() + i);
+      return {
+        month: date,
+        monthStr: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      };
+    });
+
+    // Get monthly revenue from transactions for the past 12 months
+    const monthlyRevenue = await WalletModel.aggregate([
+      { $match: { doctorId } },
+      { $unwind: '$transactions' },
+      {
+        $match: {
+          'transactions.date': {
+            $gte: startOfLastYear, // Filter for the last 12 months
+            $lte: currentDate
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: '%Y-%m', date: '$transactions.date' }
+          },
+          total: {
+            $sum: {
+              $cond: [
+                { $eq: ['$transactions.transactionType', 'credit'] },
+                '$transactions.amount',
+                0
+              ]
+            }
+          }
+        }
+      },
+      { $sort: { _id: 1 } } // Sort by month
+    ]);
+
+    // Create a map of the monthly revenue results for easy access
+    const revenueMap = monthlyRevenue.reduce((acc, item) => {
+      acc[item._id] = item.total;
+      return acc;
+    }, {});
+
+    // Prepare the final monthly revenue array including all months
+    const monthlyRevenueArray = months.map(month => ({
+      month: month.monthStr,
+      totalRevenue: revenueMap[month.monthStr] || 0 // Default to 0 if no revenue
+    }));
+
+    // Get total appointments and today's appointments
+    const totalAppointments = await appointmentModel.countDocuments({ docId: doctorId });
+    const today = new Date();
+    const startOfToday = new Date(today.setHours(0, 0, 0, 0));
+    const endOfToday = new Date(today.setHours(23, 59, 59, 999));
+    const todaysAppointments = await appointmentModel.countDocuments({
+      docId: doctorId,
+      date: { $gte: startOfToday, $lte: endOfToday },
+    });
+
+    // Get number of unique patients consulted
+    const uniquePatients = await appointmentModel.distinct('userId', { docId: doctorId });
+
+    return {
+      totalRevenue,
+      monthlyRevenue: monthlyRevenueArray,
+      totalAppointments,
+      todaysAppointments,
+      numberOfPatients: uniquePatients.length,
+    };
+
+  } catch (error: any) {
+    console.error("Error fetching statistics:", error.message);
+    throw new Error(error.message);
+  }
+}
+
+
+
+
   
     
     

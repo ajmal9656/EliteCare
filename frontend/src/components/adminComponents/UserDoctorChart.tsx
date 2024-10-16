@@ -15,6 +15,8 @@ interface UserDoctorData {
     name: string; // This represents the name or label for each bar
     users: number; // Number of users registered
     doctors: number; // Number of doctors registered
+    year:number;
+    month:number
 }
 
 interface UserDoctorChartProps {
@@ -22,12 +24,28 @@ interface UserDoctorChartProps {
 }
 
 const UserDoctorChart: React.FC<UserDoctorChartProps> = ({ data }) => {
-    console.log("sgvfhbvs",data);
-    
+    // Get the current date
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-indexed, so add 1
+    const currentYear = currentDate.getFullYear();
+
+    // Filter and format data for the last 12 months
+    const last12MonthsData = data
+        .filter(item => {
+            const itemDate = new Date(item.year, item.month - 1); // Create a date object for the item
+            const monthsDiff = (currentYear - item.year) * 12 + (currentMonth - item.month); // Calculate the difference in months
+            return monthsDiff >= 0 && monthsDiff < 12; // Only keep items within the last 12 months
+        })
+        .map(item => ({
+            ...item,
+            name: `${item.month}/${item.year}`, // Format the name as "MM/YYYY"
+        }))
+        .sort((a, b) => new Date(a.year, a.month - 1).getTime() - new Date(b.year, b.month - 1).getTime()); // Sort in ascending order
+
     return (
         <ResponsiveContainer width="95%" height="100%">
             <BarChart
-                data={data}
+                data={last12MonthsData}
                 margin={{
                     top: 5,
                     right: 30,

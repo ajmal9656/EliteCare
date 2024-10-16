@@ -258,6 +258,8 @@ export class doctorService{
                     rejectedReason:doctorData.rejectedReason
                     
                 };
+                console.log("sdvcsdvc",doctorInfo);
+                
                 
                 return {
                     doctorInfo,
@@ -569,6 +571,61 @@ if (files.qualificationImage) {
             
             default:
                 throw new Error(`Unknown file type: ${fileType}`);
+        }
+    }
+
+    async updateProfile(_id: string, updateData: { fees: number; DOB: Date; phone: string }): Promise<any> {
+        try {
+            
+            const updatedDoctor = await this.doctorRepository.updateProfile(_id, updateData);
+
+            if(updatedDoctor.image!=null){
+                const folderPath = this.getFolderPathByFileType(updatedDoctor.image.type);
+                  const signedUrl = await this.S3Service.getFile(updatedDoctor.image.url, folderPath);
+
+                  updatedDoctor.image.url = signedUrl
+
+            }
+
+            const doctorInfo = {
+                name: updatedDoctor.name,
+                email: updatedDoctor.email,
+                doctorId: updatedDoctor._id,
+                phone: updatedDoctor.phone,
+                isBlocked: updatedDoctor.isBlocked,
+                DOB:updatedDoctor.DOB,
+                fees:updatedDoctor.fees,
+                image:updatedDoctor.image,
+                
+            };
+    
+            
+            return {doctorInfo};
+        } catch (error: any) {
+            console.error("Error in updateProfile:", error.message);
+            throw new Error(`Failed to update profile: ${error.message}`);
+        }
+    }
+
+    async getDashboardData(doctorId:string) {
+        try {
+            console.log("Entering getDashboardData method in docService");
+    
+            const response = await this.doctorRepository.getAllStatistics(doctorId as string);
+    
+           
+            if (response) {
+                console.log("Dashboarddd data successfully retrieved:", response);
+                return response;
+            } else {
+                
+                console.error("Failed to retrieve dashboard data: Response is invalid");
+                throw new Error("Something went wrong while retrieving dashboard data.");
+            }
+        } catch (error: any) {
+            
+            console.error("Error in getDashboardData:", error.message);
+            throw new Error(`Failed to retrieve dashboard data: ${error.message}`);
         }
     }
     

@@ -30,6 +30,7 @@ route.get('/getDoctors',adminControllerInstance.getDoctors.bind(adminControllerI
 route.put('/listUnlistDoctor/:doctorId',adminControllerInstance.listUnlistDoctor.bind(adminControllerInstance));
 route.get('/dashboardData',adminControllerInstance.getDashboardData.bind(adminControllerInstance));
 route.post('/logout', adminControllerInstance.logoutAdmin.bind(adminControllerInstance));
+route.get('/getAppointments', adminControllerInstance.getAllAppointments.bind(adminControllerInstance));
 
 
 

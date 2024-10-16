@@ -261,54 +261,73 @@ export class adminRepository {
     }
     async getAllStatistics() {
         try {
-           
             const totalDoctors = await doctorModel.countDocuments();
-        
-          
             const totalUsers = await userModel.countDocuments();
-        
-            
             const activeUsers = await userModel.countDocuments({ isBlocked: false });
-        
-            
             const activeDoctors = await doctorModel.countDocuments({ isBlocked: false });
-        
-            
+    
             const revenueData = await appointmentModel.aggregate([
-                { $match: { status: "completed" } },  
-                { 
-                    $group: { 
-                        _id: null,  
-                        totalFees: { $sum: "$fees" }, 
-                        doctorRevenue: { $sum: { $multiply: ["$fees", 0.9] } },  
-                        adminRevenue: { $sum: { $multiply: ["$fees", 0.1] } }  
+                { $match: { status: "completed" } },
+                {
+                    $group: {
+                        _id: null,
+                        totalFees: { $sum: "$fees" },
+                        doctorRevenue: { $sum: { $multiply: ["$fees", 0.9] } },
+                        adminRevenue: { $sum: { $multiply: ["$fees", 0.1] } }
                     }
                 }
             ]);
-        
-            
+    
             const totalFees = revenueData.length > 0 ? revenueData[0].totalFees : 0;
             const doctorRevenue = revenueData.length > 0 ? revenueData[0].doctorRevenue : 0;
             const adminRevenue = revenueData.length > 0 ? revenueData[0].adminRevenue : 0;
     
-            
+            // Get current date and calculate the start date (12 months ago)
+            const currentDate = new Date();
+            const startDate = new Date();
+            startDate.setMonth(currentDate.getMonth() - 12); // 12 months ago
+    
             const usersAndDoctorsRegistrationData = await Promise.all([
                 userModel.aggregate([
-                    { $group: { _id: { $month: "$createdAt" }, count: { $sum: 1 } } },  
-                    { $sort: { "_id": 1 } }  
+                    { $match: { createdAt: { $gte: startDate } } }, // Filter by createdAt date
+                    {
+                        $group: {
+                            _id: {
+                                year: { $year: "$createdAt" },  // Separate year and month
+                                month: { $month: "$createdAt" } // Separate month
+                            },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    { $sort: { "_id.year": 1, "_id.month": 1 } }
                 ]),
                 doctorModel.aggregate([
-                    { $group: { _id: { $month: "$createdAt" }, count: { $sum: 1 } } },  
-                    { $sort: { "_id": 1 } }  
+                    { $match: { createdAt: { $gte: startDate } } }, // Filter by createdAt date
+                    {
+                        $group: {
+                            _id: {
+                                year: { $year: "$createdAt" },  // Separate year and month
+                                month: { $month: "$createdAt" } // Separate month
+                            },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    { $sort: { "_id.year": 1, "_id.month": 1 } }
                 ])
             ]);
-        
+    
             // Create a map to hold the monthly statistics
-            const monthlyStatistics: { [key: number]: MonthlyStats } = {}; // Use the defined interface here
-        
-            // Initialize each month with zero values
-            for (let month = 1; month <= 12; month++) {
-                monthlyStatistics[month] = {
+            const monthlyStatistics: { [key: string]: MonthlyStats } = {};
+    
+            // Initialize each month with zero values for the last 12 months
+            for (let monthOffset = 0; monthOffset < 12; monthOffset++) {
+                const monthDate = new Date();
+                monthDate.setMonth(currentDate.getMonth() - monthOffset);
+                const year = monthDate.getFullYear();
+                const month = monthDate.getMonth() + 1; // Months are 0-indexed
+                const key = `${year}-${month < 10 ? '0' : ''}${month}`; // Format as YYYY-MM
+    
+                monthlyStatistics[key] = {
                     users: 0,
                     doctors: 0,
                     revenue: 0,
@@ -320,46 +339,62 @@ export class adminRepository {
     
             // Fill in registration data for users
             usersAndDoctorsRegistrationData[0].forEach(userData => {
-                monthlyStatistics[userData._id].users = userData.count;
+                const key = `${userData._id.year}-${userData._id.month < 10 ? '0' : ''}${userData._id.month}`;
+                if (monthlyStatistics[key]) {
+                    monthlyStatistics[key].users = userData.count;
+                }
             });
-        
+    
             // Fill in registration data for doctors
             usersAndDoctorsRegistrationData[1].forEach(doctorData => {
-                monthlyStatistics[doctorData._id].doctors = doctorData.count;
+                const key = `${doctorData._id.year}-${doctorData._id.month < 10 ? '0' : ''}${doctorData._id.month}`;
+                if (monthlyStatistics[key]) {
+                    monthlyStatistics[key].doctors = doctorData.count;
+                }
             });
-        
-            // Fill in revenue data for completed appointments
+    
+            // Revenue by month for completed appointments
             const revenueByMonth = await appointmentModel.aggregate([
-                { $match: { status: "completed" } },  // Only consider completed appointments
-                { 
-                    $group: { 
-                        _id: { $month: "$date" },  // Group by month of the appointment date
-                        totalFees: { $sum: "$fees" },  // Total fees
-                        doctorRevenue: { $sum: { $multiply: ["$fees", 0.9] } },  // 90% to doctors
-                        adminRevenue: { $sum: { $multiply: ["$fees", 0.1] } }  // 10% to admin
+                { $match: { status: "completed", date: { $gte: startDate } } }, // Filter by date
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: "$date" },   // Separate year and month
+                            month: { $month: "$date" }  // Separate month
+                        },
+                        totalFees: { $sum: "$fees" },
+                        doctorRevenue: { $sum: { $multiply: ["$fees", 0.9] } },
+                        adminRevenue: { $sum: { $multiply: ["$fees", 0.1] } }
                     }
                 },
-                { $sort: { "_id": 1 } }  // Sort by month
+                { $sort: { "_id.year": 1, "_id.month": 1 } }
             ]);
     
             // Update monthly statistics with revenue data
             revenueByMonth.forEach(revenueData => {
-                monthlyStatistics[revenueData._id].revenue = revenueData.totalFees;
-                monthlyStatistics[revenueData._id].totalFees = revenueData.totalFees;
-                monthlyStatistics[revenueData._id].doctorRevenue = revenueData.doctorRevenue;
-                monthlyStatistics[revenueData._id].adminRevenue = revenueData.adminRevenue;
+                const key = `${revenueData._id.year}-${revenueData._id.month < 10 ? '0' : ''}${revenueData._id.month}`;
+                if (monthlyStatistics[key]) {
+                    monthlyStatistics[key].revenue = revenueData.totalFees;
+                    monthlyStatistics[key].totalFees = revenueData.totalFees;
+                    monthlyStatistics[key].doctorRevenue = revenueData.doctorRevenue;
+                    monthlyStatistics[key].adminRevenue = revenueData.adminRevenue;
+                }
             });
-        
+    
             // Convert the object into an array for easier use in charts
-            const userDoctorChartData = Object.keys(monthlyStatistics).map(month => ({
-                month: parseInt(month, 10), // Convert month from string to number
-                users: monthlyStatistics[parseInt(month, 10)].users,
-                doctors: monthlyStatistics[parseInt(month, 10)].doctors,
-                revenue: monthlyStatistics[parseInt(month, 10)].revenue,
-                totalFees: monthlyStatistics[parseInt(month, 10)].totalFees,
-                doctorRevenue: monthlyStatistics[parseInt(month, 10)].doctorRevenue,
-                adminRevenue: monthlyStatistics[parseInt(month, 10)].adminRevenue,
-            }));
+            const userDoctorChartData = Object.keys(monthlyStatistics).map(key => {
+                const [year, month] = key.split('-');
+                return {
+                    year: parseInt(year, 10),
+                    month: parseInt(month, 10),
+                    users: monthlyStatistics[key].users,
+                    doctors: monthlyStatistics[key].doctors,
+                    revenue: monthlyStatistics[key].revenue,
+                    totalFees: monthlyStatistics[key].totalFees,
+                    doctorRevenue: monthlyStatistics[key].doctorRevenue,
+                    adminRevenue: monthlyStatistics[key].adminRevenue,
+                };
+            });
     
             // Return the object with all the statistics and chart data
             return {
@@ -372,12 +407,44 @@ export class adminRepository {
                 adminRevenue,   // Revenue credited to admin
                 userDoctorChartData  // Data for the user/doctor registration chart
             };
-        
+    
         } catch (error: any) {
             console.error("Error fetching statistics:", error.message);
             throw new Error(error.message);
         }
     }
+
+    async getAllAppointments(status:string) {
+        try {
+          
+          
+        
+      
+          
+         
+            
+            let appointments = [];
+    
+        
+            if (status === "All") {
+              appointments = await appointmentModel.find().populate("docId").lean();
+            } else {
+              
+              appointments = await appointmentModel.find({status: status }).populate("docId").lean();
+            }
+          
+      
+          
+          
+          
+          return appointments;
+        } catch (error: any) {
+          console.error("Error getting appointments:", error.message);
+          throw new Error(error.message);
+        }
+      }
+    
+    
     
       
       

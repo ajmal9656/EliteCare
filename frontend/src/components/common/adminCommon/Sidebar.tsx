@@ -29,7 +29,7 @@ function Sidebar() {
   };
   return (
     <>
-      <nav className=" fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <nav className=" fixed top-0 z-50 w-full bg-white border-b border-gray-200 bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 dark:border-gray-700">
   <div className="px-3 py-3 lg:px-5 lg:pl-3">
     <div className="flex items-center justify-between">
       <div className="flex items-center justify-start rtl:justify-end">
@@ -128,10 +128,10 @@ function Sidebar() {
       
 <aside
   id="logo-sidebar"
-  className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
+  className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 dark:border-gray-700"
   aria-label="Sidebar"
 >
-  <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+  <div className="h-full px-3 pb-4 overflow-y-auto bg-white bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800">
     <ul className="space-y-2 font-medium">
       <li>
         <NavLink
@@ -153,6 +153,27 @@ function Sidebar() {
             <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
           </svg>
           <span className="ms-3">Dashboard</span>
+        </NavLink>
+      </li>
+      <li>
+        <NavLink
+          to="/admin/appointments"
+          className={({ isActive }) =>
+            isActive
+              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
+              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+          }
+        >
+          <svg
+            className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
+          </svg>
+          <span className="ms-3">Appointments</span>
         </NavLink>
       </li>
       <li>

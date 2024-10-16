@@ -13,6 +13,7 @@ import { RootState } from '../../Redux/store';
 import { MdDelete } from "react-icons/md";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import { TiTick } from "react-icons/ti";
 
 
 function SlotManagement() {
@@ -313,12 +314,14 @@ function SlotManagement() {
           <div className="grid grid-cols-1 gap-2">
             {availableSlots.length > 0 ? (
               availableSlots.map((slot, index) => (
-                <div key={index} className={`p-2 ${slot.availability ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'} rounded flex justify-between items-center`}>
-                  {slot.start} to {slot.end}
-                  {slot.availability && (
-                    <MdDelete onClick={() => handleDeleteSlot(slot._id,slot.date,slot.doctorId)} fill='red' size={20} />
-                  )}
-                </div>
+                <div key={index} className={`p-4 border rounded-lg transition-all duration-300 ${slot.availability ? 'bg-blue-100 text-blue-600 hover:bg-blue-200' : 'bg-green-100 text-green-600 hover:bg-green-200'} flex justify-between items-center cursor-pointer`}>
+  {slot.start} to {slot.end}
+  {slot.availability ? (
+    <MdDelete onClick={() => handleDeleteSlot(slot._id, slot.date, slot.doctorId)} fill='red' size={24} className="cursor-pointer hover:scale-110 transition-all" />
+  ) : (
+    <TiTick fill='green' size={24} className="cursor-pointer hover:scale-110 transition-all" />
+  )}
+</div>
               ))
             ) : (
               <p>No available slots for the selected date.</p>

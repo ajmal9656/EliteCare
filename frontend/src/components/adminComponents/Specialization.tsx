@@ -103,9 +103,9 @@ const Specialization: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full mx-auto pl-64 p-4 ml-3 mt-14">
-      <div className='flex flex-row justify-between'>
+      <div className='flex flex-row justify-between '>
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Categories</h1>
+          
         </div>
 
         <div className="">
@@ -113,12 +113,12 @@ const Specialization: React.FC = () => {
             className="bg-blue-500 text-white px-4 py-2 rounded"
             onClick={toggleAddModal}
           >
-            Add Category
+            Add Specialization
           </button>
         </div>
       </div>
 
-      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden">
+      <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden mt-3">
         <thead className="bg-gray-100">
           <tr>
             <th className="py-2 px-4 border-b border-gray-300 text-center  text-gray-700">Name</th>
@@ -154,14 +154,14 @@ const Specialization: React.FC = () => {
       {isAddModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg w-full max-w-md">
-            <h2 className="text-lg font-bold mb-4">Add New Category</h2>
+            <h2 className="text-lg font-bold mb-4">Add New Specialization</h2>
             <form onSubmit={addFormik.handleSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700">Name</label>
                 <input
                   type="text"
                   name="name"
-                  placeholder="Enter category name"
+                  placeholder="Enter Specialization name"
                   value={addFormik.values.name}
                   onChange={addFormik.handleChange}
                   onBlur={addFormik.handleBlur}
