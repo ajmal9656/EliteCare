@@ -408,6 +408,23 @@ export class adminService{
             throw new Error(`Failed to get appointments: ${error.message}`);
         }
     }
+    async getTransactions(status: string) {
+        try {
+            
+            const response = await this.adminRepository.getAllTransactions(status);
+    
+           
+    
+            
+            
+                return response; 
+            
+        } catch (error: any) {
+            
+            console.error("Error in getAppointments:", error.stack || error.message);
+            throw new Error(`Failed to get appointments: ${error.message}`);
+        }
+    }
     getTime(slot:any){
         return moment(slot).tz('UTC').format('h:mm A')
       }

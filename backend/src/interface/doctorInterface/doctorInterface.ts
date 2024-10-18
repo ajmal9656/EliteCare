@@ -101,3 +101,12 @@ export interface DoctorState {
     lockExpiration: Date | null;
     bookedBy: mongoose.Types.ObjectId| null;
   }
+
+  export interface doctorImage {
+    profileUrl: {
+      type:string
+      url:string
+    };
+    
+
+  }

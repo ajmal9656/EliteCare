@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import sendMail from "../config/emailConfig";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
-import { doctorType ,DoctorData,DoctorFiles,docDetails,TimeSlot} from '../interface/doctorInterface/doctorInterface';
+import { doctorType ,DoctorData,DoctorFiles,docDetails,TimeSlot, doctorImage, FileData} from '../interface/doctorInterface/doctorInterface';
 import { S3Service } from '../config/s3client';
 import moment from 'moment';
 import { refund } from '../config/stripeConfig';
@@ -469,7 +469,7 @@ if (files.qualificationImage) {
                 console.log("paymentid",paymentId);
                 
               
-              const refundResponse = await refund(paymentId); 
+              const refundResponse = await refund(paymentId,"cancelled by doctor"); 
       
               
               return response;
@@ -626,6 +626,68 @@ if (files.qualificationImage) {
             
             console.error("Error in getDashboardData:", error.message);
             throw new Error(`Failed to retrieve dashboard data: ${error.message}`);
+        }
+    }
+
+    async updateImage(userID:string,file:FileData) {
+        try {
+
+            const doctorProfileImage: doctorImage = {
+                profileUrl: {
+                    type:'',
+                    url:''
+                }
+            };
+            
+
+if (file) {
+    const profileUrl = await this.S3Service.uploadFile('eliteCare/doctorProfileImages/', file);
+    doctorProfileImage.profileUrl.url = profileUrl;
+    doctorProfileImage.profileUrl.type = "profile image";
+}
+
+
+
+            
+
+            
+
+
+            const response = await this.doctorRepository.uploadProfileImage(userID,doctorProfileImage);
+            if (response) {
+                
+
+                const folderPath = this.getFolderPathByFileType(response.image.type);
+                  const signedUrl = await this.S3Service.getFile(response.image.url, folderPath);
+                  
+                  const doctorInfo = {
+                    name: response.name,
+                    email: response.email,
+                    doctorId: response._id,
+                    phone: response.phone,
+                    isBlocked: response.isBlocked,
+                    DOB:response.DOB,
+                    fees:response.fees,
+                    image:signedUrl,
+                    
+                };
+
+                  
+                 
+
+                  return {doctorInfo};
+                
+    
+                
+                
+                
+                
+                
+            } 
+
+            
+    } catch (error: any)  {  
+            throw new Error(error.message);
         }
     }
     

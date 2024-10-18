@@ -540,6 +540,39 @@ async getDashboardData(req: Request, res: Response): Promise<void> {
   }
 }
 
+async updateProfileImage(req: Request, res: Response): Promise<void> {
+  try {
+  
+    if (!req.file) {
+      res.status(400).json({ message: "No image file provided." });
+      return;
+    }
+
+   
+    const doctorId = req.body._id;
+    if (!doctorId) {
+      res.status(400).json({ message: "doctor ID is required." });
+      return;
+    }
+    
+
+    
+    const response = await this.doctorService.updateImage(doctorId, req.file);
+
+   
+    res.status(200).json({ message: "Profile image updated successfully" ,response});
+  } catch (error: any) {
+    console.error("Error updating profile Image:", error.message);
+
+   
+    if (error.message.includes("something went wrong")) {
+      res.status(400).json({ message: "Error updating profile image." });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+    }
+  }
+}
+
 
 
 

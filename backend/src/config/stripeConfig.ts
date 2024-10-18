@@ -54,7 +54,7 @@ async function makeThePayment(
 }
 
 
-export async function refund(paymentId: string): Promise<any> {
+export async function refund(paymentId: string,status:string): Promise<any> {
   try {
     // Retrieve the checkout session
     const session = await stripe.checkout.sessions.retrieve(paymentId);
@@ -73,15 +73,29 @@ export async function refund(paymentId: string): Promise<any> {
     const chargeId = paymentIntent.latest_charge as string | null;
     if (!chargeId) {
       throw new Error("No charge found in the payment intent.");
+
+      
     }
+    let refundAmount;
+    if(status == "cancelled by user"){
+      refundAmount = Math.round(paymentIntent.amount * 0.95);
+        
+    }
+    if(status == "cancelled by doctor"){
+      refundAmount = paymentIntent.amount
+        
+    }
+    
+   
 
     // Create the refund
     const refund = await stripe.refunds.create({
       charge: chargeId,
-      amount: paymentIntent.amount, // Amount should be in cents
+      amount: refundAmount, // Amount should be in cents
     });
 
     console.log("refund",refund);
+
     
 
     return refund; // Return the refund details

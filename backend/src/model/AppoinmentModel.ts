@@ -2,6 +2,7 @@ import mongoose, { Document, Schema, model } from "mongoose";
 
 // Define the interface for the Appointment document
 export interface IAppointment extends Document {
+  appointmentId:number;
   userId: mongoose.Types.ObjectId;
   docId: mongoose.Types.ObjectId;
   patientNAme:string,
@@ -13,7 +14,7 @@ export interface IAppointment extends Document {
   locked:mongoose.Types.ObjectId | null;
   status: "pending" | "prescription pending" | "completed" | "cancelled" |"cancelled by Dr";
   fees: number;
-  paymentMethod: "stripe" | "wallet";
+  paymentMethod: "stripe" ;
   paymentStatus: "payment pending" | "payment completed" | "payment failed" | "refunded" | "anonymous";
   paymentId?: string | null; // Optional since it can be null
   prescription?: string | null; // Optional since it can be null
@@ -30,6 +31,11 @@ export interface IAppointment extends Document {
 // Define the schema for the Appointment model
 const AppointmentSchema = new Schema<IAppointment>(
   {
+    appointmentId: {
+      type: Number,
+      
+      required: true,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -98,7 +104,7 @@ const AppointmentSchema = new Schema<IAppointment>(
     },
     paymentMethod: {
       type: String,
-      enum: ["stripe", "wallet"],
+      enum: ["stripe"],
       required: true,
     },
     paymentStatus: {

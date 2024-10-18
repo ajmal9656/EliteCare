@@ -443,6 +443,31 @@ export class adminRepository {
           throw new Error(error.message);
         }
       }
+
+      async getAllTransactions(status: string) {
+        try {
+          let appointments:any[] = [];
+      
+          if ( status === "Credit") {
+            // Fetch all appointments or credit transactions
+            appointments = await appointmentModel.find().populate("docId").lean();
+          } else if (status === "Paid") {
+            // Fetch only completed (paid) appointments
+            appointments = await appointmentModel.find({ status: "completed" }).populate("docId").lean();
+          } else if (status === "Refunded") {
+            // Fetch cancelled or refunded appointments using $or
+            appointments = await appointmentModel.find({
+              $or: [{ status: "cancelled" }, { status: "cancelled by Dr" }]
+            }).populate("docId").lean();
+          }
+      
+          return appointments;
+        } catch (error: any) {
+          console.error("Error getting appointments:", error.message);
+          throw new Error(error.message);
+        }
+      }
+      
     
     
     

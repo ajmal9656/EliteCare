@@ -260,6 +260,27 @@ function Sidebar() {
           <span className="flex-1 ms-3 whitespace-nowrap">Applications</span>
         </NavLink>
       </li>
+      <li>
+        <NavLink
+          to="/admin/transactions"
+          className={({ isActive }) =>
+            isActive
+              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
+              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+          }
+        >
+          <svg
+            className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M10 0a2 2 0 0 0-2 2v4h4V2a2 2 0 0 0-2-2Zm-5 7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5Zm1 2h8v8H6V9Zm2-7a.5.5 0 0 0-1 0v3.5A.5.5 0 0 0 7.5 6h5a.5.5 0 0 0 0-1H8V2Z" />
+          </svg>
+          <span className="flex-1 ms-3 whitespace-nowrap">Transactions</span>
+        </NavLink>
+      </li>
     </ul>
   </div>
 </aside>

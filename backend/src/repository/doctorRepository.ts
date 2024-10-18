@@ -1,6 +1,6 @@
 import doctorModel from "../model/doctorModel";
 import mongoose, { Document,ObjectId } from "mongoose";
-import { doctorType,DoctorData,DoctorFiles,docDetails, TimeSlot } from "../interface/doctorInterface/doctorInterface";
+import { doctorType,DoctorData,DoctorFiles,docDetails, TimeSlot, doctorImage } from "../interface/doctorInterface/doctorInterface";
 import doctorApplicationModel from "../model/doctorApplicationModel";
 import RejectDoctorModel from "../model/RejectDoctorSchema";
 import doctorSlotsModel from "../model/doctorSlotModel";
@@ -310,7 +310,7 @@ export class doctorRepository {
         
         const appointment = await appointmentModel.findOneAndUpdate(
           { _id: appointmentId },
-          { status: "cancelled by Dr",reason:reason },
+          { status: "cancelled by Dr",reason:reason,paymentStatus:"refunded" },
           { new: true } 
         );
     
@@ -690,6 +690,31 @@ async getAllStatistics(doctorId: string) {
   } catch (error: any) {
     console.error("Error fetching statistics:", error.message);
     throw new Error(error.message);
+  }
+}
+
+async uploadProfileImage(doctorID: string, imageData: doctorImage) {
+  try {
+      
+      const doctor = await doctorModel.findById(doctorID);
+      
+      if (!doctor) {
+          throw new Error('doctor not found');
+      }
+
+     
+      doctor.image.url = imageData.profileUrl.url;
+      doctor.image.type = imageData.profileUrl.type
+
+    
+      const updatedDoctor = await doctor.save();
+
+     
+      return updatedDoctor;  
+      
+  } catch (error: any) {
+      console.error("Repository error:", error.message);
+      throw new Error(error.message); 
   }
 }
 

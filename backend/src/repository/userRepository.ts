@@ -8,6 +8,8 @@ import doctorSlotsModel from "../model/doctorSlotModel";
 import { Slot } from "../interface/userInterface/interface";
 import appointmentModel from "../model/AppoinmentModel";
 
+import { randomInt } from "crypto";
+
 
 
 
@@ -359,6 +361,8 @@ export class userRepository {
             if (!doctorSlot) {
                 throw new Error('Slot not found or doctor does not exist.');
             }
+
+            const appointmentId = randomInt(100000, 999999).toString();
             
 
             if (doctorSlot && doctorSlot.slots ) {
@@ -376,6 +380,7 @@ export class userRepository {
             
        
             const newAppointment = new appointmentModel({
+                appointmentId:appointmentId,
                 userId: userId, 
                 docId: doctor._id, 
                 patientNAme: patientName,
@@ -537,7 +542,7 @@ export class userRepository {
           
           const appointment = await appointmentModel.findOneAndUpdate(
             { _id: applicationId },
-            { status: "cancelled" },
+            { status: "cancelled",paymentStatus:"refunded" },
             { new: true } 
           );
       

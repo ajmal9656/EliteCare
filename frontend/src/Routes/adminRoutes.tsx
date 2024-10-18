@@ -9,6 +9,7 @@ import ApplicationDetailspage from '../pages/adminPages/ApplicationDetailspage';
 import UsersListPage from '../pages/adminPages/UsersListPage';
 import DoctorListingPage from '../pages/adminPages/DoctorListingPage';
 import AppointmentPage from '../pages/adminPages/AppointmentPage';
+import TransactionsPage from '../pages/adminPages/TransactionsPage';
 
 function adminRoutes() {
   return (
@@ -23,6 +24,7 @@ function adminRoutes() {
                    <Route path="usersList" element={<UsersListPage/>} />
                    <Route path="doctorsList" element={<DoctorListingPage/>} />
                    <Route path="appointments" element={<AppointmentPage/>} />
+                   <Route path="transactions" element={<TransactionsPage/>} />
             </Route>
 
             

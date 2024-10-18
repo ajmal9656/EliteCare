@@ -446,6 +446,31 @@ async getAllAppointments(req: Request, res: Response): Promise<void> {
         }
     }
   }
+async getAllTransactions(req: Request, res: Response): Promise<void> {
+    try {
+        
+        const {status} = req.query
+        
+        
+  
+     
+        const response = await this.adminService.getTransactions(status as string);
+  
+        
+        
+  
+        res.status(200).json({ message: "Appointments fetched successfully", data: response});
+    } catch (error: any) {
+        console.error("Error fetching appointments:", error.message);
+  
+    
+        if (error.message.includes("Failed to get appointments")) {
+            res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+        } else {
+            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        }
+    }
+  }
 
   
     
