@@ -558,6 +558,8 @@ async updateProfileImage(req: Request, res: Response): Promise<void> {
 
     
     const response = await this.doctorService.updateImage(doctorId, req.file);
+    console.log("image res",response);
+    
 
    
     res.status(200).json({ message: "Profile image updated successfully" ,response});

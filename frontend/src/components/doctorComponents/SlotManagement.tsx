@@ -288,9 +288,9 @@ function SlotManagement() {
   }, []); 
 
   return (
-    <div className="flex flex-col w-full mx-auto pl-64 p-4 ml-3 mt-14">
-      <div className="flex flex-row justify-between mb-4">
-        <h1 className="text-2xl font-bold">Slot Management</h1>
+    <div className="flex flex-col w-full mx-auto pl-64 p-4  mt-14">
+      <div className="flex flex-row justify-end mb-4">
+       
         <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={toggleAddSlotModal}>
           Add Slot
         </button>

@@ -128,18 +128,20 @@ function Sidebar() {
       
 <aside
   id="logo-sidebar"
-  className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 dark:border-gray-700"
+  className="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white  sm:translate-x-0 "
   aria-label="Sidebar"
 >
-  <div className="h-full px-3 pb-4 overflow-y-auto bg-white bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800">
+  <div className="h-full px-1 pb-4 overflow-y-auto bg-white bg-gradient-to-br ">
     <ul className="space-y-2 font-medium">
       <li>
         <NavLink
           to="/admin/dashboard"
           className={({ isActive }) =>
-            isActive
-              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
-              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            `flex items-center p-2 rounded-lg group ${
+              isActive
+                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+            }`
           }
         >
           <svg
@@ -159,9 +161,11 @@ function Sidebar() {
         <NavLink
           to="/admin/appointments"
           className={({ isActive }) =>
-            isActive
-              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
-              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            `flex items-center p-2 rounded-lg group ${
+              isActive
+                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+            }`
           }
         >
           <svg
@@ -180,9 +184,11 @@ function Sidebar() {
         <NavLink
           to="/admin/doctorsList"
           className={({ isActive }) =>
-            isActive
-              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
-              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            `flex items-center p-2 rounded-lg group ${
+              isActive
+                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+            }`
           }
         >
           <svg
@@ -201,9 +207,11 @@ function Sidebar() {
         <NavLink
           to="/admin/usersList"
           className={({ isActive }) =>
-            isActive
-              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
-              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            `flex items-center p-2 rounded-lg group ${
+              isActive
+                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+            }`
           }
         >
           <svg
@@ -222,9 +230,11 @@ function Sidebar() {
         <NavLink
           to="/admin/specializations"
           className={({ isActive }) =>
-            isActive
-              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
-              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            `flex items-center p-2 rounded-lg group ${
+              isActive
+                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+            }`
           }
         >
           <svg
@@ -243,9 +253,11 @@ function Sidebar() {
         <NavLink
           to="/admin/applications"
           className={({ isActive }) =>
-            isActive
-              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
-              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            `flex items-center p-2 rounded-lg group ${
+              isActive
+                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+            }`
           }
         >
           <svg
@@ -264,9 +276,11 @@ function Sidebar() {
         <NavLink
           to="/admin/transactions"
           className={({ isActive }) =>
-            isActive
-              ? "flex items-center p-2 text-gray-900 bg-gray-200 rounded-lg dark:bg-gray-700 dark:text-white"
-              : "flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+            `flex items-center p-2 rounded-lg group ${
+              isActive
+                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+            }`
           }
         >
           <svg

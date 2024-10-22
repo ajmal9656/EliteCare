@@ -167,7 +167,7 @@ function AppointmentDetails() {
   
   const navigateChat = () =>{
 
-    navigate("/userProfile/chat")
+    navigate("/userProfile/chat",{ state: { appointment: appointment } })
 
 
   }

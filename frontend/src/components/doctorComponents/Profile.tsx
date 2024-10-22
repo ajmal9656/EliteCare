@@ -3,9 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import axiosUrl from "../../utils/axios";
 import { Rating, Typography, Modal, Box, TextField, Button } from "@mui/material"; // Import Modal, TextField, Button
-import { FaEdit } from "react-icons/fa";
-import { updateDoctorProfile } from "../../Redux/Action/doctorActions";
+import { FaEdit ,FaCamera} from "react-icons/fa";
+import { updateDoctorProfile, updateDoctorProfileImage } from "../../Redux/Action/doctorActions";
 import Swal from 'sweetalert2';
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
 
 
 
@@ -13,6 +16,8 @@ function Profile() {
 
 const dispatch:any = useDispatch()
   const DoctorData = useSelector((state: RootState) => state.doctor);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   console.log("doc",DoctorData);
   
 
@@ -143,7 +148,7 @@ const dispatch:any = useDispatch()
   
     try {
       // Dispatch the updateUserProfile action
-      const response = await dispatch(updateDoctorProfile(updatedValues)).unwrap(); // Ensure proper error handling
+      await dispatch(updateDoctorProfile(updatedValues)).unwrap(); // Ensure proper error handling
   
       // Refresh the profile data after update
       setProfileData({ ...profileData, ...editFields });
@@ -167,47 +172,121 @@ const dispatch:any = useDispatch()
     }
   };
   
+  const openImageModal = () => setIsImageModalOpen(true);
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+    setPreviewImage(null); 
+  };
+
+  const formikImage = useFormik({
+    initialValues: {
+      image: null,
+    },
+  
+   
+    validationSchema: Yup.object({
+      image: Yup.mixed().required("An image is required."), 
+    }),
+  
+    onSubmit: async (values) => {
+      try {
+        if (!DoctorData || !values.image) {
+          console.log("Image not selected or Doctor data is missing.");
+          return;
+        }
+    
+        const formData = new FormData();
+        formData.append("image", values.image);
+        formData.append("_id", DoctorData.doctorInfo?.doctorId as string);
+    
+        const response = await dispatch(updateDoctorProfileImage(formData)).unwrap();
+
+        console.log("resdd",response.doctorInfo);
+        
+    
+        // Update the profile data state with the new image URL to reflect changes immediately
+        setProfileData({
+          ...profileData, 
+          signedImageUrl: response.doctorInfo.image // assuming your response contains the new image URL
+        });
+    
+        // Close the modal and reset the form
+        setIsImageModalOpen(false);
+        formikImage.resetForm();
+        
+        // Optionally show a success message
+        Swal.fire({
+          icon: 'success',
+          title: 'Image Updated',
+          text: 'Your profile image has been successfully updated!',
+          confirmButtonText: 'OK',
+        });
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        // Show an error message
+        Swal.fire({
+          icon: 'error',
+          title: 'Update Failed',
+          text: 'Something went wrong while updating the image!',
+          confirmButtonText: 'Try Again',
+        });
+      }
+    },
+  });
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      formikImage.setFieldValue("image", file);
+      const previewURL = URL.createObjectURL(file);
+      setPreviewImage(previewURL); 
+    }
+  };
 
 
   return (
     <div className="flex flex-col w-full mx-auto pl-80 p-4 ml-3 mt-14 h-screen px-10 space-y-6">
       <main className="profile-page mt-64">
-        <section className="relative py-16 bg-blueGray-200">
-          <div className="container mx-auto px-4">
-            <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64 min-h-[600px]">
-              <div className="px-6">
-                <div className="flex justify-center items-start">
-                  <div className="flex flex-wrap justify-center">
-                    <div className="w-full lg:w-56 px-4 lg:order-2 flex justify-center mr-52">
-                      <div className="relative">
-                        <img
-                          alt="Profile"
-                          src={profileData?.signedImageUrl || "default-image-url.jpg"}
-                          className="shadow-xl rounded-3xl h-44 align-middle border-none -m-16 mx-auto max-w-150-px ml-52"
-                        />
-                      </div>
+      <section className="relative py-16 bg-blueGray-200">
+      <div className="container mx-auto px-4">
+        <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-xl rounded-lg -mt-64 min-h-[600px]">
+          <div className="px-6">
+            <div className="flex justify-center items-start">
+              <div className="flex flex-wrap justify-center">
+                <div className="w-full lg:w-56 px-4 lg:order-2 flex justify-center mr-52">
+                  <div className="relative">
+                    <img
+                      alt="Profile"
+                      src={profileData?.signedImageUrl || "default-image-url.jpg"}
+                      className="shadow-xl rounded-3xl h-44 align-middle border-none -m-16 mx-auto max-w-150-px ml-52"
+                    />
+                    {/* Camera Icon */}
+                    <div className="absolute ml-96 mt-7">
+                      <FaCamera size={28} className="cursor-pointer" onClick={openImageModal} />
                     </div>
                   </div>
-
-                  {/* Rating and Review Count */}
-                  <div className="flex flex-col pt-5 pl-1">
-                    <Rating value={averageRating || 0} precision={0.1} readOnly />
-                    <Typography color="blue-gray" className="font-medium text-blue-gray-500">
-                      Out of {reviews.length} Reviews
-                    </Typography>
-                  </div>
-
-                  {/* Edit Button */}
-                  <div className="flex flex-col pt-5 pl-16">
-                    <FaEdit className="text-2xl cursor-pointer" onClick={handleOpenModal} />
-                  </div>
                 </div>
+              </div>
 
-                <ProfileDetails profileData={profileData} />
+              {/* Rating and Review Count */}
+              <div className="flex flex-col pt-5 pl-1">
+                <Rating value={averageRating || 0} precision={0.1} readOnly />
+                <Typography color="blue-gray" className="font-medium text-blue-gray-500">
+                  Out of {reviews.length} Reviews
+                </Typography>
+              </div>
+
+              {/* Edit Button */}
+              <div className="flex flex-col pt-5 pl-16">
+                <FaEdit className="text-2xl cursor-pointer" onClick={handleOpenModal} />
               </div>
             </div>
+
+            <ProfileDetails profileData={profileData} />
           </div>
-        </section>
+        </div>
+      </div>
+    </section>
       </main>
 
       {/* Modal for Editing Profile */}
@@ -267,6 +346,49 @@ const dispatch:any = useDispatch()
           </Button>
         </Box>
       </Modal>
+      {isImageModalOpen && (
+  <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
+    <div className="bg-white p-8 rounded-lg w-[400px]">
+      <h2 className="text-2xl font-bold mb-4">Update Profile Image</h2>
+
+      <form onSubmit={formikImage.handleSubmit}>
+  <div className="mb-4">
+    <label className="block text-lg font-semibold mb-2">Select Image</label>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      className="border p-2 rounded w-full"
+    />
+    {formikImage.errors.image && formikImage.touched.image && (
+      <p className="text-red-500">{formikImage.errors.image}</p>
+    )}
+  </div>
+
+  {/* Image preview */}
+  {previewImage && (
+    <div className="mb-4">
+      <img src={previewImage} alt="Preview" className="w-full h-48 object-cover rounded-md" />
+    </div>
+  )}
+
+  <div className="flex justify-end space-x-4">
+    <Button
+      variant="contained"
+      color="secondary"
+      onClick={closeImageModal} // Close modal on cancel
+    >
+      Cancel
+    </Button>
+    <Button type="submit" variant="contained" color="primary">
+      Upload Image
+    </Button>
+  </div>
+</form>
+
+    </div>
+  </div>
+)}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-import { login, logoutDoctor, updateDoctorProfile } from "../Action/doctorActions";
+import { login, logoutDoctor, updateDoctorProfile, updateDoctorProfileImage } from "../Action/doctorActions";
 import { Doctor,DoctorState } from "../../interfaces/doctorinterface";
+
 
 
 const initialState: DoctorState = {
@@ -73,7 +74,25 @@ const doctorSlice = createSlice({
         .addCase(updateDoctorProfile.rejected, (state, action) => {
             state.loading = false;
             state.error = (action.payload as string) || 'Login failed';
-        })
+        }).addCase(updateDoctorProfileImage.pending,(state)=>{
+          state.loading =true;
+          state.error = null
+          
+      })
+      .addCase(updateDoctorProfileImage.fulfilled,(state,action:PayloadAction<{ doctorInfo: Doctor }>)=>{
+          console.log("aaa",action.payload)
+      const { doctorInfo } = action.payload;
+      state.doctorInfo = doctorInfo;  
+      state.loading = false;
+
+      
+      localStorage.setItem('doctorInfo', JSON.stringify(doctorInfo));
+
+      })
+      .addCase(updateDoctorProfileImage.rejected, (state, action) => {
+          state.loading = false;
+          state.error = (action.payload as string) || 'Login failed';
+      })
 
     }
 })

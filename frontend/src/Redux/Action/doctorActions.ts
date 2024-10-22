@@ -168,3 +168,30 @@ export const logoutDoctor = createAsyncThunk(
       }
     }
   );
+
+  export const updateDoctorProfileImage = createAsyncThunk(
+    'doctor/updateDoctorProfileImage',
+    async (formData: FormData, { rejectWithValue }) => {
+      try {
+        console.log("form",formData)
+        const response = await axiosUrl.put('/doctor/updateProfileImage', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data', // Ensure correct headers for file upload
+          },
+        });
+  
+        console.log('Thunkkkkkksssss response:', response.data.response);
+        return response.data.response // Adjust according to your API response structure
+      } catch (error: any) {
+        if (error.response) {
+          const errorMessage = error.response.data.message || 'Update failed';
+          console.log('Error response:', errorMessage);
+          return rejectWithValue(errorMessage);
+        } else if (error.request) {
+          return rejectWithValue('No response from server.');
+        } else {
+          return rejectWithValue(error.message || 'Update failed');
+        }
+      }
+    }
+  );

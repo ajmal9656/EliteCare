@@ -19,6 +19,8 @@ const uploadDoctorDataFiles = upload.fields([
   { name: 'qualificationImage', maxCount: 1 },
 ]);
 
+const uploadUserFiles = upload.single('image');
+
 const route = Router();
 const doctorRepositoryInstance = new doctorRepository();
 const S3ServiceInstance = new S3Service();
@@ -44,5 +46,6 @@ route.post('/logout', doctorControllerInstance.logoutDoctor.bind(doctorControlle
 route.get('/getDoctorDetails/:doctorId', doctorControllerInstance.getDoctorDetails.bind(doctorControllerInstance));
 route.put('/updateDoctor', doctorControllerInstance.updateDoctorProfile.bind(doctorControllerInstance));
 route.get('/dashboardData',doctorControllerInstance.getDashboardData.bind(doctorControllerInstance));
+route.put('/updateProfileImage', uploadUserFiles, doctorControllerInstance.updateProfileImage.bind(doctorControllerInstance));
 
 export default route;
