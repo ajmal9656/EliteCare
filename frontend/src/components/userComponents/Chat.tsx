@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import io from "socket.io-client";
 import axiosUrl from "../../utils/axios";
+import { useSocket } from "../../Context/SocketIO";
 
 function Chat() {
   const location = useLocation();
@@ -15,18 +16,17 @@ function Chat() {
   const [newMsg, setNewMsg] = useState(""); // State for new message input
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState<any>(null);
-  let socket = io('http://localhost:5001');
+  let {socket} = useSocket()
 
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.docId._id, userID: appointment?.userId } });
-        console.log("aaaaaa.data",response);
+        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.docId._id, userID: appointment?.userId , sender:"USER" } });
+        console.log("aaaaaa.data",response.data);
         
         
-        setChatHistory(response.data.messages);
-        socket.emit("joinChatRoom", { doctorID: appointment?.docId._id, userID: appointment?.userId });
+        setChatHistory(response.data);
         
       } catch (error:any) {
         if (error.response.status === 401) {
@@ -39,6 +39,13 @@ function Chat() {
     })();
   }, []);
 
+  useEffect(()=>{
+    console.log("SOCKKK",socket)
+    if(socket){
+      socket?.emit("joinChatRoom", { doctorID: appointment?.docId._id, userID: appointment?.userId ,online:"USER"});
+
+    }    
+  },[socket])
 
   const sendMessage = (newMsg:string) => {
     if (newMsg.trim()) {
@@ -51,7 +58,7 @@ function Chat() {
         };
 
         
-        socket.emit("sendMessage", { messageDetails});
+        socket?.emit("sendMessage", { messageDetails});
 
         setNewMsg(""); // Clear the message input
       } catch (error:any) {
@@ -75,24 +82,23 @@ function Chat() {
   //   };
   // }, [socket]);
   useEffect(() => {
-    socket.on("receiveMessage", (messageDetails:any) => {
+    socket?.on("receiveMessage", (messageDetails:any) => {
       console.log("gggggggggg",messageDetails);
        
       setChatHistory(messageDetails.messages);
     });
     return () => {
-      socket.off("receiveMessage");
+      socket?.off("receiveMessage");
     };
   }, []);
 
   useEffect(()=>{
    
    
-    socket.on('connection',()=>{
-      console.log('Client connected')
-    })
+    console.log("chatt",chatHistory);
     
-  },[])
+    
+  },[chatHistory])
 
 
 
@@ -110,14 +116,14 @@ function Chat() {
               </svg>
             </span>
             <img
-              src="https://images.unsplash.com/photo-1549078642-b2ba4bda0cdb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144"
+              src={chatHistory?.signedDoctorImageUrl}
               alt="User profile"
               className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
             />
           </div>
           <div className="flex flex-col leading-tight">
             <div className="text-2xl mt-1 flex items-center">
-              <span className="text-gray-700 mr-3">Anderson Vanhron</span>
+              <span className="text-gray-700 mr-3">Dr.{chatHistory?.doctor?.name}</span>
             </div>
             <span className="text-lg text-gray-600">Junior Developer</span>
           </div>
@@ -189,8 +195,8 @@ function Chat() {
   className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
 >
   {/* Ensure chatHistory is always an array */}
-  {chatHistory?.length > 0 ? (
-    chatHistory.map((chat:any, index:any) => (
+  {chatHistory?.chatResult.messages.length > 0 ? (
+    chatHistory.chatResult.messages.map((chat:any, index:any) => (
       <div key={index} className="chat-message">
         {chat.sender === "user" ? (
           <div className="flex items-end justify-end">
@@ -202,7 +208,7 @@ function Chat() {
               </div>
             </div>
             <img
-              src={chat.profileImage}
+              src={chatHistory?.signedUserImageUrl}
               alt="Doctor profile"
               className="w-6 h-6 rounded-full order-2"
             />
@@ -217,7 +223,7 @@ function Chat() {
               </div>
             </div>
             <img
-              src={chat.profileImage}
+              src={chatHistory?.signedDoctorImageUrl}
               alt="User profile"
               className="w-6 h-6 rounded-full order-1"
             />

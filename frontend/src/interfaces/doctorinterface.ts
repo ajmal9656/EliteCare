@@ -8,6 +8,7 @@ export interface Doctor {
     isBlocked: boolean;
     docStatus:string;
     rejectedReason?:string
+    image:any
     
   
   }
@@ -30,7 +31,10 @@ export interface DoctorState {
     accessToken: string | null;
     loading: boolean;
     error: string | null;
-    docStatus:string
+    docStatus:string;
+    videoCall:null | any
+    showVideoCallDoctor: Boolean;
+    roomIdDoctor: string | null;
   }
 
 

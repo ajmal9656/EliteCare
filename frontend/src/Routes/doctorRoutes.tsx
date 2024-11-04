@@ -13,12 +13,14 @@ import AppointmentDetailsPage from '../pages/doctorPages/AppointmentDetailsPage'
 import WalletPage from '../pages/doctorPages/WalletPage';
 import ChatPage from '../pages/doctorPages/ChatPage';
 import ProfilePage from '../pages/doctorPages/ProfilePage';
+import VideochatPage from '../pages/doctorPages/VideochatPage';
 
 
 
 
 
 function doctorRoutes() {
+  
   return (
     
     <Routes>
@@ -41,6 +43,11 @@ function doctorRoutes() {
                    
                    
             </Route>
+
+
+                
+
+
       
       
       

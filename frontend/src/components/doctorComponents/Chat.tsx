@@ -1,35 +1,53 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BsSendFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import io from "socket.io-client";
 import axiosUrl from "../../utils/axios";
+import { FcVideoCall } from "react-icons/fc";
+import { useDispatch } from "react-redux";
+import { setVideoCall } from "../../Redux/Slice/doctorSlice";
+import { useSocket } from "../../Context/SocketIO";
+
+
 
 
 
 
 const Chat = () => {
   const location = useLocation();
+  const dispatch:any = useDispatch()
+
+  
 
   const { appointment } = location.state || {};
   const [newMsg, setNewMsg] = useState(""); // State for new message input
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState<any>(null);
-  let socket = io('http://localhost:5001');
+  let {socket} = useSocket()
+ 
+  // useEffect(()=>{
+   
+   
+  //   socket.on('connection',()=>{
+  //     console.log('Client connected')
+  //   })
+    
+  // },[])
+  
 
 
   useEffect(() => {
     (async () => {
       try {
-        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,sender:"doctor" } });
+        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,sender:"DOCTOR" } });
         console.log("aaaaaa.data",response.data );
         
         
-        setChatHistory(response.data.messages);
-        socket.emit("joinChatRoom", { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id });
+        setChatHistory(response.data);
         
       } catch (error:any) {
-        if (error.response.status === 401) {
+        if (error.response?.status === 401) {
           
           navigate("/login", { state: { message: "Authorization failed, please login" } });
         } else {
@@ -39,6 +57,12 @@ const Chat = () => {
     })();
   }, []);
 
+  useEffect(()=>{
+    console.log("SOCKKK",socket)
+    if(socket){
+      socket?.emit("joinChatRoom", { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,online:"DOCTOR" });
+    }    
+  },[socket])
 
   const sendMessage = (newMsg:string) => {
     if (newMsg.trim()) {
@@ -51,7 +75,7 @@ const Chat = () => {
         };
 
         
-        socket.emit("sendMessage", { messageDetails});
+        socket?.emit("sendMessage", { messageDetails});
 
         setNewMsg(""); // Clear the message input
       } catch (error:any) {
@@ -66,7 +90,7 @@ const Chat = () => {
 
   // useEffect(() => {
   //   // Example of receiving messages
-  //   socket.on("receiveMessage", (message) => {
+  //   socket.on("receiveMessage", (message:any) => {
   //     console.log("New message received:", message);
   //   });
 
@@ -75,27 +99,59 @@ const Chat = () => {
   //   };
   // }, [socket]);
   useEffect(() => {
-    socket.on("receiveMessage", (messageDetails:any) => {
+    socket?.on("receiveMessage", (messageDetails:any) => {
       console.log("gggggggggg",messageDetails);
        
       setChatHistory(messageDetails.messages);
     });
     return () => {
-      socket.off("receiveMessage");
+      socket?.off("receiveMessage");
     };
   }, []);
 
-  useEffect(()=>{
-   
-   
-    socket.on('connection',()=>{
-      console.log('Client connected')
-    })
-    
-  },[])
+  
+
+//   const invite = async (userData: User) => {
+//     const { ZegoUIKitPrebuilt } = await import(
+//         '@zegocloud/zego-uikit-prebuilt'
+//     )
+
+//     const targetUser = {
+//         userID: userData?._id,
+//         userName: userData?.username,
+//         image: userData?.image,
+//     };
+
+//     if (targetUser.userID && targetUser?.userName && targetUser?.image) {
+//         const data = {
+//             callees: [targetUser],
+//             callType: ZegoUIKitPrebuilt.InvitationTypeVideoCall,
+//             timeout: 60,
+
+//         };
+//         zp.sendCallInvitation(data)
+//     } else {
+//         console.error("Invalid target user data");
+//     }
+// }
+
+const navigateVideoChat=()=>{
+  dispatch(setVideoCall({
+    userID:appointment?.viewDetails?.userId?._id,
+    type: "out-going",
+    callType: "video",
+    roomId: Date.now(),
+    userImage:chatHistory?.signedUserImageUrl,
+    doctorImage:chatHistory?.signedDoctorImageUrl,
+    name:chatHistory?.user?.name,
+
+}))
+
+}
 
   return (
     <div className="flex flex-col w-full mx-auto pl-80 p-4 ml-3 mt-4 h-screen px-10 space-y-3">
+      
     <div className="flex-1  sm:p-6 justify-between flex flex-col h-screen">
       {/* Chat header */}
       <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
@@ -107,57 +163,28 @@ const Chat = () => {
               </svg>
             </span>
             <img
-              src="https://images.unsplash.com/photo-1549078642-b2ba4bda0cdb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=3&amp;w=144&amp;h=144"
+              src={chatHistory?.signedUserImageUrl}
               alt="User profile"
               className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
             />
           </div>
           <div className="flex flex-col leading-tight">
             <div className="text-2xl mt-1 flex items-center">
-              <span className="text-gray-700 mr-3">Anderson Vanhron</span>
+              <span className="text-gray-700 mr-3">{chatHistory?.user?.name}</span>
             </div>
             <span className="text-lg text-gray-600">Junior Developer</span>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </button>
+         
+        <button
+  type="button"
+  className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
+  onClick={navigateVideoChat}  // Trigger the meeting on button click
+>
+  <FcVideoCall className="h-6 w-6" />
+</button>
+
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
@@ -186,8 +213,8 @@ const Chat = () => {
   className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
 >
   {/* Ensure chatHistory is always an array */}
-  {chatHistory?.length > 0 ? (
-    chatHistory.map((chat:any, index:any) => (
+  {chatHistory?.chatResult.messages.length > 0 ? (
+    chatHistory.chatResult.messages.map((chat:any, index:any) => (
       <div key={index} className="chat-message">
         {chat.sender === "doctor" ? (
           <div className="flex items-end justify-end">
@@ -199,7 +226,7 @@ const Chat = () => {
               </div>
             </div>
             <img
-              src={chat.profileImage}
+              src={chatHistory?.signedDoctorImageUrl}
               alt="Doctor profile"
               className="w-6 h-6 rounded-full order-2"
             />
@@ -214,7 +241,7 @@ const Chat = () => {
               </div>
             </div>
             <img
-              src={chat.profileImage}
+              src={chatHistory?.signedUserImageUrl}
               alt="User profile"
               className="w-6 h-6 rounded-full order-1"
             />

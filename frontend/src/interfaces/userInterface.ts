@@ -31,6 +31,10 @@ export interface UserState {
     accessToken: string | null;
     loading: boolean;
     error: string | null;
+    showIncomingVideoCall:any,
+    videoCall:any,
+    showVideoCallUser: Boolean;
+    roomIdUser: string | null;
   }
 
  export interface UpdateUserProfilePayload {

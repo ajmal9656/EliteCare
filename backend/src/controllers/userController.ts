@@ -234,7 +234,7 @@ async getDoctorDetails(req: Request, res: Response): Promise<void> {
 
       const doctorId = req.params.doctorId
       const reviewData = req.query.reviewData;
-      console.log("revi",typeof reviewData);
+     
       
 
     
@@ -482,8 +482,7 @@ async addReview(req: Request, res: Response): Promise<void> {
   try {
     const { appointmentId, rating, reviewText } = req.body;
 
-    console.log(rating);
-    console.log(typeof rating);
+   
     
 
    

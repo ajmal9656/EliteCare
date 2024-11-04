@@ -1,6 +1,7 @@
-import { createSlice,PayloadAction } from "@reduxjs/toolkit";
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    import { createSlice,PayloadAction } from "@reduxjs/toolkit";
 import { login, logoutUser, updateUserProfile,updateUserProfileImage } from "../Action/userActions";
 import { User,UserState } from "../../interfaces/userInterface";
+import { boolean } from "yup";
 
 
 
@@ -9,12 +10,39 @@ const initialState: UserState = {
     accessToken: null,
     loading: false,
     error: null,
+    showIncomingVideoCall:null,
+    videoCall:null,
+    showVideoCallUser: false,
+    roomIdUser: null
   };
 
 const userSlice = createSlice({
     name:"User",
     initialState,
     reducers:{
+
+        setShowIncomingVideoCall: (state, action) => {
+            // console.log('action is ',action)
+            state.showIncomingVideoCall = action.payload
+        },
+        setVideoCall: (state, action) => {
+            // console.log('action is ',action)
+            state.videoCall = action.payload
+        },
+        setShowVideoCall: (state, action) => {
+            state.showVideoCallUser = action.payload
+            
+        },
+        setRoomId: (state, action) => {
+            state.roomIdUser = action.payload
+            
+        },
+        endCallUser: (state) => {
+            state.videoCall = null
+            state.showIncomingVideoCall = null
+            localStorage.removeItem('IncomingVideoCall')
+        }
+        
 
     },
     extraReducers:(builder)=>{
@@ -93,4 +121,5 @@ const userSlice = createSlice({
     }
 })
 
+export const {setShowIncomingVideoCall,setVideoCall,setShowVideoCall,setRoomId,endCallUser} = userSlice.actions;
 export default userSlice.reducer

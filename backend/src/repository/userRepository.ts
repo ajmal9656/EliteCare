@@ -123,11 +123,10 @@ export class userRepository {
       }
       async getDoctor(doctorId: string, reviewData: any) {
         try {
-            console.log(doctorId);
-            console.log(reviewData);
+            
 
             const isReviewDataPresent = reviewData === "true";
-            console.log(isReviewDataPresent);
+           
             
             
             
@@ -184,7 +183,7 @@ export class userRepository {
           if (doctor.length === 0) {
             return null;
           }
-      console.log("review",doctor[0]);
+      
       
           return doctor[0]; 
         } catch (error: any) {

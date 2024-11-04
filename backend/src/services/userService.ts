@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 import { S3Service} from '../config/s3client';
 import { Appointment } from "../interface/userInterface/interface";
 import makeThePayment, { refund } from "../config/stripeConfig";
-import { log } from "console";
 import moment from "moment";
 
 dotenv.config()
@@ -580,7 +579,7 @@ if (file) {
             const response = await this.userRepository.getAllAppointments(userId, status);
     
             if (response) {
-                console.log("appointments", response);
+                
     
                
                 const updatedAppointments = response.map((appointment: any) => ({
@@ -589,7 +588,7 @@ if (file) {
                     end: this.getTime(appointment.end)
                 }));
 
-                console.log("up",updatedAppointments);
+                
                 
     
                 return updatedAppointments;
@@ -665,7 +664,7 @@ if (file) {
             const response = await this.userRepository.getAppointment(appointmentId);
     
             if (response) {
-                console.log("appointments", response);
+                
     
                 
                 const updatedAppointment = {
@@ -674,7 +673,7 @@ if (file) {
                     end: this.getTime(response.end)      
                 };
     
-                console.log("updated appointment", updatedAppointment);
+               
                 
                 return updatedAppointment; 
             } else {

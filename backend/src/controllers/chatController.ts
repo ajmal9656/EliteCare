@@ -15,7 +15,10 @@ export class chatController {
         try {
           const doctorID = req.query.doctorID as string;
           const userID = req.query.userID as string;
-          const chatHistory = await this.chatService.getChat(doctorID, userID);
+          const sender = req.query.sender as string;
+          const chatHistory = await this.chatService.getChat(doctorID, userID,sender);
+          console.log("sssss",chatHistory);
+          
           res.status(200).json(chatHistory);
         } catch (error) {
           console.log("chat:= get chat error", error)

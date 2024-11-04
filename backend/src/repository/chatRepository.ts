@@ -1,4 +1,6 @@
 import ChatModel from "../model/chatModel";
+import doctorModel from "../model/doctorModel";
+import userModel from "../model/userModel";
 
 export class chatRepository{
 
@@ -40,10 +42,25 @@ export class chatRepository{
     }
     
 
-    getChat = async (doctorID: string, userID: string): Promise<any> => {
+    getChat = async (doctorID: string, userID: string,sender:string): Promise<any> => {
         try {
           const chatResult = await ChatModel.findOne({doctorId:doctorID,userId:userID})
-          return chatResult;
+          
+
+            const user = await userModel.findById(userID,{name:1,image:1})
+            
+
+          
+          
+            const doctor = await doctorModel.findById(doctorID,{name:1,image:1})
+            return {
+                doctor:doctor,
+                user:user,
+                chatResult
+            };
+
+          
+          
         } catch (error) {
           throw error;
         }

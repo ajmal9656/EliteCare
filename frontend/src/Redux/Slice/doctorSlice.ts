@@ -9,7 +9,11 @@ const initialState: DoctorState = {
     accessToken: null,
     loading: false,
     error: null,
-    docStatus:"pending"
+    docStatus:"pending",
+    videoCall:null,
+    showVideoCallDoctor: false,
+    roomIdDoctor: null
+    
     
   };
 
@@ -17,6 +21,22 @@ const doctorSlice = createSlice({
     name:"Doctor",
     initialState,
     reducers:{
+      setVideoCall: (state, action) => {
+        // console.log('action is ',action)
+        state.videoCall = action.payload
+    },
+    setShowVideoCall: (state, action) => {
+      state.showVideoCallDoctor = action.payload
+      
+  },
+  setRoomId: (state, action) => {
+      state.roomIdDoctor = action.payload
+      
+  },
+  endCallDoctor: (state) => {
+    state.videoCall = null
+    localStorage.removeItem('IncomingVideoCall')
+}
 
     },
     extraReducers:(builder)=>{
@@ -96,5 +116,6 @@ const doctorSlice = createSlice({
 
     }
 })
+export const {setVideoCall,setRoomId,setShowVideoCall,endCallDoctor} = doctorSlice.actions;
 
 export default doctorSlice.reducer
