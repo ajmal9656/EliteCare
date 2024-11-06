@@ -40,6 +40,41 @@ export class chatRepository{
             throw error; // Propagate the error
         }
     }
+    async deleteMessage(messageDetails: any) {
+        try {
+            const query =
+                messageDetails.sender === 'doctor'
+                    ? {
+                        doctorId: messageDetails.senderID,  
+                        userId: messageDetails.receiverID,
+                    }
+                    : {
+                        doctorId: messageDetails.receiverID, 
+                        userId: messageDetails.senderID,
+                    };
+    
+            // Update the 'delete' field to true for the message with the matching messageId
+            const updateChat = await ChatModel.findOneAndUpdate(
+                query,
+                {
+                    $set: {
+                        "messages.$[elem].delete": true
+                    }
+                },
+                {
+                    new: true, // Return the updated document
+                    upsert: true, // Create if not found
+                    arrayFilters: [{ "elem._id": messageDetails.messageId }] // Filter the message with the specific messageId
+                }
+            );
+    
+            return updateChat;
+        } catch (error: any) {
+            console.error("Error in chatRepository:", error);
+            throw error; 
+        }
+    }
+    
     
 
     getChat = async (doctorID: string, userID: string,sender:string): Promise<any> => {

@@ -288,100 +288,117 @@ function SlotManagement() {
   }, []); 
 
   return (
-    <div className="flex flex-col w-full mx-auto pl-64 p-4  mt-14">
-      <div className="flex flex-row justify-end mb-4">
-       
-        <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={toggleAddSlotModal}>
-          Add Slot
-        </button>
-      </div>
+    <div className="flex flex-col w-full mx-auto pl-64 p-4 mt-14">
+  <div className="shadow-lg w-full h-[730px] flex gap-4 p-4">
+    {/* Calendar Section */}
+    <div className=" bg-white p-4 box-border relative w-2/3">
+      <button 
+        className="absolute top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded"
+        onClick={toggleAddSlotModal}
+      >
+        Add Slot
+      </button>
+      <div className="flex items-center justify-center h-full">
+  <div className="transform scale-110"> {/* Increase scale value to enlarge further */}
+    <Calendar
+      onClickDay={handleDateChange}
+      value={selectedDate}
+      minDate={new Date()}
+      maxDate={new Date(new Date().setDate(new Date().getDate() + 10))}
+    />
+  </div>
+</div>
 
-      <div className="shadow-lg w-full h-[730px] flex gap-4 p-4">
-        <div className="flex-1 bg-white p-4 box-border">
-          <div className="flex items-center justify-center h-full">
-            <Calendar
-              onClickDay={handleDateChange}
-              value={selectedDate}
+    </div>
+
+    {/* Available Slots Section */}
+    <div className="flex-1 bg-white p-4 box-border w-1/2">
+      <h3 className="text-lg font-bold mb-2">Available Slots</h3>
+      <div className="grid grid-cols-1 gap-2">
+        {availableSlots.length > 0 ? (
+          availableSlots.map((slot, index) => (
+            <div 
+              key={index} 
+              className={`p-4 border rounded-lg transition-all duration-300 ${slot.availability ? 'bg-blue-100 text-blue-600 hover:bg-blue-200' : 'bg-green-100 text-green-600 hover:bg-green-200'} flex justify-between items-center cursor-pointer`}
+            >
+              {slot.start} to {slot.end}
+              {slot.availability ? (
+                <MdDelete 
+                  onClick={() => handleDeleteSlot(slot._id, slot.date, slot.doctorId)} 
+                  fill="red" 
+                  size={24} 
+                  className="cursor-pointer hover:scale-110 transition-all" 
+                />
+              ) : (
+                <TiTick 
+                  fill="green" 
+                  size={24} 
+                  className="cursor-pointer hover:scale-110 transition-all" 
+                />
+              )}
+            </div>
+          ))
+        ) : (
+          <p>No available slots for the selected date.</p>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {/* Modal for Adding Slots */}
+  {isModalOpen && (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-4 md:mx-auto">
+        <h2 className="text-xl font-bold mb-4">Add Slot</h2>
+        <form onSubmit={formik.handleSubmit}>
+          <div className="mb-4">
+            <label className="block mb-2">Select Date:</label>
+            <DatePicker
+              selected={formik.values.selectedDate}
+              onChange={(date) => formik.setFieldValue('selectedDate', date)}
+              dateFormat="MM/dd/yyyy"
+              className="border border-gray-300 p-2 rounded w-full"
+              placeholderText="Select a date"
               minDate={new Date()}
               maxDate={new Date(new Date().setDate(new Date().getDate() + 10))}
-              
             />
+            {formik.errors.selectedDate && <div className="text-red-500">{formik.errors.selectedDate}</div>}
           </div>
-        </div>
 
-        <div className="flex-1 bg-white p-4 box-border">
-          <h3 className="text-lg font-bold mb-2">Available Slots</h3>
-          <div className="grid grid-cols-1 gap-2">
-            {availableSlots.length > 0 ? (
-              availableSlots.map((slot, index) => (
-                <div key={index} className={`p-4 border rounded-lg transition-all duration-300 ${slot.availability ? 'bg-blue-100 text-blue-600 hover:bg-blue-200' : 'bg-green-100 text-green-600 hover:bg-green-200'} flex justify-between items-center cursor-pointer`}>
-  {slot.start} to {slot.end}
-  {slot.availability ? (
-    <MdDelete onClick={() => handleDeleteSlot(slot._id, slot.date, slot.doctorId)} fill='red' size={24} className="cursor-pointer hover:scale-110 transition-all" />
-  ) : (
-    <TiTick fill='green' size={24} className="cursor-pointer hover:scale-110 transition-all" />
+          <div className="mb-4">
+            <label className="block mb-2">Select Slots:</label>
+            <div className="grid grid-cols-2 gap-2">
+              {timeSlots.map((slot) => (
+                <div key={slot}>
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={formik.values.selectedSlots.includes(slot)}
+                      onChange={() => handleSlotChange(slot)}
+                      className="mr-2"
+                    />
+                    {slot}
+                  </label>
+                </div>
+              ))}
+            </div>
+            {formik.errors.selectedSlots && <div className="text-red-500">{formik.errors.selectedSlots}</div>}
+          </div>
+
+          <div className="flex justify-end">
+            <button type="button" className="bg-gray-300 text-black px-4 py-2 rounded mr-2" onClick={toggleAddSlotModal}>
+              Cancel
+            </button>
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+              Add Slots
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   )}
 </div>
-              ))
-            ) : (
-              <p>No available slots for the selected date.</p>
-            )}
-          </div>
-        </div>
-      </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-4 md:mx-auto">
-            <h2 className="text-xl font-bold mb-4">Add Slot</h2>
-            <form onSubmit={formik.handleSubmit}>
-              <div className="mb-4">
-                <label className="block mb-2">Select Date:</label>
-                <DatePicker
-                  selected={formik.values.selectedDate}
-                  onChange={(date) => formik.setFieldValue('selectedDate', date)}
-                  dateFormat="MM/dd/yyyy"
-                  className="border border-gray-300 p-2 rounded w-full"
-                  placeholderText="Select a date"
-                  minDate={new Date()}
-                  maxDate={new Date(new Date().setDate(new Date().getDate() + 10))}
-                />
-                {formik.errors.selectedDate && <div className="text-red-500">{formik.errors.selectedDate}</div>}
-              </div>
-
-              <div className="mb-4">
-                <label className="block mb-2">Select Slots:</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {timeSlots.map((slot) => (
-                    <div key={slot}>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formik.values.selectedSlots.includes(slot)}
-                          onChange={() => handleSlotChange(slot)}
-                          className="mr-2"
-                        />
-                        {slot}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                {formik.errors.selectedSlots && <div className="text-red-500">{formik.errors.selectedSlots}</div>}
-              </div>
-
-              <div className="flex justify-end">
-                <button type="button" className="bg-gray-300 text-black px-4 py-2 rounded mr-2" onClick={toggleAddSlotModal}>
-                  Cancel
-                </button>
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-                  Add Slots
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
 

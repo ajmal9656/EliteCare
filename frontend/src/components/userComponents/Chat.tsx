@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { BsSendFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import io from "socket.io-client";
 import axiosUrl from "../../utils/axios";
 import { useSocket } from "../../Context/SocketIO";
+import { MdDeleteOutline } from "react-icons/md";
 
 function Chat() {
   const location = useLocation();
@@ -16,6 +16,8 @@ function Chat() {
   const [newMsg, setNewMsg] = useState(""); // State for new message input
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState<any>(null);
+  const [chatDetails, setChatDetails] = useState<any>(null);
+  const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number; messageId: string } | null>(null);
   let {socket} = useSocket()
 
 
@@ -26,7 +28,8 @@ function Chat() {
         console.log("aaaaaa.data",response.data);
         
         
-        setChatHistory(response.data);
+        setChatHistory(response.data.chatResult.messages);
+        setChatDetails(response.data)
         
       } catch (error:any) {
         if (error.response.status === 401) {
@@ -83,7 +86,7 @@ function Chat() {
   // }, [socket]);
   useEffect(() => {
     socket?.on("receiveMessage", (messageDetails:any) => {
-      console.log("gggggggggg",messageDetails);
+      console.log("user recieved",messageDetails.messages);
        
       setChatHistory(messageDetails.messages);
     });
@@ -100,12 +103,56 @@ function Chat() {
     
   },[chatHistory])
 
+  const onDeleteMessage = async (messageId: string) => {
+    try {
+
+      const messageDetails = {
+        senderID: appointment?.userId,
+        receiverID: appointment?.docId._id,
+        messageId: contextMenu?.messageId,
+        sender:"user"
+      };
+
+      console.log("sssssssssssssssssssssssssss",messageDetails);
+      
+  
+      socket?.emit("deleteMessage", { messageDetails});
+      // const response = await axiosUrl.delete(`/chat/deleteMessage`, { data: { messageId } });
+      // if (response.status === 200) {
+      //   setChatHistory((prev: any) => ({
+      //     ...prev,
+      //     chatResult: {
+      //       ...prev.chatResult,
+      //       messages: prev.chatResult.messages.filter((message: any) => message._id !== messageId),
+      //     },
+      //   }));
+      //   toast.success("Message deleted successfully");
+      // }
+    } catch (error) {
+      toast.error("Failed to delete the message. Please try again.");
+    }
+    setContextMenu(null); // Close the context menu
+  };
+  
+  const handleRightClick = (event: any, messageId: string) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      messageId: messageId,
+    });
+  };
+  
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+  };
+
 
 
   return (
     <div className="w-[75%] mt-10 pr-10 pb-5">
-      <div className="bg-white h-[650px] rounded-lg border flex flex-col justify-around p-5">
-    <div className="flex-1  sm:p-6 justify-between flex flex-col h-screen">
+  <div className="bg-white h-[800px] rounded-lg border flex flex-col justify-around p-5">
+    <div className="flex-1 sm:p-6 justify-between flex flex-col h-full">
       {/* Chat header */}
       <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
         <div className="relative flex items-center space-x-4">
@@ -116,148 +163,105 @@ function Chat() {
               </svg>
             </span>
             <img
-              src={chatHistory?.signedDoctorImageUrl}
+              src={chatDetails?.signedDoctorImageUrl}
               alt="User profile"
               className="w-10 sm:w-16 h-10 sm:h-16 rounded-full"
             />
           </div>
           <div className="flex flex-col leading-tight">
             <div className="text-2xl mt-1 flex items-center">
-              <span className="text-gray-700 mr-3">Dr.{chatHistory?.doctor?.name}</span>
+              <span className="text-gray-700 mr-3">Dr.{chatDetails?.doctor?.name}</span>
             </div>
             <span className="text-lg text-gray-600">Junior Developer</span>
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="h-6 w-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              />
-            </svg>
-          </button>
+          {/* Buttons (if needed) */}
         </div>
       </div>
 
       {/* Chat messages */}
-      <div
-  id="messages"
-  className="flex flex-col space-y-4 p-3 overflow-y-auto scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
+      <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto">
+          {chatHistory?.length > 0 ? (
+            chatHistory.map((chat: any, index: any) => (
+              <div key={index} className="chat-message">
+                {chat.sender === "user" ? (
+                  <div className="flex items-end justify-end">
+                  <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-end">
+                      <div onContextMenu={(e) => handleRightClick(e, chat._id)}>
+                          {chat.delete ? (
+                              <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
+                                  This message was deleted
+                              </span>
+                          ) : (
+                              <span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white">
+                                  {chat.message}
+                              </span>
+                          )}
+                      </div>
+                  </div>
+                  <img src={chatDetails.signedDoctorImageUrl} alt="Doctor profile" className="w-6 h-6 rounded-full" />
+              </div>
+              
+                ) : (
+                  <div className="flex items-end">
+                  <img src={chatDetails?.signedUserImageUrl} alt="User profile" className="w-6 h-6 rounded-full" />
+                  <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-start">
+                      <div>
+                          {chat.delete ? (
+                              <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
+                                  This message was deleted
+                              </span>
+                          ) : (
+                              <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                                  {chat.message}
+                              </span>
+                          )}
+                      </div>
+                  </div>
+              </div>
+              
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No messages yet...</p>
+          )}
+        </div>
+
+        {/* Context Menu for Deleting a Message */}
+        {contextMenu && (
+          <>
+           <div
+  style={{
+    position: "absolute",
+    top: contextMenu.mouseY,
+    left: contextMenu.mouseX,
+    backgroundColor: "white",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    padding: "4px",
+    zIndex: 1000,
+  }}
+  onClick={() => onDeleteMessage(contextMenu.messageId)}
 >
-  {/* Ensure chatHistory is always an array */}
-  {chatHistory?.chatResult.messages.length > 0 ? (
-    chatHistory.chatResult.messages.map((chat:any, index:any) => (
-      <div key={index} className="chat-message">
-        {chat.sender === "user" ? (
-          <div className="flex items-end justify-end">
-            <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-1 items-end">
-              <div>
-                <span className="px-4 py-2 rounded-lg inline-block rounded-br-none bg-blue-600 text-white">
-                  {chat.message}
-                </span>
-              </div>
-            </div>
-            <img
-              src={chatHistory?.signedUserImageUrl}
-              alt="Doctor profile"
-              className="w-6 h-6 rounded-full order-2"
-            />
-          </div>
-        ) : (
-          <div className="flex items-end">
-            <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 order-2 items-start">
-              <div>
-                <span className="px-4 py-2 rounded-lg inline-block rounded-bl-none bg-gray-300 text-gray-600">
-                  {chat.message}
-                </span>
-              </div>
-            </div>
-            <img
-              src={chatHistory?.signedDoctorImageUrl}
-              alt="User profile"
-              className="w-6 h-6 rounded-full order-1"
-            />
-          </div>
-        )}
-      </div>
-    ))
-  ) : (
-    <p>No messages yet...</p>
-  )}
+  <button style={{ fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
+    <MdDeleteOutline /> Delete Message
+  </button>
 </div>
+            <div onClick={handleCloseContextMenu} className="fixed inset-0" />
+          </>
+        )}
 
       {/* Chat input */}
-      <div className="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
+      <div className="border-t-2 border-gray-200 px-4 pt-4">
         <div className="relative flex">
           <span className="absolute inset-y-0 flex items-center">
             <button
               type="button"
               className="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="h-6 w-6 text-gray-600"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M14.752 11.168l-3.197-2.132A4.992 4.992 0 0112 4.667c0-1.105-.448-2.105-1.248-2.902A4.968 4.968 0 008 1.333c-1.105 0-2.105.448-2.902 1.248A4.968 4.968 0 004 5.667c0 1.104.448 2.105 1.248 2.902l3.197 2.132a4.992 4.992 0 00-2.248 4.67h2a4.992 4.992 0 014.752-4.67zm0 0A4.992 4.992 0 0112 19.333h2a4.992 4.992 0 01-2.248-4.67z"
-                />
-              </svg>
+              {/* Icon if needed */}
             </button>
           </span>
           <input
@@ -267,39 +271,18 @@ function Chat() {
             onChange={(e) => setNewMsg(e.target.value)}
             className="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3"
           />
-          <div className="absolute right-0 items-center inset-y-0 flex space-x-2">
-            
-            {/* <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                className="h-6 w-6 text-gray-600"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 10h11m0 0V3m0 7l7 7-7 7"
-                />
-              </svg>
-            </button> */}
-            <button
+          <button
             onClick={() => sendMessage(newMsg)}
             className="absolute right-0 inset-y-0 flex items-center justify-center h-full w-12 text-gray-500"
           >
             <BsSendFill className="text-xl" />
           </button>
-          </div>
         </div>
       </div>
     </div>
-    </div>
-    </div>
+  </div>
+</div>
+
   )
 }
 

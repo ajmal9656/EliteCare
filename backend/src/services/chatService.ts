@@ -22,6 +22,16 @@ export class chatService{
             throw error; // Propagate the error for further handling
         }
     }
+    async deleteMessage(messageDetails: any) {
+        try {
+            // Call the repository to save the chat
+            const savedChat = await chatRepositoryInstance.deleteMessage(messageDetails);
+            return savedChat;
+        } catch (error: any) {
+            console.error("Error in chatService:", error);
+            throw error; // Propagate the error for further handling
+        }
+    }
 
     getChat = async (doctorID: string, userID: string,sender:string): Promise<any> => {
         try {

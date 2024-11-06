@@ -15,7 +15,7 @@ const userSocketMap: {
     [key: string]: string } = {};
 
 export const getReceiverSocketId = (userId: string) => {
-  console.log('recienver and his socket id are ', userId, userSocketMap[userId])
+//   console.log('recienver and his socket id are ', userId, userSocketMap[userId])
   return userSocketMap[userId]
 }
 
@@ -23,7 +23,7 @@ export const getReceiverSocketId = (userId: string) => {
 
 const configSocketIO = (server: HttpServer) => {
     try{
-        console.log("socket");
+        
     
     io = new SocketServer(server, {
        cors: {
@@ -37,14 +37,14 @@ const configSocketIO = (server: HttpServer) => {
  
     io.on("connection", (socket) => {
 
-       console.log("User connected,", socket.id);
+      
        const userId = socket.handshake.query.userId
-       console.log("userid",userId);
+      
        
        if (userId != undefined){
          userSocketMap[userId as string] = socket.id
          onlineUser[userId as string] = socket.id;}
-       console.log("socketMap",userSocketMap);
+      
        
  
        socket.on("joinChatRoom", ({ doctorID, userID, online }) => {
@@ -87,26 +87,89 @@ const configSocketIO = (server: HttpServer) => {
     //       }
     //    });
  
-       socket.on("sendMessage", async ({ messageDetails}) => {
-          try {
-            console.log("qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq");
-            
-             let savedMessage: null | any = null;
-            
-                
-                
-                const connectionDetails: any = await chatServices.createChat(messageDetails)
-                savedMessage = connectionDetails
-              
-             const chatRoom = [messageDetails.senderID, messageDetails.receiverID].sort().join("-");
-             console.log("sss",savedMessage);
-             
-             io.to(chatRoom).emit("receiveMessage", savedMessage);
-            //  io.to(`chatNotificationRoom${savedMessage?.receiverID}`).emit("newChatNotification", savedMessage?.message);
-          } catch (error) {
-             console.log(error);
-          }
-       });
+    socket.on("sendMessage", async ({ messageDetails }) => {
+      try {
+        console.log("Entered sendMessage handler");
+    
+        let savedMessage: any = null;
+    
+        // Create or retrieve chat connection details based on the message
+        const connectionDetails: any = await chatServices.createChat(messageDetails);
+        console.log("Chat created/updated in database");
+    
+        // Save message details to the variable
+        savedMessage = connectionDetails;
+    
+        // Determine the chat room based on sender type
+        let chatRoom: string;
+    
+        if (messageDetails.sender === "doctor") {
+          chatRoom = [messageDetails.senderID, messageDetails.receiverID].sort().join("-");
+          console.log(messageDetails.sender,chatRoom);
+          
+        } else if (messageDetails.sender === "user") {
+          chatRoom = [messageDetails.receiverID, messageDetails.senderID].sort().join("-");
+          console.log(messageDetails.sender,chatRoom);
+        } else {
+          console.log("Invalid sender type specified in messageDetails.");
+          return;
+        }
+    
+        console.log("Chat room identified:", chatRoom);
+        console.log("messages:", savedMessage);
+    
+        // Emit the message to the specified chat room
+        io.to(chatRoom).emit("receiveMessage", savedMessage);
+    
+        // Uncomment the following line if you want to emit notifications in a different room
+        // io.to(`chatNotificationRoom${savedMessage?.receiverID}`).emit("newChatNotification", savedMessage?.message);
+    
+      } catch (error) {
+        console.error("Error in sendMessage handler:", error);
+      }
+    });
+    socket.on("deleteMessage", async ({ messageDetails }) => {
+      try {
+        console.log("Entered deleteMessage handler");
+    
+        let savedMessage: any = null;
+    
+        // Create or retrieve chat connection details based on the message
+        const connectionDetails: any = await chatServices.deleteMessage(messageDetails);
+        
+    
+        // Save message details to the variable
+        savedMessage = connectionDetails;
+    
+        // Determine the chat room based on sender type
+        let chatRoom: string;
+    
+        if (messageDetails.sender === "doctor") {
+          chatRoom = [messageDetails.senderID, messageDetails.receiverID].sort().join("-");
+          console.log(messageDetails.sender,chatRoom);
+          
+        } else if (messageDetails.sender === "user") {
+          chatRoom = [messageDetails.receiverID, messageDetails.senderID].sort().join("-");
+          console.log(messageDetails.sender,chatRoom);
+        } else {
+          console.log("Invalid sender type specified in messageDetails.");
+          return;
+        }
+    
+        console.log("Chat room identified:", chatRoom);
+        console.log("messages:", savedMessage);
+    
+        // Emit the message to the specified chat room
+        io.to(chatRoom).emit("receiveMessage", savedMessage);
+    
+        // Uncomment the following line if you want to emit notifications in a different room
+        // io.to(`chatNotificationRoom${savedMessage?.receiverID}`).emit("newChatNotification", savedMessage?.message);
+    
+      } catch (error) {
+        console.error("Error in sendMessage handler:", error);
+      }
+    });
+    
 
  
     //    socket.on("joinTechnicianNoficationRoom", (technicianUserID) => {

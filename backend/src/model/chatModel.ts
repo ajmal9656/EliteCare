@@ -5,6 +5,7 @@ interface IMessage extends Document {
   sender: "user" | "doctor";
   message: string;
   type: "img" | "txt";
+  delete:boolean
 }
 
 // Define the chat schema with TypeScript types
@@ -31,6 +32,10 @@ const messageSchema = new Schema<IMessage>(
       enum: ["img", "txt"],
       default: "txt",
     },
+    delete:{
+      type:Boolean,
+      default:false
+    }
   },
   {
     timestamps: true,
