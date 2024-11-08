@@ -117,12 +117,27 @@ const configSocketIO = (server: HttpServer) => {
     
         console.log("Chat room identified:", chatRoom);
         console.log("messages:", savedMessage);
+
+        await chatServices.createNotification(messageDetails);
     
         // Emit the message to the specified chat room
         io.to(chatRoom).emit("receiveMessage", savedMessage);
+        const userSocketId = getReceiverSocketId(messageDetails.receiverID)
+        io.to(userSocketId).emit("receiveNotification", {
+          message: `You have a new message from ${messageDetails.sender === "doctor" ? "your doctor" : "your patient"}.`,
+          messageDetails: connectionDetails
+        });
+
+        if(messageDetails){
+
+          console.log("qqqqqqqqqqqqqqqqqqq",messageDetails.receiverID);
+          
+
+          
+
+        }
     
-        // Uncomment the following line if you want to emit notifications in a different room
-        // io.to(`chatNotificationRoom${savedMessage?.receiverID}`).emit("newChatNotification", savedMessage?.message);
+        
     
       } catch (error) {
         console.error("Error in sendMessage handler:", error);
@@ -162,8 +177,7 @@ const configSocketIO = (server: HttpServer) => {
         // Emit the message to the specified chat room
         io.to(chatRoom).emit("receiveMessage", savedMessage);
     
-        // Uncomment the following line if you want to emit notifications in a different room
-        // io.to(`chatNotificationRoom${savedMessage?.receiverID}`).emit("newChatNotification", savedMessage?.message);
+        
     
       } catch (error) {
         console.error("Error in sendMessage handler:", error);

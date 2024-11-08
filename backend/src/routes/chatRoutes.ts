@@ -14,6 +14,9 @@ const chatControllerInstance = new chatController(chatServiceInstance)
 
 
 route.get('/fetchTwoMembersChat', chatControllerInstance.getChat.bind(chatControllerInstance));
+route.get('/notificationCount/:recieverId', chatControllerInstance.getNotificationCount.bind(chatControllerInstance));
+route.get('/getAllNotifications/:recieverId', chatControllerInstance.getAllNotifications.bind(chatControllerInstance));
+route.get('/readAllNotifications/:recieverId', chatControllerInstance.getAllNotifications.bind(chatControllerInstance));
 
 export default route;
 

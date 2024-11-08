@@ -10,6 +10,8 @@ import { S3Service} from '../config/s3client';
 import { Appointment } from "../interface/userInterface/interface";
 import makeThePayment, { refund } from "../config/stripeConfig";
 import moment from "moment";
+import { cropAndSave } from "../helper/sharp";
+import sharp from "sharp";
 
 dotenv.config()
 
@@ -431,63 +433,78 @@ export class userService{
             throw new Error(`Failed to update profile: ${error.message}`);
         }
     }
-    async updateImage(userID:string,file:FileData) {
+    async updateImage(userID: string, file: FileData) {
         try {
-
             const userProfileImage: userImage = {
                 profileUrl: {
-                    type:'',
-                    url:''
+                    type: '',
+                    url: ''
                 }
             };
-            
-
-if (file) {
-    const profileUrl = await this.S3Services.uploadFile('eliteCare/userProfileImages/', file);
-    userProfileImage.profileUrl.url = profileUrl;
-    userProfileImage.profileUrl.type = "user profile image";
-}
-
-
-
-            
-
-            
-
-
-            const response = await this.userRepository.uploadProfileImage(userID,userProfileImage);
-            if (response) {
+    
+            if (file) {
+                console.log("File received for upload:", file);
+    
+                // Load the image buffer into sharp and get metadata
+                const image = await sharp(file.buffer);
+                const metadata = await image.metadata();
                 
+                const width = metadata.width;
+                const height = metadata.height;
+    
+                // Check if width and height are defined
+                if (width === undefined || height === undefined) {
+                    throw new Error("Image metadata could not be retrieved.");
+                }
+    
+                // Calculate the size and position for cropping
+                const squareSize = Math.min(width, height); // Ensuring the crop is square
+                const x = (width - squareSize) / 2; // X position for cropping (centered)
+                const y = (height - squareSize) / 2; // Y position for cropping (centered)
+    
+                // Crop the image into a square
+                const croppedBuffer = await cropAndSave(x, y, squareSize, squareSize, file.buffer);
 
+                file.buffer = croppedBuffer
+    
+                // Upload the cropped image to S3
+                const profileUrl = await this.S3Services.uploadFile('eliteCare/userProfileImages/', file);
+    
+                // Set the profile image details
+                userProfileImage.profileUrl.url = profileUrl;
+                userProfileImage.profileUrl.type = "user profile image";
+            }
+    
+            // Update the user profile with the new image data
+            const response = await this.userRepository.uploadProfileImage(userID, userProfileImage);
+    
+            if (response) {
+                // Get the folder path for the file based on its type
                 const folderPath = this.getFolderPathByFileType(response.image.type);
-                  const signedUrl = await this.S3Services.getFile(response.image.url, folderPath);
-                  response.image.url = signedUrl
-                  const userInfo = {
+    
+                // Retrieve a signed URL for the image
+                const signedUrl = await this.S3Services.getFile(response.image.url, folderPath);
+                response.image.url = signedUrl;
+    
+                // Constructing the user info response with the updated image URL
+                const userInfo = {
                     name: response.name,
                     email: response.email,
                     userId: response.userId,
                     phone: response.phone,
                     isBlocked: response.isBlocked,
-                    DOB:response.DOB,
-                    address:response.address,
-                    image:response.image,
-                    _id:response._id
+                    DOB: response.DOB,
+                    address: response.address,
+                    image: response.image,
+                    _id: response._id
                 };
-
-                  
-                 
-
-                  return {userInfo};
-                
     
-                
-                
-                
-                
-                
-            } 
-    } catch (error: any)  {  
-            throw new Error(error.message);
+                return { userInfo };  // Return the updated user info
+            }
+    
+        } catch (error: any) {
+            // Error handling
+            throw new Error(`Error updating profile image: ${error.message}`);
         }
     }
     async checkSlotLocked(doctorId: string, slotId: Slot,date:string,userId:string): Promise< boolean > {

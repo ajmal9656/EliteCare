@@ -11,7 +11,18 @@ import { useNavigate } from 'react-router-dom';
 const validationSchema = Yup.object({
   name: Yup.string().required('Name is required'),
   gender: Yup.string().required('Select your gender'),
-  dob: Yup.date().required('Date of Birth is required'),
+  dob: Yup.date()
+    .required('Date of Birth is required')
+    .test('age', 'You must be at least 18 years old', function (value) {
+      if (!value) return false; // handle empty date input
+      const today = new Date();
+      const birthDate = new Date(value);
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const isBirthdayPassedThisYear =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+      return isBirthdayPassedThisYear ? age >= 18 : age - 1 >= 18;
+    }),
   department: Yup.string().required('Department is required'),
   fees: Yup.number().required('Fees are required').positive('Fees must be positive'),
   aadhaarNumber: Yup.string()
@@ -23,6 +34,7 @@ const validationSchema = Yup.object({
   certificateImage: Yup.mixed().required('Certificate Image is required'),
   qualificationImage: Yup.mixed().required('Qualification Image is required'),
 });
+
 
 function DoctorVerifivationForm() {
   const navigate = useNavigate()

@@ -36,6 +36,9 @@ const dispatch:any = useDispatch()
     phone: "",
   });
 
+  const today = new Date();
+const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate()).toISOString().split("T")[0];
+
   // Fetch profile details when the component mounts
   useEffect(() => {
     if (DoctorData?.doctorInfo?.doctorId) {
@@ -116,7 +119,19 @@ const dispatch:any = useDispatch()
     if (!editFields.DOB) {
       newErrors.DOB = "Date of Birth is required.";
       hasError = true;
-    }
+  } else {
+      const birthDate = new Date(editFields.DOB);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+      if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+          age--;
+      }
+      if (age < 18) {
+          newErrors.DOB = "You must be at least 18 years old.";
+          hasError = true;
+      }
+  }
     if (!editFields.fees) {
       newErrors.fees = "Fees are required.";
       hasError = true;
@@ -291,61 +306,64 @@ const dispatch:any = useDispatch()
 
       {/* Modal for Editing Profile */}
       <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: "10px",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <Typography variant="h6" component="h2" gutterBottom>
-            Edit Profile
-          </Typography>
-          <TextField
-            label="Date of Birth"
-            type="date"
-            name="DOB"
-            value={editFields.DOB}
-            fullWidth
-            onChange={handleInputChange}
-            margin="normal"
-            InputLabelProps={{
-              shrink: true, // Ensure the label doesn't overlap
-            }}
-            error={!!errors.DOB} // Set error state
-            helperText={errors.DOB} // Display error message
-          />
-          <TextField
-            label="Fees"
-            name="fees"
-            value={editFields.fees}
-            fullWidth
-            onChange={handleInputChange}
-            margin="normal"
-            error={!!errors.fees} // Set error state
-            helperText={errors.fees} // Display error message
-          />
-          <TextField
-            label="Mobile Number"
-            name="phone"
-            value={editFields.phone}
-            fullWidth
-            onChange={handleInputChange}
-            margin="normal"
-            error={!!errors.phone} // Set error state
-            helperText={errors.phone} // Display error message
-          />
-          <Button variant="contained" color="primary" onClick={handleFormSubmit} fullWidth>
-            Update Profile
-          </Button>
-        </Box>
-      </Modal>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: 400,
+      bgcolor: "background.paper",
+      borderRadius: "10px",
+      boxShadow: 24,
+      p: 4,
+    }}
+  >
+    <Typography variant="h6" component="h2" gutterBottom>
+      Edit Profile
+    </Typography>
+    <TextField
+      label="Date of Birth"
+      type="date"
+      name="DOB"
+      value={editFields.DOB}
+      fullWidth
+      onChange={handleInputChange}
+      margin="normal"
+      InputLabelProps={{
+        shrink: true, // Ensure the label doesn't overlap
+      }}
+      InputProps={{
+        inputProps: { max: maxDate }, // Set the maximum date to 18 years ago
+      }}
+      error={!!errors.DOB} // Set error state
+      helperText={errors.DOB} // Display error message
+    />
+    <TextField
+      label="Fees"
+      name="fees"
+      value={editFields.fees}
+      fullWidth
+      onChange={handleInputChange}
+      margin="normal"
+      error={!!errors.fees} // Set error state
+      helperText={errors.fees} // Display error message
+    />
+    <TextField
+      label="Mobile Number"
+      name="phone"
+      value={editFields.phone}
+      fullWidth
+      onChange={handleInputChange}
+      margin="normal"
+      error={!!errors.phone} // Set error state
+      helperText={errors.phone} // Display error message
+    />
+    <Button variant="contained" color="primary" onClick={handleFormSubmit} fullWidth>
+      Update Profile
+    </Button>
+  </Box>
+</Modal>
       {isImageModalOpen && (
   <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
     <div className="bg-white p-8 rounded-lg w-[400px]">

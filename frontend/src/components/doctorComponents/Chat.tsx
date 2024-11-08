@@ -21,6 +21,8 @@ const Chat = () => {
   
 
   const { appointment } = location.state || {};
+  console.log("eeeeeeee",appointment);
+  
   const [newMsg, setNewMsg] = useState(""); // State for new message input
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState<any>(null);
@@ -48,6 +50,8 @@ const Chat = () => {
         
         
         setChatHistory(response.data.chatResult.messages);
+        console.log("ccc",chatDetails);
+        
         setChatDetails(response.data)
         
       } catch (error:any) {
@@ -74,6 +78,8 @@ const Chat = () => {
         const messageDetails = {
           senderID: appointment?.viewDetails?.docId,
           receiverID: appointment?.viewDetails?.userId?._id,
+          appointmentId:appointment?.viewDetails?._id,
+          name:chatDetails?.doctor?.name,
           message: newMsg,
           sender:"doctor"
         };
@@ -196,6 +202,8 @@ const handleRightClick = (event: any, messageId: string) => {
 const handleCloseContextMenu = () => {
   setContextMenu(null);
 };
+
+
 
   return (
     <div className="flex flex-col w-full mx-auto pl-80 p-4 ml-3 mt-4 h-screen px-10 space-y-3">

@@ -1,6 +1,8 @@
 import ChatModel from "../model/chatModel";
 import doctorModel from "../model/doctorModel";
+import NotificationModel from "../model/notificationModel";
 import userModel from "../model/userModel";
+import mongoose from 'mongoose';
 
 export class chatRepository{
 
@@ -35,6 +37,44 @@ export class chatRepository{
             );
     
             return existingChat;
+        } catch (error: any) {
+            console.error("Error in chatRepository:", error);
+            throw error; // Propagate the error
+        }
+    }
+    async createNotification(messageDetails: any) {
+        try {
+            console.log("message data",messageDetails)
+            console.log("message data", messageDetails);
+
+        const { receiverID, message,appointmentId } = messageDetails;
+        let notificationMessage;
+
+        if(messageDetails.sender ==="doctor"){
+            notificationMessage = `You got a new message from Dr.${messageDetails.name}`
+
+        }else{
+            notificationMessage = `You got a new message from ${messageDetails.name}`
+
+        }
+
+        // Create notification content
+        const notificationContent = {
+            content: notificationMessage,
+            type: "message",  // Assume "message" type for chat notifications; adjust as needed
+            read: false,
+            appointmentId:appointmentId
+        };
+
+        // Find the receiver's notification document, or create a new one if it doesn't exist
+        const notification = await NotificationModel.findOneAndUpdate(
+            { receiverId: new mongoose.Types.ObjectId(receiverID) },
+            { $push: { notifications: notificationContent } },
+            { new: true, upsert: true }  // Creates document if not found
+        );
+
+        console.log("Notification created/updated:", notification);
+            
         } catch (error: any) {
             console.error("Error in chatRepository:", error);
             throw error; // Propagate the error
@@ -100,6 +140,51 @@ export class chatRepository{
           throw error;
         }
       };
+      getNotificationCount = async (receiverId: string): Promise<any> => {
+        try {
+            const notificationCount = await NotificationModel.aggregate([
+                { $match: { receiverId: new mongoose.Types.ObjectId(receiverId) } },
+                { $unwind: "$notifications" },
+                { $match: { "notifications.read": false } },
+                { $count: "unreadCount" }
+            ]);
+    
+            return {
+                notificationCount: notificationCount[0]?.unreadCount || 0
+            };
+        } catch (error) {
+            throw error;
+        }
+    };
+      getAllNotifications = async (receiverId: string): Promise<any> => {
+        try {
+            const notifications = await NotificationModel.aggregate([
+                { $match: { receiverId: new mongoose.Types.ObjectId(receiverId) } },
+                { $unwind: "$notifications" },
+                { $match: { "notifications.read": false } }
+            ]);
+           
+    
+            return notifications;
+        } catch (error) {
+            throw error;
+        }
+    };
+      readAllNotifications = async (receiverId: string): Promise<any> => {
+        try {
+            const notifications = await NotificationModel.find
+           
+    
+            return notifications;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+
+
+
+      
     
     
 

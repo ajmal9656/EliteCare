@@ -19,6 +19,9 @@ function UserProfile() {
   const dispatch: any = useDispatch();
   const navigate = useNavigate();
 
+  const today = new Date();
+const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate()).toISOString().split("T")[0];
+
   
   const formik = useFormik({
     initialValues: {
@@ -110,13 +113,7 @@ function UserProfile() {
       setPreviewImage(previewURL); 
     }
   };
-  const handleLogout = () => {
-    
-    localStorage.clear();
-
-    
-    navigate("/login");
-  };
+  
 
   return (
     <div className="w-[75%] h-screen mt-10 pr-14">
@@ -173,73 +170,75 @@ function UserProfile() {
       
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
-          <div className="bg-white p-8 rounded-lg w-[400px]">
-            <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
-
-            <form onSubmit={formik.handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-lg font-semibold mb-2">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formik.values.name}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="border border-gray-300 rounded-md p-2 w-full"
-                />
-                {formik.touched.name && formik.errors.name ? (
-                  <div className="text-red-500 text-sm">{formik.errors.name}</div>
-                ) : null}
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-lg font-semibold mb-2">DOB</label>
-                <input
-                  type="date"
-                  name="dob"
-                  value={formik.values.dob ? new Date(formik.values.dob).toISOString().split("T")[0] : ""}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="border border-gray-300 rounded-md p-2 w-full"
-                />
-                {formik.touched.dob && formik.errors.dob ? (
-                  <div className="text-red-500 text-sm">{formik.errors.dob}</div>
-                ) : null}
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-lg font-semibold mb-2">Address</label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formik.values.address}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="border border-gray-300 rounded-md p-2 w-full"
-                />
-                {formik.touched.address && formik.errors.address ? (
-                  <div className="text-red-500 text-sm">{formik.errors.address}</div>
-                ) : null}
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="bg-gray-500 text-white py-2 px-4 rounded-md"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-brightColor text-white py-2 px-4 rounded-md hover:bg-hoverColor transition duration-300 ease-in-out"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
+        <div className="bg-white p-8 rounded-lg w-[400px]">
+          <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
+      
+          <form onSubmit={formik.handleSubmit}>
+            <div className="mb-4">
+              <label className="block text-lg font-semibold mb-2">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+              {formik.touched.name && formik.errors.name ? (
+                <div className="text-red-500 text-sm">{formik.errors.name}</div>
+              ) : null}
+            </div>
+      
+            <div className="mb-4">
+              <label className="block text-lg font-semibold mb-2">DOB</label>
+              <input
+                type="date"
+                name="dob"
+                value={formik.values.dob ? new Date(formik.values.dob).toISOString().split("T")[0] : ""}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="border border-gray-300 rounded-md p-2 w-full"
+                max={maxDate} // Set max date to 18 years ago
+              />
+              {formik.touched.dob && formik.errors.dob ? (
+                <div className="text-red-500 text-sm">{formik.errors.dob}</div>
+              ) : null}
+            </div>
+      
+            <div className="mb-4">
+              <label className="block text-lg font-semibold mb-2">Address</label>
+              <input
+                type="text"
+                name="address"
+                value={formik.values.address}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="border border-gray-300 rounded-md p-2 w-full"
+              />
+              {formik.touched.address && formik.errors.address ? (
+                <div className="text-red-500 text-sm">{formik.errors.address}</div>
+              ) : null}
+            </div>
+      
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={closeModal}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="bg-brightColor text-white py-2 px-4 rounded-md hover:bg-hoverColor transition duration-300 ease-in-out"
+              >
+                Save
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
+      
       )}
 
       

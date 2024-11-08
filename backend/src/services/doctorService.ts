@@ -8,6 +8,8 @@ import { doctorType ,DoctorData,DoctorFiles,docDetails,TimeSlot, doctorImage, Fi
 import { S3Service } from '../config/s3client';
 import moment from 'moment';
 import { refund } from '../config/stripeConfig';
+import { cropAndSave } from '../helper/sharp';
+import sharp from 'sharp';
 
 
 
@@ -641,6 +643,29 @@ if (files.qualificationImage) {
             
 
 if (file) {
+    console.log("File received for upload:", file);
+    
+    // Load the image buffer into sharp and get metadata
+    const image = await sharp(file.buffer);
+    const metadata = await image.metadata();
+    
+    const width = metadata.width;
+    const height = metadata.height;
+
+    // Check if width and height are defined
+    if (width === undefined || height === undefined) {
+        throw new Error("Image metadata could not be retrieved.");
+    }
+
+    // Calculate the size and position for cropping
+    const squareSize = Math.min(width, height); // Ensuring the crop is square
+    const x = (width - squareSize) / 2; // X position for cropping (centered)
+    const y = (height - squareSize) / 2; // Y position for cropping (centered)
+
+    // Crop the image into a square
+    const croppedBuffer = await cropAndSave(x, y, squareSize, squareSize, file.buffer);
+
+    file.buffer = croppedBuffer
     const profileUrl = await this.S3Service.uploadFile('eliteCare/doctorProfileImages/', file);
     doctorProfileImage.profileUrl.url = profileUrl;
     doctorProfileImage.profileUrl.type = "profile image";

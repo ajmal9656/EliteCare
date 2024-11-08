@@ -25,5 +25,46 @@ export class chatController {
           res.status(400).json(error);
         };
       };
+      getNotificationCount = async (req: Request, res: Response) => {
+        try {
+          const recieverID = req.params.recieverId as string;
+         
+          const count = await this.chatService.getNotificationCount(recieverID);
+          console.log("sssss",count);
+          
+          res.status(200).json(count);
+        } catch (error) {
+          console.log("chat:= get chat error", error)
+          res.status(400).json(error);
+        };
+      };
+      getAllNotifications = async (req: Request, res: Response) => {
+        try {
+          const recieverID = req.params.recieverId as string;
+          
+         
+          const notifications = await this.chatService.getAllNotifications(recieverID);
+          console.log("iiiiiiiii",notifications);
+          
+          res.status(200).json(notifications);
+        } catch (error) {
+          console.log("chat:= get chat error", error)
+          res.status(400).json(error);
+        };
+      };
+      readAllNotifications = async (req: Request, res: Response) => {
+        try {
+          const recieverID = req.params.recieverId as string;
+          
+         
+          const notifications = await this.chatService.readAllNotifications(recieverID);
+          console.log("iiiiiiiii",notifications);
+          
+          res.status(200).json(notifications);
+        } catch (error) {
+          console.log("chat:= get chat error", error)
+          res.status(400).json(error);
+        };
+      };
 
 }

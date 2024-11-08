@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
 import { S3Service } from "../config/s3client";
 import { chatRepository } from "../repository/chatRepository";
+import NotificationModel from "../model/notificationModel";
 
 const chatRepositoryInstance = new chatRepository()
 const S3Services = new S3Service()
@@ -17,6 +19,16 @@ export class chatService{
             // Call the repository to save the chat
             const savedChat = await chatRepositoryInstance.createChat(messageDetails);
             return savedChat;
+        } catch (error: any) {
+            console.error("Error in chatService:", error);
+            throw error; // Propagate the error for further handling
+        }
+    }
+    async createNotification(messageDetails: any) {
+        try {
+            // Call the repository to save the chat
+            const savedNotification = await chatRepositoryInstance.createNotification(messageDetails);
+            return savedNotification;
         } catch (error: any) {
             console.error("Error in chatService:", error);
             throw error; // Propagate the error for further handling
@@ -64,6 +76,39 @@ export class chatService{
           throw error;
         };
       };
+      getNotificationCount = async (receiverId: string): Promise<any> => {
+        try {
+            const notificationCount = await chatRepositoryInstance.getNotificationCount(receiverId)
+    
+            return {
+                notificationCount: notificationCount
+            };
+        } catch (error) {
+            throw error;
+        }
+    };
+    getAllNotifications = async (receiverId: string): Promise<any> => {
+        try {
+
+            const notifications = await chatRepositoryInstance.getAllNotifications(receiverId)
+            
+    
+            return notifications;
+        } catch (error) {
+            throw error;
+        }
+    };
+    readAllNotifications = async (receiverId: string): Promise<any> => {
+        try {
+
+            const notifications = await chatRepositoryInstance.readAllNotifications(receiverId)
+            
+    
+            return notifications;
+        } catch (error) {
+            throw error;
+        }
+    };
 
       private getFolderPathByFileType(fileType: string): string {
         
