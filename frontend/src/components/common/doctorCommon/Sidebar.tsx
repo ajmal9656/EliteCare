@@ -1,13 +1,43 @@
 import { Link,NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutDoctor } from "../../../Redux/Action/doctorActions";
+import { useEffect, useState } from "react";
+import { IoNotificationsOutline } from "react-icons/io5";
+import { AiOutlineClose } from "react-icons/ai";
+import { useSocket } from "../../../Context/SocketIO";
+import axiosUrl from "../../../utils/axios";
+import { RootState } from "../../../Redux/store";
 
 
 
 function Sidebar() {
   const navigate = useNavigate();
   const dispatch:any = useDispatch()
+
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState<any>([]);
+
+  const doctorData = useSelector((state: RootState) => state.doctor.doctorInfo);
+
+  let {socket} = useSocket()
+
+  const fetchUnreadNotifications = async () => {
+    
+    try {
+      console.log("hellow",doctorData);
+      
+      const response = await axiosUrl.get(`/chat/getAllNotifications/${doctorData?.doctorId}`);
+      console.log("wwwwwww",response.data);
+       // Adjust endpoint as needed
+      setNotifications(response.data);
+
+      await axiosUrl.get(`/chat/readAllNotifications/${doctorData?.doctorId}`);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } 
+  };
 
   const handleLogout = async () => {
     
@@ -28,6 +58,54 @@ function Sidebar() {
       console.error('Error logging out:', error);
     }
   };
+
+  const toggleNotificationDrawer = () => {
+    console.log("hii");
+    
+    setIsNotificationOpen(true);
+    fetchUnreadNotifications();
+    
+    setNotificationCount(0)
+
+
+  };
+  const toggleCloseNotificationDrawer = () => {
+    console.log("hii");
+    
+    setIsNotificationOpen(false);
+    
+
+  };
+
+  useEffect(() => {
+    const fetchNotificationCount = async () => {
+      try {
+        const response = await axiosUrl.get(`/chat/notificationCount/${doctorData?.doctorId}`);
+        
+        console.log("no",response.data.notificationCount.notificationCount);
+        
+        setNotificationCount(response.data.notificationCount.notificationCount);
+      } catch (error) {
+        console.error("Error fetching notification count:", error);
+      }
+    };
+
+    fetchNotificationCount();
+  }, [doctorData?.doctorId]);
+
+  useEffect(()=>{
+
+    socket?.on('receiveNotification', (notificationData:any) => {
+      console.log("fffffffffffffffffff");
+      
+      
+      setNotificationCount((prevCount) => {console.log("hhhhhhhhhhhhhhhhh",prevCount);
+        return prevCount + 1});
+      console.log('Notification received:', notificationData);
+      // dispatch(addNotification(notificationData)); 
+    });
+
+  },[socket])
   return (
     <>
       <nav className="fixed top-0 z-50 w-full bg-white border-b bg-gradient-to-l from-cyan-500 to-blue-500 ">
@@ -69,49 +147,15 @@ function Sidebar() {
       </div>
       <div className="flex items-center">
         <div className="flex items-center ms-3">
-          <div>
-            <button
-              type="button"
-              className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-              aria-expanded="false"
-              data-dropdown-toggle="dropdown-user"
-            >
-              <span className="sr-only">Open user menu</span>
-              <img
-                className="w-8 h-8 rounded-full"
-                src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                alt="user photo"
-              />
-            </button>
-          </div>
-          <div className="hidden z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600" id="dropdown-user">
-            <div className="px-4 py-3" role="none">
-              <p className="text-sm text-gray-900 dark:text-white" role="none">Neil Sims</p>
-              <p className="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">neil.sims@flowbite.com</p>
-            </div>
-            <ul className="py-1" role="none">
-              <li>
-                <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link to="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                  Settings
-                </Link>
-              </li>
-              <li>
-                <Link to="/earnings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                  Earnings
-                </Link>
-              </li>
-              <li>
-                <Link to="/logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">
-                  Sign out
-                </Link>
-              </li>
-            </ul>
-          </div>
+        <button onClick={toggleNotificationDrawer} className="relative text-white text-2xl hover:text-hoverColor transition duration-300">
+            <IoNotificationsOutline size={36}  />
+            {notificationCount > 0 && (
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {notificationCount}
+              </span>
+            )}
+          </button>
+          
           <button
             type="button"
             className="ml-4 text-sm text-gray-900 dark:text-white"
@@ -253,6 +297,42 @@ function Sidebar() {
 </ul>
         </div>
       </aside>
+      <div className={`fixed top-0 right-0 h-full w-80 bg-white z-50 shadow-lg transform transition-transform duration-300 ${isNotificationOpen ? "translate-x-0" : "translate-x-full"}`}>
+  <div className="p-4 border-b flex justify-between items-center bg-gradient-to-l from-cyan-500 to-blue-500 text-white">
+    <h2 className="text-xl font-semibold">Notifications</h2>
+    <button onClick={toggleCloseNotificationDrawer} className="text-white text-2xl">
+      <AiOutlineClose />
+    </button>
+  </div>
+  <div className="p-4 max-h-[90vh] overflow-y-auto">
+    {/* Display Notifications */}
+    <ul>
+      {notifications.length > 0 ? (
+        notifications.slice().reverse().map((notificationObj: any, index: any) => (
+          <li
+            key={index}
+            className={`mb-4 border-b pb-2 ${
+              notificationObj.notifications.read ? "text-gray-400" : "text-black"
+            }`}
+          >
+            <p
+              className={`${
+                notificationObj.notifications.read ? "text-gray-500" : "text-slate-800 font-semibold"
+              }`}
+            >
+              {notificationObj.notifications.content}
+            </p>
+            <p className="text-gray-500 text-sm">
+              {new Date(notificationObj.notifications.createdAt).toLocaleString()}
+            </p>
+          </li>
+        ))
+      ) : (
+        <p>No new notifications</p>
+      )}
+    </ul>
+  </div>
+</div>
     </>
   );
 }

@@ -239,10 +239,10 @@ export class doctorService{
                     throw new Error("Doctor is Blocked");
                 }
     
-                const accessToken = jwt.sign({ id: doctorData.doctorId, email: doctorData.email }, process.env.JWT_SECRET as string, {
+                const accessToken = jwt.sign({ id: doctorData.doctorId, email: doctorData.email,role:"doctor" }, process.env.JWT_SECRET as string, {
                     expiresIn: "1hr"
                 });
-                const refreshToken = jwt.sign({ id: doctorData.doctorId, email: doctorData.email }, process.env.JWT_SECRET as string, {
+                const refreshToken = jwt.sign({ id: doctorData.doctorId, email: doctorData.email,role:"doctor" }, process.env.JWT_SECRET as string, {
                     expiresIn: "7d"
                 });
 

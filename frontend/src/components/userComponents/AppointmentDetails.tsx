@@ -177,7 +177,7 @@ function AppointmentDetails() {
   
 
   return (
-    <div className="w-[75%] mt-10 pr-10 pb-5">
+    <div className="w-[75%]  pr-10 pb-5">
       <div className="bg-white w-[100%] object-cover rounded-lg border flex flex-col justify-around p-5 space-y-6">
         <h2 className="text-2xl font-bold text-gray-700 border-b pb-4">Appointment Details</h2>
 

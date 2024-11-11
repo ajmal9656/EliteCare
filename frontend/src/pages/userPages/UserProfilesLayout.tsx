@@ -2,6 +2,7 @@ import { useSelector,useDispatch } from "react-redux";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { RootState } from "../../Redux/store";
 import { logoutUser } from "../../Redux/Action/userActions";
+import Navbar from "../../components/common/userCommon/Navbar";
 
 
 
@@ -33,8 +34,10 @@ function UserProfilesLayout() {
   };
   console.log("kjsvbkjsbvs")
   return (
-    <div className="bg-gray-100 h-screen flex overflow-hidden">
-      <div className="w-[25%] h-full pl-20 mt-10 ">
+    <>
+    <Navbar/>
+    <div className="bg-gray-100 h-screen flex overflow-hidden pt-28">
+      <div className="w-[25%] h-full pl-20  ">
       <div className="object-cover p-3 space-y-2 w-60 bg-white text-gray-100 border rounded-lg">
           <div className="flex items-center p-2 space-x-4">
             <img
@@ -154,6 +157,7 @@ function UserProfilesLayout() {
 
 
     </div>
+    </>
   )
 }
 

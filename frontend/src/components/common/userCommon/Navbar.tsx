@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-scroll";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import { IoNotificationsOutline } from "react-icons/io5";
 import axiosUrl from "../../../utils/axios";
@@ -14,6 +14,7 @@ const Navbar = () => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState<any>([]);
   let {socket} = useSocket()
+  const navigate = useNavigate()
 
   const userData = useSelector((state: RootState) => state.user.userInfo);
 
@@ -86,6 +87,10 @@ const Navbar = () => {
 
   },[socket])
 
+  const navigateAppointment = (appointment: any) => {
+    navigate("/userProfile/viewAppointment", { state: { appointmentId:appointment } });
+  };
+
   return (
     <div className="fixed w-screen z-20 text-white">
       <div className="flex flex-row justify-between p-5 md:px-32 px-5 bg-backgroundColor shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px]">
@@ -130,20 +135,32 @@ const Navbar = () => {
 
       {/* Notification Drawer */}
       {/* Notification Drawer */}
-<div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 z-20 ${isNotificationOpen ? "translate-x-0" : "translate-x-full"}`}>
+      <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform transition-transform duration-300 z-20 ${isNotificationOpen ? "translate-x-0" : "translate-x-full"}`}>
   <div className="p-4 border-b flex justify-between items-center bg-backgroundColor text-white">
     <h2 className="text-xl font-semibold">Notifications</h2>
     <button onClick={toggleCloseNotificationDrawer} className="text-white text-2xl">
       <AiOutlineClose />
     </button>
   </div>
-  <div className="p-4">
+  <div className="p-4 max-h-[90vh] overflow-y-auto">
     {/* Display Notifications */}
     <ul>
   {notifications.length > 0 ? (
     notifications.slice().reverse().map((notificationObj: any, index: any) => (
-      <li key={index} className="mb-4 border-b pb-2">
-        <p className="text-slate-600">{notificationObj.notifications.content}</p>
+      <li
+        key={index}
+        className={`mb-4 border-b pb-2 ${
+          notificationObj.notifications.read ? "text-gray-400" : "text-black"
+        }`}
+        onClick={() => navigateAppointment(notificationObj.notifications.appointmentId)}
+      >
+        <p
+          className={`${
+            notificationObj.notifications.read ? "text-gray-500" : "text-slate-800 font-semibold"
+          }`}
+        >
+          {notificationObj.notifications.content}
+        </p>
         <p className="text-gray-500 text-sm">
           {new Date(notificationObj.notifications.createdAt).toLocaleString()}
         </p>
@@ -156,6 +173,7 @@ const Navbar = () => {
 
   </div>
 </div>
+
 
     </div>
   );

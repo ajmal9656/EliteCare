@@ -28,7 +28,7 @@ export interface DoctorDetails {
 export interface DoctorState {
     
     doctorInfo: Doctor | null;
-    accessToken: string | null;
+    
     loading: boolean;
     error: string | null;
     docStatus:string;

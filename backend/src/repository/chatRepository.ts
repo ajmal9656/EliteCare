@@ -160,8 +160,7 @@ export class chatRepository{
         try {
             const notifications = await NotificationModel.aggregate([
                 { $match: { receiverId: new mongoose.Types.ObjectId(receiverId) } },
-                { $unwind: "$notifications" },
-                { $match: { "notifications.read": false } }
+                { $unwind: "$notifications" }
             ]);
            
     
@@ -170,16 +169,19 @@ export class chatRepository{
             throw error;
         }
     };
-      readAllNotifications = async (receiverId: string): Promise<any> => {
+    readAllNotifications = async (receiverId: string): Promise<any> => {
         try {
-            const notifications = await NotificationModel.find
-           
+            const result = await NotificationModel.updateOne(
+                { receiverId }, // Find the document by receiverId
+                { $set: { "notifications.$[].read": true } } // Set 'read' to true for each item in 'notifications' array
+            );
     
-            return notifications;
+            return result;
         } catch (error) {
             throw error;
         }
     };
+    
 
 
 

@@ -7,7 +7,6 @@ import { boolean } from "yup";
 
 const initialState: UserState = {
     userInfo: null,
-    accessToken: null,
     loading: false,
     error: null,
     showIncomingVideoCall:null,
@@ -52,13 +51,13 @@ const userSlice = createSlice({
             state.error = null
             
         })
-        .addCase(login.fulfilled,(state,action:PayloadAction<{ accessToken: string; userInfo: User }>)=>{
-        const { accessToken, userInfo } = action.payload;
+        .addCase(login.fulfilled,(state,action:PayloadAction<{  userInfo: User }>)=>{
+        const {  userInfo } = action.payload;
         state.userInfo = userInfo;
-        state.accessToken = accessToken;  
+          
         state.loading = false;
 
-        localStorage.setItem('accessToken', accessToken);
+        
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
         })
@@ -107,11 +106,10 @@ const userSlice = createSlice({
           .addCase(logoutUser.fulfilled, (state) => {
             // Reset the user state on logout
             state.userInfo = null;
-            state.accessToken = null;
+            
             state.loading = false;
     
-            // Remove user info from localStorage
-            localStorage.removeItem("userAccessToken");
+            
             localStorage.removeItem("userInfo");
           })
           .addCase(logoutUser.rejected, (state, action) => {

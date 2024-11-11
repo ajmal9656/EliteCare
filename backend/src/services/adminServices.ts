@@ -37,10 +37,10 @@ export class adminService{
                 }
                 
     
-                const accessToken = jwt.sign({ email: adminData.email }, process.env.JWT_SECRET as string, {
+                const accessToken = jwt.sign({id: adminData._id, email: adminData.email,role:"admin" }, process.env.JWT_SECRET as string, {
                     expiresIn: "1hr"
                 });
-                const refreshToken = jwt.sign({email: adminData.email }, process.env.JWT_SECRET as string, {
+                const refreshToken = jwt.sign({id: adminData._id,email: adminData.email,role:"admin" }, process.env.JWT_SECRET as string, {
                     expiresIn: "7d"
                 });
                 

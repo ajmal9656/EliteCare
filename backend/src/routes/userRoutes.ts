@@ -3,6 +3,7 @@ import { userController } from "../controllers/userController";
 import { userService } from "../services/userService";
 import { userRepository } from "../repository/userRepository";
 import multer from 'multer';
+import { verifyUserToken } from "../config/jwtConfig";
 
 
 const storage = multer.memoryStorage();

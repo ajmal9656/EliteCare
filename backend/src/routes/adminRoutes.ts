@@ -3,6 +3,7 @@ import { adminController } from "../controllers/adminController";
 import { adminRepository } from "../repository/adminRepository";
 import { adminService } from "../services/adminServices";
 import { S3Service } from "../config/s3client";
+import { verifyAdminToken } from "../config/jwtConfig";
 
 
 

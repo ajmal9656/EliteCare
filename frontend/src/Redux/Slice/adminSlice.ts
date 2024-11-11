@@ -7,7 +7,7 @@ const initialState:AdminState = {
     adminInfo:null,
     error:null,
     loading:false,
-    accessToken: null
+    
 
 
 }
@@ -44,11 +44,10 @@ const adminSlice = createSlice({
           .addCase(logoutAdmin.fulfilled, (state) => {
             // Reset the Admin state on logout
             state.adminInfo = null;
-            state.accessToken = null;
+            
             state.loading = false;
     
-            // Remove Admin info from localStorage
-            localStorage.removeItem("adminAccessToken");
+            
             localStorage.removeItem("adminInfo");
           })
           .addCase(logoutAdmin.rejected, (state, action) => {

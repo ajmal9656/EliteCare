@@ -174,10 +174,10 @@ export class userService{
                     throw new Error("User is Blocked");
                 }
     
-                const accessToken = jwt.sign({ id: userData.userId, email: userData.email }, process.env.JWT_SECRET as string, {
+                const accessToken = jwt.sign({ id: userData.userId, email: userData.email,role:"user" }, process.env.JWT_SECRET as string, {
                     expiresIn: "1hr"
                 });
-                const refreshToken = jwt.sign({ id: userData.userId, email: userData.email }, process.env.JWT_SECRET as string, {
+                const refreshToken = jwt.sign({ id: userData.userId, email: userData.email ,role:"user"}, process.env.JWT_SECRET as string, {
                     expiresIn: "7d"
                 });
                 

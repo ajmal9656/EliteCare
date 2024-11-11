@@ -122,6 +122,7 @@ const configSocketIO = (server: HttpServer) => {
     
         // Emit the message to the specified chat room
         io.to(chatRoom).emit("receiveMessage", savedMessage);
+        console.log("receiever",messageDetails.receiverID)
         const userSocketId = getReceiverSocketId(messageDetails.receiverID)
         io.to(userSocketId).emit("receiveNotification", {
           message: `You have a new message from ${messageDetails.sender === "doctor" ? "your doctor" : "your patient"}.`,

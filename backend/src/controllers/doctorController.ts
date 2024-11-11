@@ -103,23 +103,23 @@ export class doctorController {
           
           
           const response = {
-            accessToken:loginResponse.accessToken,
+            
             doctorInfo:loginResponse.doctorInfo
           }
          
           
           
-          res.cookie('doctorRefreshToken', loginResponse.refreshToken, {
+          res.cookie('RefreshToken', loginResponse.refreshToken, {
             httpOnly: true,  // Makes the cookie inaccessible to JavaScript
             secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
             sameSite: 'strict',  // Protects against CSRF attacks
-            maxAge: 21 * 24 * 60 * 60 * 1000,  // 21 days
+            maxAge: 7 * 24 * 60 * 60 * 1000,  // 21 days
           });
-          res.cookie('doctorAccessToken', loginResponse.accessToken, {
+          res.cookie('AccessToken', loginResponse.accessToken, {
             httpOnly: true,  // Makes the cookie inaccessible to JavaScript
             secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent over HTTPS in production
             sameSite: 'strict',  // Protects against CSRF attacks
-            maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
+            maxAge: 1 * 24 * 60 * 60 * 1000,  // 7 days
           });
          
           res.status(200).json({ message: "Login successful", response});

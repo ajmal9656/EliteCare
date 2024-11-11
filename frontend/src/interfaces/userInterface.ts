@@ -28,7 +28,7 @@ export interface UserDetails {
   
 export interface UserState {
     userInfo: User | null;
-    accessToken: string | null;
+   
     loading: boolean;
     error: string | null;
     showIncomingVideoCall:any,

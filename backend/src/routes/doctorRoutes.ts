@@ -4,6 +4,7 @@ import { doctorController } from "../controllers/doctorController";
 import { doctorRepository } from "../repository/doctorRepository";
 import { doctorService } from "../services/doctorService";
 import { S3Service } from "../config/s3client";
+import { verifyDoctorToken } from "../config/jwtConfig";
 
 
 const storage = multer.memoryStorage();

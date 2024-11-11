@@ -154,8 +154,8 @@ function Chat() {
 
 
   return (
-    <div className="w-[75%] mt-10 pr-10 pb-5">
-  <div className="bg-white h-[600px] rounded-lg border flex flex-col justify-around p-5">
+    <div className="w-[75%]  pr-10 pb-5">
+  <div className="bg-white h-[700px] rounded-lg border flex flex-col justify-around p-5">
     <div className="flex-1 sm:p-6 justify-between flex flex-col h-full">
       {/* Chat header */}
       <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">

@@ -116,8 +116,8 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
   
 
   return (
-    <div className="w-[75%] h-screen mt-10 pr-14">
-      <div className="bg-white h-[92%] rounded-lg border flex flex-col">
+    <div className="w-[75%] h-screen  pr-14">
+      <div className="bg-white h-[85%] rounded-lg border flex flex-col">
         <div className="w-[100%] h-[25%] rounded-md border bg-gradient-to-r from-[#D2EFEA] to-[#ADE9DC] flex place-content-center">
         <div className="w-[15%] h-[165px] mt-16 relative flex">
   <img
