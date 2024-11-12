@@ -10,6 +10,7 @@ import { useSocket } from '../../Context/SocketIO';
 import { MdYard } from 'react-icons/md';
 import { setRoomId, setShowIncomingVideoCall, setShowVideoCall } from '../../Redux/Slice/userSlice';
 import { useNavigate } from 'react-router-dom';
+import axiosUrl from '../../utils/axios';
 
 
 export function getUrlParams(
@@ -57,6 +58,10 @@ function VideoChat() {
             dispatch(setRoomId(null))
             dispatch(setVideoCall(null))
             dispatch(setShowIncomingVideoCall(null))
+            axiosUrl.post('/chat/end-call', {
+              appointmentId: showIncomingVideoCall.appointmentId,
+              
+          });
         },
     });
 

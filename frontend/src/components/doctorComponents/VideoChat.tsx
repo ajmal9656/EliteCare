@@ -5,6 +5,7 @@ import { setRoomId, setShowVideoCall, setVideoCall } from '../../Redux/Slice/doc
 import { RootState } from '../../Redux/store';
 import { useSocket } from '../../Context/SocketIO';
 import { useNavigate } from 'react-router-dom';
+import axiosUrl from '../../utils/axios';
 
 
 
@@ -50,6 +51,12 @@ function VideoChat() {
             dispatch(setShowVideoCall(false))
             dispatch(setRoomId(null))
             dispatch(setVideoCall(null))
+            console.log("videosss",videoCall);
+        
+        axiosUrl.post('/chat/end-call', {
+          appointmentId: videoCall?.appointmentId,
+          
+      });
             
         },
     });
@@ -62,6 +69,7 @@ function VideoChat() {
         dispatch(setRoomId(null))
         dispatch(setVideoCall(null))
         // dispatch(setIncomingVideoCall(null))
+        
         localStorage.removeItem('roomId')
         localStorage.removeItem('showVideoCall')
     });

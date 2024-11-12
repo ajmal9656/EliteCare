@@ -1,3 +1,4 @@
+import appointmentModel from "../model/AppoinmentModel";
 import ChatModel from "../model/chatModel";
 import doctorModel from "../model/doctorModel";
 import NotificationModel from "../model/notificationModel";
@@ -181,6 +182,22 @@ export class chatRepository{
             throw error;
         }
     };
+    updateAppointment = async (appointmentId: string): Promise<any> => {
+        try {
+            
+            
+            const result = await appointmentModel.findByIdAndUpdate(
+                appointmentId,                 // Use appointmentId directly as the _id
+                { status: "prescription pending" },
+                { new: true }                   // Return the updated document
+            );
+    
+            return result;
+        } catch (error) {
+            throw error;
+        }
+    };
+    
     
 
 

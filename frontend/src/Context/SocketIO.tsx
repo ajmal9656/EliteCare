@@ -71,7 +71,7 @@ export const SocketProvider: React.FC<any> = ({ children }) => {
   useEffect(()=>{
     socket?.on('incoming-video-call',(data)=>{
       console.log('Client connected',data)
-      dispatch(setShowIncomingVideoCall({ ...data.from, callType: data.callType, roomId: data.roomId }))
+      dispatch(setShowIncomingVideoCall({ ...data.from, callType: data.callType, roomId: data.roomId,appointmentId:data.appointmentId }))
       // dispatch(setStartVideoCall({ ...data.from, callType: data.callType, roomId: data.roomId }))
     })
 

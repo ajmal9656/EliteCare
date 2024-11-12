@@ -109,6 +109,19 @@ export class chatService{
             throw error;
         }
     };
+    updateAppointment = async (appointmentId: string): Promise<any> => {
+        try {
+
+            console.log("appoinmttt",appointmentId);
+
+            const response = await chatRepositoryInstance.updateAppointment(appointmentId)
+            
+    
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    };
 
       private getFolderPathByFileType(fileType: string): string {
         

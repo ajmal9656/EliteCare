@@ -57,7 +57,7 @@ const configSocketIO = (server: HttpServer) => {
              } else {
                 io.emit("receiverIsOffline", { user_id: doctorID });
              }
-             console.log(`User ${userID} joined room: ${roomName}`);
+            //  console.log(`User ${userID} joined room: ${roomName}`);
 
           }
           if(online==="DOCTOR"){
@@ -68,7 +68,7 @@ const configSocketIO = (server: HttpServer) => {
              } else {
                 io.emit("receiverIsOffline", { user_id: userID });
              }
-             console.log(`Doctor ${doctorID} joined room: ${roomName}`);
+            //  console.log(`Doctor ${doctorID} joined room: ${roomName}`);
 
           }
           
@@ -89,13 +89,13 @@ const configSocketIO = (server: HttpServer) => {
  
     socket.on("sendMessage", async ({ messageDetails }) => {
       try {
-        console.log("Entered sendMessage handler");
+        // console.log("Entered sendMessage handler");
     
         let savedMessage: any = null;
     
         // Create or retrieve chat connection details based on the message
         const connectionDetails: any = await chatServices.createChat(messageDetails);
-        console.log("Chat created/updated in database");
+        // console.log("Chat created/updated in database");
     
         // Save message details to the variable
         savedMessage = connectionDetails;
@@ -105,24 +105,24 @@ const configSocketIO = (server: HttpServer) => {
     
         if (messageDetails.sender === "doctor") {
           chatRoom = [messageDetails.senderID, messageDetails.receiverID].sort().join("-");
-          console.log(messageDetails.sender,chatRoom);
+          // console.log(messageDetails.sender,chatRoom);
           
         } else if (messageDetails.sender === "user") {
           chatRoom = [messageDetails.receiverID, messageDetails.senderID].sort().join("-");
-          console.log(messageDetails.sender,chatRoom);
+          // console.log(messageDetails.sender,chatRoom);
         } else {
-          console.log("Invalid sender type specified in messageDetails.");
+          // console.log("Invalid sender type specified in messageDetails.");
           return;
         }
     
-        console.log("Chat room identified:", chatRoom);
-        console.log("messages:", savedMessage);
+        // console.log("Chat room identified:", chatRoom);
+        // console.log("messages:", savedMessage);
 
         await chatServices.createNotification(messageDetails);
     
         // Emit the message to the specified chat room
         io.to(chatRoom).emit("receiveMessage", savedMessage);
-        console.log("receiever",messageDetails.receiverID)
+        // console.log("receiever",messageDetails.receiverID)
         const userSocketId = getReceiverSocketId(messageDetails.receiverID)
         io.to(userSocketId).emit("receiveNotification", {
           message: `You have a new message from ${messageDetails.sender === "doctor" ? "your doctor" : "your patient"}.`,
@@ -131,7 +131,7 @@ const configSocketIO = (server: HttpServer) => {
 
         if(messageDetails){
 
-          console.log("qqqqqqqqqqqqqqqqqqq",messageDetails.receiverID);
+          // console.log("qqqqqqqqqqqqqqqqqqq",messageDetails.receiverID);
           
 
           
@@ -146,7 +146,7 @@ const configSocketIO = (server: HttpServer) => {
     });
     socket.on("deleteMessage", async ({ messageDetails }) => {
       try {
-        console.log("Entered deleteMessage handler");
+        // console.log("Entered deleteMessage handler");
     
         let savedMessage: any = null;
     
@@ -162,18 +162,18 @@ const configSocketIO = (server: HttpServer) => {
     
         if (messageDetails.sender === "doctor") {
           chatRoom = [messageDetails.senderID, messageDetails.receiverID].sort().join("-");
-          console.log(messageDetails.sender,chatRoom);
+          // console.log(messageDetails.sender,chatRoom);
           
         } else if (messageDetails.sender === "user") {
           chatRoom = [messageDetails.receiverID, messageDetails.senderID].sort().join("-");
-          console.log(messageDetails.sender,chatRoom);
+          // console.log(messageDetails.sender,chatRoom);
         } else {
-          console.log("Invalid sender type specified in messageDetails.");
+          // console.log("Invalid sender type specified in messageDetails.");
           return;
         }
     
-        console.log("Chat room identified:", chatRoom);
-        console.log("messages:", savedMessage);
+        // console.log("Chat room identified:", chatRoom);
+        // console.log("messages:", savedMessage);
     
         // Emit the message to the specified chat room
         io.to(chatRoom).emit("receiveMessage", savedMessage);
@@ -198,15 +198,16 @@ const configSocketIO = (server: HttpServer) => {
 
     socket.on('outgoing-video-call', (data) => {
       const userSocketId = getReceiverSocketId(data.to)
-      console.log(userSocketId,"OUT")
+      // console.log(userSocketId,"OUT")
       if (userSocketId) {
-         console.log("dddddddddd",userSocketMap);
-         console.log("cccccccc",data);
+        //  console.log("dddddddddd",userSocketMap);
+        //  console.log("cccccccc",data);
          
         socket.to(userSocketId).emit('incoming-video-call', {
           from: data.from,
           roomId: data.roomId,
           callType: data.callType,
+          appointmentId:data.appointmentId
         })
       }
     })

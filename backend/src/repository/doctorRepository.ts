@@ -718,6 +718,24 @@ async uploadProfileImage(doctorID: string, imageData: doctorImage) {
   }
 }
 
+async getMedicalRecords(userId: string) {
+  try {
+    // Query appointments where the userId matches and prescription is not null
+    const medicalRecords = await appointmentModel.find({
+      userId: userId,
+      prescription: { $ne: null }, // Filters appointments where prescription is not null
+    });
+
+   
+
+    return medicalRecords;
+  } catch (error: any) {
+    console.error("Error getting medical records:", error.message);
+    throw new Error(`Failed to fetch medical records for user ${userId}: ${error.message}`);
+  }
+}
+
+
 
 
 

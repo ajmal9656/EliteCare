@@ -17,6 +17,7 @@ route.get('/fetchTwoMembersChat', chatControllerInstance.getChat.bind(chatContro
 route.get('/notificationCount/:recieverId', chatControllerInstance.getNotificationCount.bind(chatControllerInstance));
 route.get('/getAllNotifications/:recieverId', chatControllerInstance.getAllNotifications.bind(chatControllerInstance));
 route.get('/readAllNotifications/:recieverId', chatControllerInstance.readAllNotifications.bind(chatControllerInstance));
+route.post('/end-call', chatControllerInstance.updateAppointment.bind(chatControllerInstance));
 
 export default route;
 

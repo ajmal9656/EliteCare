@@ -48,5 +48,6 @@ route.get('/getDoctorDetails/:doctorId', doctorControllerInstance.getDoctorDetai
 route.put('/updateDoctor', doctorControllerInstance.updateDoctorProfile.bind(doctorControllerInstance));
 route.get('/dashboardData',doctorControllerInstance.getDashboardData.bind(doctorControllerInstance));
 route.put('/updateProfileImage', uploadUserFiles, doctorControllerInstance.updateProfileImage.bind(doctorControllerInstance));
+route.get('/getMedical-records/:userId',doctorControllerInstance.getMedicalRecords.bind(doctorControllerInstance));
 
 export default route;

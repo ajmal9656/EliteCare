@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { setVideoCall } from "../../Redux/Slice/doctorSlice";
 import { useSocket } from "../../Context/SocketIO";
 import { MdDeleteOutline } from "react-icons/md";
+import { login } from "../../Redux/Action/userActions";
 
 
 
@@ -146,6 +147,8 @@ const Chat = () => {
 // }
 
 const navigateVideoChat=()=>{
+  console.log("app",appointment);
+  
   dispatch(setVideoCall({
     userID:appointment?.viewDetails?.userId?._id,
     type: "out-going",
@@ -154,6 +157,7 @@ const navigateVideoChat=()=>{
     userImage:chatDetails?.signedUserImageUrl,
     doctorImage:chatDetails?.signedDoctorImageUrl,
     name:chatDetails?.user?.name,
+    appointmentId:appointment?.viewDetails?._id
 
 }))
 

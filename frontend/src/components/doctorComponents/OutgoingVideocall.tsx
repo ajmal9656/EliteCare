@@ -6,6 +6,7 @@ import { RootState } from "../../Redux/store"
 import { endCallDoctor } from "../../Redux/Slice/doctorSlice"
 
 
+
 function OutgoingVideocall() {
 
     const { videoCall,doctorInfo} = useSelector((state: RootState) => state.doctor)
@@ -23,6 +24,7 @@ function OutgoingVideocall() {
           _id: doctorInfo?.doctorId,
           profilePic: videoCall?.doctorImage,
           name: doctorInfo?.name,
+          appointmentId:videoCall?.appointmentId
           
         },
         callType: videoCall.callType,
