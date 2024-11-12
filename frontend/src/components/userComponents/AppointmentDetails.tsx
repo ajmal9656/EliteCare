@@ -20,6 +20,10 @@ interface Appointment {
   age: number;
   date: string;
   start: string;
+  docId:any;
+  paymentMethod:string;
+  paymentStatus:string;
+  paymentId:any
   end: string;
   description: string;
   status: string;
@@ -47,6 +51,8 @@ function AppointmentDetails() {
       try {
         const response = await axiosUrl.get(`/getAppointment/${appointmentId}`);
         console.log("Fetched appointment data:", response.data.data);
+        console.log("appoin",response.data.data);
+        
         
         setAppointment(response.data.data); // Assuming response.data contains appointment details
       } catch (error) {
@@ -177,172 +183,206 @@ function AppointmentDetails() {
   
 
   return (
-    <div className="w-[75%]  pr-10 pb-5">
-      <div className="bg-white w-[100%] object-cover rounded-lg border flex flex-col justify-around p-5 space-y-6">
-        <h2 className="text-2xl font-bold text-gray-700 border-b pb-4">Appointment Details</h2>
+    <div className="w-[75%] pr-10 pb-5">
+  <div className="bg-white w-[100%] object-cover rounded-lg border flex flex-col justify-around p-5 space-y-6">
+    <h2 className="text-2xl font-bold text-gray-700 border-b pb-4">Appointment Details</h2>
 
-        <div className="flex justify-between items-center">
-          <div className="text-lg font-medium text-gray-700">
-            <p>
-              Patient Name: <span className="text-indigo-600">{appointment?.patientNAme}</span>
-            </p>
-            <p>
-              Age: <span className="text-indigo-600">{appointment?.age || "N/A"}</span>
-            </p>
-          </div>
-          <div className="text-lg font-medium text-gray-700">
-            <p>
-              Date: <span className="text-indigo-600">{moment(appointment?.date).format("MMMM Do YYYY")}</span>
-            </p>
-            <p>
-              Time: <span className="text-indigo-600">{appointment?.start} - {appointment?.end}</span>
-            </p>
-          </div>
-        </div>
+    {/* Patient Information */}
+    <div className="flex justify-between items-center">
+      <div className="text-lg font-medium text-gray-700">
+        <p>
+          Patient Name: <span className="text-indigo-600">{appointment?.patientNAme}</span>
+        </p>
+        <p>
+          Age: <span className="text-indigo-600">{appointment?.age || "N/A"}</span>
+        </p>
+      </div>
+      <div className="text-lg font-medium text-gray-700">
+        <p>
+          Date: <span className="text-indigo-600">{moment(appointment?.date).format("MMMM Do YYYY")}</span>
+        </p>
+        <p>
+          Time: <span className="text-indigo-600">{appointment?.start} - {appointment?.end}</span>
+        </p>
+      </div>
+    </div>
+    <div className="text-lg font-medium text-gray-700">
+      <p>Description:</p>
+      <div className="mt-2 text-gray-600 w-[100%] italic h-32 overflow-y-scroll overflow-x-hidden border border-gray-300 p-3 rounded-lg">
+        <p className="w-[100%]">{appointment?.description || "No description provided."}</p>
+      </div>
+    </div>
 
-        <div className="text-lg font-medium text-gray-700">
-          <p>Description:</p>
-          <div className="mt-2 text-gray-600 w-[100%] italic h-32 overflow-y-scroll overflow-x-hidden border border-gray-300 p-3 rounded-lg">
-            <p className="w-[100%]">{appointment?.description || "No description provided."}</p>
-          </div>
-        </div>
+    {/* Doctor Information */}
+    <div className="text-lg font-medium text-gray-700">
+      <h3 className="text-xl font-semibold mt-4">Doctor Details</h3>
+      <p>
+        Name: <span className="text-indigo-600">{appointment?.docId?.name}</span>
+      </p>
+      <p>
+        Email: <span className="text-indigo-600">{appointment?.docId?.email}</span>
+      </p>
+      
+      
+    </div>
 
-        <div className="text-right">
-  {appointment?.status === "completed" && (
-    <>
-      {appointment?.review?.rating === 0 ? (
-        <button
-          className="px-6 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-full shadow-lg hover:from-green-500 hover:to-green-700 transform hover:scale-105 transition duration-300 ease-in-out"
-          onClick={openReviewModal}
-        >
-          Add Review
-        </button>
-      ) : (
-        <p className="text-green-600 pb-2">Review Added: {appointment?.review?.rating} ⭐</p>
+    {/* Description */}
+    
+
+    {/* Payment Details */}
+    <div className="text-lg font-medium text-gray-700">
+      <h3 className="text-xl font-semibold mt-4">Payment Details</h3>
+      <p>
+        Method: <span className="text-indigo-600">{appointment?.paymentMethod}</span>
+      </p>
+      <p>
+        Status: <span className="text-indigo-600">{appointment?.paymentStatus}</span>
+      </p>
+      <p>
+        Fees: <span className="text-indigo-600">${appointment?.fees || "N/A"}</span>
+      </p>
+      <p>
+        Payment ID: <span className="text-indigo-600">{appointment?.paymentId || "N/A"}</span>
+      </p>
+    </div>
+
+    {/* Appointment Actions */}
+    <div className="text-right">
+      {appointment?.status === "completed" && (
+        <>
+          {appointment?.review?.rating === 0 ? (
+            <button
+              className="px-6 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-full shadow-lg hover:from-green-500 hover:to-green-700 transform hover:scale-105 transition duration-300 ease-in-out"
+              onClick={openReviewModal}
+            >
+              Add Review
+            </button>
+          ) : (
+            <p className="text-green-600 pb-2">Review Added: {appointment?.review?.rating} ⭐</p>
+          )}
+          <button
+            className="px-6 py-2 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-full shadow-lg hover:from-indigo-500 hover:to-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+            onClick={downloadPrescription}
+          >
+            Download Prescription
+          </button>
+        </>
       )}
-      <button
-        className="px-6 py-2 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-full shadow-lg hover:from-indigo-500 hover:to-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
-        onClick={downloadPrescription}
+
+      {appointment?.status === "cancelled" && (
+        <p className="px-4 py-2 text-red-600 rounded-lg">Cancelled</p>
+      )}
+
+      {appointment?.status === "cancelled by Dr" && (
+        <button
+          className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out"
+          onClick={openModal}
+        >
+          Cancelled by Dr
+        </button>
+      )}
+
+      {appointment?.status === "prescription pending" && (
+        <p className="text-lg italic text-yellow-600">
+          Prescription will be added soon...
+        </p>
+      )}
+
+      {appointment?.status === "pending" && (
+        <>
+          <button
+            className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
+            onClick={navigateChat}
+          >
+            Chat
+          </button>
+          <button
+            className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+            
+          >
+            Cancel
+          </button>
+        </>
+      )}
+    </div>
+  </div>
+
+  {/* Review Modal */}
+  {isReviewModalOpen && (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[80%] overflow-y-auto overflow-x-hidden">
+      <h3 className="text-lg font-semibold mb-4">Submit Your Review</h3>
+      <Formik
+        initialValues={{ rating: null, reviewText: "" }}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmitReview}
       >
-        Download Prescription
-      </button>
-    </>
+        {({ setFieldValue }) => (
+          <Form>
+            <div className="mb-4">
+              <label className="block text-gray-700">Rating:</label>
+              <Field name="rating">
+                {({ field }: FieldProps) => (
+                  <Rating
+                    {...field}
+                    value={field.value}
+                    onChange={(event, newValue) => {
+                      setFieldValue("rating", newValue);
+                    }}
+                    precision={0.5}
+                  />
+                )}
+              </Field>
+              <ErrorMessage name="rating" component="div" className="text-red-600 text-sm" />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700" htmlFor="reviewText">Review:</label>
+              <Field
+                id="reviewText"
+                name="reviewText"
+                as="textarea"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                rows={4}
+              />
+              <ErrorMessage name="reviewText" component="div" className="text-red-600 text-sm" />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 transition duration-200"
+            >
+              Submit Review
+            </button>
+            <button
+              type="button"
+              onClick={closeReviewModal}
+              className="mt-2 w-full text-gray-500 hover:text-gray-700"
+            >
+              Cancel
+            </button>
+          </Form>
+        )}
+      </Formik>
+    </div>
+        </div>
   )}
 
-  {appointment?.status === "cancelled" && (
-    <p className="px-4 py-2 text-red-600 rounded-lg">Cancelled</p>
-  )}
-
-  {appointment?.status === "cancelled by Dr" && (
-    <button
-      className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out"
-      onClick={openModal}
-    >
-      Cancelled by Dr
-    </button>
-  )}
-
-  {appointment?.status === "prescription pending" && (
-    <p className="text-lg italic text-yellow-600">
-      Prescription will be added soon...
-    </p>
-  )}
-
-  {appointment?.status === "pending" && (
-    <>
-      <button
-        className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
-        onClick={navigateChat}
-      >
-        Chat
-      </button>
-      <button
-        className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
-        // onClick={cancelAppointment}
-      >
-        Cancel
-      </button>
-    </>
+  {/* Cancelled Modal */}
+  {isModalOpen && (
+   <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+   <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[80%] overflow-y-auto overflow-x-hidden">
+     <h3 className="text-lg font-semibold mb-4">Appointment Cancelled</h3>
+     <p>{appointment?.reason || "No reason provided."}</p>
+     <button
+       onClick={closeModal}
+       className="mt-4 w-full bg-gray-300 text-gray-700 rounded-lg py-2 hover:bg-gray-400 transition duration-200"
+     >
+       Close
+     </button>
+   </div>
+        </div>
   )}
 </div>
 
-      </div>
-      
-      {/* Review Modal */}
-      {isReviewModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[80%] overflow-y-auto overflow-x-hidden">
-            <h3 className="text-lg font-semibold mb-4">Submit Your Review</h3>
-            <Formik
-              initialValues={{ rating: null, reviewText: "" }}
-              validationSchema={validationSchema}
-              onSubmit={handleSubmitReview}
-            >
-              {({ setFieldValue }) => (
-                <Form>
-                  <div className="mb-4">
-                    <label className="block text-gray-700">Rating:</label>
-                    <Field name="rating">
-                      {({ field }: FieldProps) => (
-                        <Rating
-                          {...field}
-                          value={field.value}
-                          onChange={(event, newValue) => {
-                            setFieldValue("rating", newValue);
-                          }}
-                          precision={0.5}
-                        />
-                      )}
-                    </Field>
-                    <ErrorMessage name="rating" component="div" className="text-red-600 text-sm" />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700" htmlFor="reviewText">Review:</label>
-                    <Field
-                      id="reviewText"
-                      name="reviewText"
-                      as="textarea"
-                      className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                      rows={4}
-                    />
-                    <ErrorMessage name="reviewText" component="div" className="text-red-600 text-sm" />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white rounded-lg py-2 hover:bg-blue-700 transition duration-200"
-                  >
-                    Submit Review
-                  </button>
-                  <button
-                    type="button"
-                    onClick={closeReviewModal}
-                    className="mt-2 w-full text-gray-500 hover:text-gray-700"
-                  >
-                    Cancel
-                  </button>
-                </Form>
-              )}
-            </Formik>
-          </div>
-        </div>
-      )}
-
-      {/* Cancelled Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[80%] overflow-y-auto overflow-x-hidden">
-            <h3 className="text-lg font-semibold mb-4">Appointment Cancelled</h3>
-            <p>{appointment?.reason || "No reason provided."}</p>
-            <button
-              onClick={closeModal}
-              className="mt-4 w-full bg-gray-300 text-gray-700 rounded-lg py-2 hover:bg-gray-400 transition duration-200"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
   );
 }
 

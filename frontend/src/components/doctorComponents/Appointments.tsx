@@ -86,6 +86,14 @@ function Appointments() {
         </button>
         <button
           className={`px-3 py-1 border border-transparent text-sm font-medium ${
+            status === 'prescription pending' ? 'bg-yellow-500 text-white' : 'bg-white text-gray-500'
+          } rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500`}
+          onClick={() => handleStatusChange('prescription pending')}
+        >
+          Prescription Pending
+        </button>
+        <button
+          className={`px-3 py-1 border border-transparent text-sm font-medium ${
             status === 'completed' ? 'bg-blue-500 text-white' : 'bg-white text-gray-500'
           } rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
           onClick={() => handleStatusChange('completed')}

@@ -104,6 +104,24 @@ function Sidebar() {
       console.log('Notification received:', notificationData);
       // dispatch(addNotification(notificationData)); 
     });
+    socket?.on('AppointmentNotification', () => {
+      console.log("fffffffffffffffffff");
+      
+      
+      setNotificationCount((prevCount) => {console.log("hhhhhhhhhhhhhhhhh",prevCount);
+        return prevCount + 1});
+      
+      // dispatch(addNotification(notificationData)); 
+    });
+    socket?.on('AppointmentCancellation', () => {
+      console.log("fffffffffffffffffff");
+      
+      
+      setNotificationCount((prevCount) => {console.log("hhhhhhhhhhhhhhhhh",prevCount);
+        return prevCount + 1});
+      
+      // dispatch(addNotification(notificationData)); 
+    });
 
   },[socket])
   return (

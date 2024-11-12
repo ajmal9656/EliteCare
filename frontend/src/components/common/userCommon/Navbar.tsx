@@ -84,6 +84,13 @@ const Navbar = () => {
       console.log('Notification received:', notificationData);
       // dispatch(addNotification(notificationData)); 
     });
+    socket?.on('AppointmentCancellation', () => {
+      
+      setNotificationCount((prevCount) => {console.log("hhhhhhhhhhhhhhhhh",prevCount);
+        return prevCount + 1});
+      
+      // dispatch(addNotification(notificationData)); 
+    });
 
   },[socket])
 

@@ -255,5 +255,30 @@ const configSocketIO = (server: HttpServer) => {
     }
     
  };
+
+ const sendAppointmentNotification = (doctorId: any) => {
+  const socketId = getReceiverSocketId(doctorId);
+  if (socketId ) {
+    io.to(socketId).emit("AppointmentNotification");
+  } else {
+    console.log(`doctor with ID ${doctorId} is not connected.`);
+  }
+};
+const sendAppointmentCancellationNotification = (doctorId: any, userId: any) => {
+  const doctorSocketId = getReceiverSocketId(doctorId);
+  const userSocketId = getReceiverSocketId(userId);
+
+  if (doctorSocketId) {
+    io.to(doctorSocketId).emit("AppointmentCancellation");
+  } else {
+    console.log(`Doctor with ID ${doctorId} is not connected.`);
+  }
+
+  if (userSocketId) {
+    io.to(userSocketId).emit("AppointmentCancellation");
+  } else {
+    console.log(`User with ID ${userId} is not connected.`);
+  }
+};
  
- export { configSocketIO, io };
+ export { configSocketIO, io,sendAppointmentNotification,sendAppointmentCancellationNotification };
