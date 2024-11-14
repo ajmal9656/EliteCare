@@ -248,27 +248,48 @@ export class doctorRepository {
     }
   }
 
-  async getAllAppointments(doctorId: string, status: string, page: number = 1, limit: number = 10) {
+  async getAllAppointments(
+    doctorId: string,
+    status: string,
+    page: number = 1,
+    limit: number = 10,
+    startDate: Date | null = null,
+    endDate: Date | null = null
+  ) {
     try {
       let query: any = { docId: doctorId };
+  
+      // Filter by status if provided
       if (status !== "All") {
         query.status = status;
       }
-
+  
+      // Adjust startDate and endDate to include the full day range if provided
+      if (startDate && endDate) {
+        const startOfDay = new Date(startDate);
+        startOfDay.setUTCHours(0, 0, 0, 0); // Start at 00:00:00 UTC
+  
+        const endOfDay = new Date(endDate);
+        endOfDay.setUTCHours(23, 59, 59, 999); // End at 23:59:59.999 UTC
+  
+        query.start = { $gte: startOfDay };
+        query.end = { $lte: endOfDay };
+      }
+  
       // Count total appointments for pagination
       const totalAppointments = await appointmentModel.countDocuments(query);
-
+  
       // Calculate total pages
       const totalPages = Math.ceil(totalAppointments / limit);
-
-      // Fetch appointments with pagination
+  
+      // Fetch appointments with pagination and date filtering
       const appointments = await appointmentModel
         .find(query)
         .populate("userId")
         .skip((page - 1) * limit) // Skip records for the current page
         .limit(limit)             // Limit to the number of records per page
         .lean();
-
+  
       return {
         appointments,
         totalPages,
@@ -280,6 +301,8 @@ export class doctorRepository {
       throw new Error(error.message);
     }
   }
+  
+  
 
 
   async cancelAppointment(appointmentId: string, reason: string): Promise<any> {

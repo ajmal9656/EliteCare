@@ -85,13 +85,13 @@ export class userController {
       res.cookie("RefreshToken", loginResponse.refreshToken, {
         httpOnly: true, // Makes the cookie inaccessible to JavaScript
         secure: process.env.NODE_ENV === "production", // Ensures the cookie is sent over HTTPS in production
-        sameSite: "strict", // Protects against CSRF attacks
+        // sameSite: "strict", // Protects against CSRF attacks
         maxAge: 7 * 24 * 60 * 60 * 1000, // 21 days
       });
       res.cookie("AccessToken", loginResponse.accessToken, {
         httpOnly: true, // Makes the cookie inaccessible to JavaScript
         secure: process.env.NODE_ENV === "production", // Ensures the cookie is sent over HTTPS in production
-        sameSite: "strict", // Protects against CSRF attacks
+        // sameSite: "strict", // Protects against CSRF attacks
         maxAge: 1 * 24 * 60 * 60 * 1000, // 7 days
       });
 

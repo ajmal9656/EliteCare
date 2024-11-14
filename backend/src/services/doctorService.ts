@@ -385,15 +385,24 @@ export class doctorService {
     }
   }
 
-  async getAppointments(doctorId: string, status: string, page: number = 1, limit: number = 10) {
+  async getAppointments(
+    doctorId: string,
+    status: string,
+    page: number = 1,
+    limit: number = 10,
+    startDate: Date | null = null,
+    endDate: Date | null = null
+  ) {
     try {
       const response = await this.doctorRepository.getAllAppointments(
         doctorId,
         status,
         page,
-        limit
+        limit,
+        startDate,
+        endDate
       );
-
+  
       if (response && Array.isArray(response.appointments)) {
         const formattedAppointments = response.appointments.map((appointment) => {
           return {
@@ -402,7 +411,7 @@ export class doctorService {
             end: this.getTime(appointment.end),
           };
         });
-
+  
         return {
           appointments: formattedAppointments,
           totalPages: response.totalPages,
@@ -410,19 +419,15 @@ export class doctorService {
           totalAppointments: response.totalAppointments,
         };
       } else {
-        console.error(
-          "Failed to get appointments: Response is invalid",
-          response
-        );
-        throw new Error(
-          "Something went wrong while fetching the appointments."
-        );
+        console.error("Failed to get appointments: Response is invalid", response);
+        throw new Error("Something went wrong while fetching the appointments.");
       }
     } catch (error: any) {
       console.error("Error in getAppointments:", error.stack || error.message);
       throw new Error(`Failed to get appointments: ${error.message}`);
     }
   }
+  
 
 
   getTime(slot: any) {

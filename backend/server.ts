@@ -26,7 +26,7 @@ const server = createServer(app);
 
 configSocketIO(server);
 
-// app.use(cookieParser());
+app.use(cookieParser());
 
 app.use(express.json());
 const corsOptions = {

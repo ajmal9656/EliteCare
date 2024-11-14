@@ -300,39 +300,39 @@ export class doctorController {
 
   async getAllAppointments(req: Request, res: Response): Promise<void> {
     try {
-
-      console.log("yyyyyyyyyyyyyy");
-      
       const doctorId = req.params.doctorId;
-      const { status = "All", page = "1", limit = "10" } = req.query;
-
+      const { status = "All", page = "1", limit = "10", startDate, endDate } = req.query;
+  
+      // Check if startDate and endDate are provided and format them
+      const start = startDate ? new Date(startDate as string) : null;
+      const end = endDate ? new Date(endDate as string) : null;
+  
       const response = await this.doctorService.getAppointments(
         doctorId,
         status as string,
         parseInt(page as string, 10),
-        parseInt(limit as string, 10)
+        parseInt(limit as string, 10),
+        start,
+        end
       );
-
-      res
-        .status(200)
-        .json({ message: "Appointments fetched successfully", data: response });
+  
+      res.status(200).json({
+        message: "Appointments fetched successfully",
+        data: response
+      });
     } catch (error: any) {
       console.error("Error fetching appointments:", error.message);
-
       if (error.message.includes("Failed to get appointments")) {
-        res
-          .status(400)
-          .json({ message: `Failed to get appointments: ${error.message}` });
+        res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
       } else {
-        res
-          .status(500)
-          .json({
-            message: "An unexpected error occurred",
-            error: error.message,
-          });
+        res.status(500).json({
+          message: "An unexpected error occurred",
+          error: error.message,
+        });
       }
     }
   }
+  
 
 
   async cancelAppointment(req: Request, res: Response): Promise<void> {

@@ -17,8 +17,14 @@ const createToken = (id: string,email:string ,role: string): string => {
 
 const verifyUserToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        console.log("hiii",req.cookies);
+        
         const accessToken: string = req.cookies.AccessToken;
+        console.log("acc",accessToken);
+        
         if (accessToken) {
+            console.log("access user",accessToken);
+            
             jwt.verify(accessToken, secret_key, async (err, decoded) => {
                 if (err) {
                     await handleRefreshToken(req, res, next);
@@ -31,6 +37,8 @@ const verifyUserToken = async (req: Request, res: Response, next: NextFunction) 
                 };
             });
         } else {
+            console.log("not access");
+            
             await handleRefreshToken(req, res, next);
         };
     } catch (error) {
