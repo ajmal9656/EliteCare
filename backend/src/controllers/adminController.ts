@@ -103,33 +103,26 @@ export class adminController {
             }
         }
     }
-      async getSpecialization(req: Request, res: Response): Promise<void> {
-        try {
-           
-    
-            
-    
-          
-            const response = await this.adminService.getSpecialization();
-    
-           
-            
-    
-           
-            res.status(200).json({ message: "Specialization added successfully", response });
-            
-        } catch (error: any) {
-           
-            
-    
-            if (error.message === "Something went wrong while fetching the specialization.") {
-                res.status(400).json({ message: "Something went wrong while fetching the specialization." });
-            } else {
-              
-                res.status(500).json({ message: "An unexpected error occurred", error: error.message });
-            }
-        }
-    }
+    async getSpecialization(req: Request, res: Response): Promise<void> {
+      try {
+          // Extract pagination parameters from query (default to page 1 and limit 10 if not provided)
+          const page = parseInt(req.query.page as string) || 1;
+          const limit = parseInt(req.query.limit as string) || 10;
+
+          // Call the service to get paginated specializations
+          const response = await this.adminService.getSpecialization(page, limit);
+
+          // Respond with the result
+          res.status(200).json({ message: "Specializations fetched successfully", response });
+      } catch (error: any) {
+          // Handle different error scenarios
+          if (error.message === "Something went wrong while fetching the specialization.") {
+              res.status(400).json({ message: "Something went wrong while fetching the specialization." });
+          } else {
+              res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+          }
+      }
+  }
       async editSpecialization(req: Request, res: Response): Promise<void> {
         try {
             console.log("Entering editSpecialization method in adminController");
@@ -184,27 +177,20 @@ export class adminController {
     }
     async getApplication(req: Request, res: Response): Promise<void> {
       try {
-      
+          // Extract page and limit from query parameters with default values
+          const page = parseInt(req.query.page as string, 10) || 1;
+          const limit = parseInt(req.query.limit as string, 10) || 10;
   
-          
+          // Call the service layer to get applications with pagination
+          const response = await this.adminService.getApplication(page, limit);
   
-        
-          const response = await this.adminService.getApplication();
-  
-         
-          console.log("Specialization successfully fetched", response);
-  
-         
-          res.status(200).json({ message: "Specialization added successfully", response });
-          
+          res.status(200).json({ message: "Applications fetched successfully", response });
       } catch (error: any) {
-         
-         
-  
-          if (error.message === "Something went wrong while fetching the applicatons.") {
-              res.status(400).json({ message: "Something went wrong while fetching the applicatons." });
+          console.error("Error fetching applications:", error.message);
+          
+          if (error.message === "Something went wrong while fetching the applications.") {
+              res.status(400).json({ message: "Something went wrong while fetching the applications." });
           } else {
-            
               res.status(500).json({ message: "An unexpected error occurred", error: error.message });
           }
       }
@@ -294,58 +280,50 @@ export class adminController {
   }
   async getUsers(req: Request, res: Response): Promise<void> {
     try {
-        console.log("Entering  method in adminController");
-
+        const page = parseInt(req.query.page as string) || 1;  // Default to page 1
+        const limit = parseInt(req.query.limit as string) || 5;  // Default to 5 users per page
         
+        // Calculate skip based on page and limit
+        const skip = (page - 1) * limit;
 
-      
-        const response = await this.adminService.getUsers();
+        // Fetch users with pagination
+        const { users, totalPages } = await this.adminService.getAllUsers(skip, limit);
 
-       
-        console.log("Specialization successfully fetched", response);
-
-       
-        res.status(200).json({ message: "fetch users successfully", response });
-        
-    } catch (error: any) {
-       
-        console.error("Error in addSpecialization controller:", error.message);
-
-        if (error.message === "Something went wrong while creating the specialization.") {
-            res.status(400).json({ message: "Something went wrong while creating the specialization." });
-        } else {
-          
-            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
-        }
-    }
-}
-  async getDoctors(req: Request, res: Response): Promise<void> {
-    try {
-        console.log("Entering  method in adminController");
-
-        
-
-      
-        const response = await this.adminService.getDoctors();
-
-       
-        console.log("Specialization successfully fetched", response);
-
-       
-        res.status(200).json({ message: "fetch Doctors successfully", response });
+        // Send the response with users and pagination details
+        res.status(200).json({
+            message: "Fetch users successfully",
+            response: { users, totalPages }
+        });
         
     } catch (error: any) {
-       
-        console.error("Error in addSpecialization controller:", error.message);
-
-        if (error.message === "Something went wrong while creating the specialization.") {
-            res.status(400).json({ message: "Something went wrong while creating the specialization." });
-        } else {
-          
-            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
-        }
+        console.error("Error in getUsers controller:", error.message);
+        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
 }
+async getDoctors(req: Request, res: Response): Promise<void> {
+  try {
+      console.log("Entering getDoctors method in adminController");
+
+      const { page = 1, limit = 10 } = req.query; // Default page is 1, limit is 10
+
+      // Convert the page and limit to integers
+      const pageNumber = parseInt(page as string, 10);
+      const pageLimit = parseInt(limit as string, 10);
+
+      // Pass pagination parameters to the service
+      const response = await this.adminService.getDoctors(pageNumber, pageLimit);
+
+      console.log("Doctors successfully fetched", response);
+
+      res.status(200).json({ message: "Fetched doctors successfully", response });
+      
+  } catch (error: any) {
+      console.error("Error in getDoctors controller:", error.message);
+
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+  }
+}
+
 
 async listUnlistUser(req: Request, res: Response): Promise<void> {
     try {
@@ -423,52 +401,49 @@ async getDashboardData(req: Request, res: Response): Promise<void> {
 
 async getAllAppointments(req: Request, res: Response): Promise<void> {
     try {
-        
-        const {status} = req.query
-        
-        
+      // Extract status, page, and limit from query parameters
+      const { status = "All", page = 1, limit = 10 } = req.query;
   
-     
-        const response = await this.adminService.getAppointments(status as string);
+      // Ensure page and limit are numbers
+      const pageNumber = Number(page);
+      const limitNumber = Number(limit);
   
-        
-        
+      // Call the service method to get the appointments with pagination
+      const response = await this.adminService.getAppointments(status as string, pageNumber, limitNumber);
   
-        res.status(200).json({ message: "Appointments fetched successfully", data: response});
+      // Respond with success and data
+      res.status(200).json({ message: "Appointments fetched successfully", data: response });
     } catch (error: any) {
-        console.error("Error fetching appointments:", error.message);
-  
-    
-        if (error.message.includes("Failed to get appointments")) {
-            res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
-        } else {
-            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
-        }
+      console.error("Error fetching appointments:", error.message);
+      if (error.message.includes("Failed to get appointments")) {
+        res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+      } else {
+        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
     }
   }
-async getAllTransactions(req: Request, res: Response): Promise<void> {
+  
+  async getAllTransactions(req: Request, res: Response): Promise<void> {
     try {
-        
-        const {status} = req.query
-        
-        
+      const { status } = req.query;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
   
-     
-        const response = await this.adminService.getTransactions(status as string);
+      const response = await this.adminService.getTransactions(status as string, page, limit);
   
-        
-        
-  
-        res.status(200).json({ message: "Appointments fetched successfully", data: response});
+      res.status(200).json({
+        message: "Appointments fetched successfully",
+        data: response.appointments,
+        totalPages: response.totalPages,
+        currentPage: response.currentPage,
+      });
     } catch (error: any) {
-        console.error("Error fetching appointments:", error.message);
-  
-    
-        if (error.message.includes("Failed to get appointments")) {
-            res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
-        } else {
-            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
-        }
+      console.error("Error fetching appointments:", error.message);
+      if (error.message.includes("Failed to get appointments")) {
+        res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+      } else {
+        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      }
     }
   }
 

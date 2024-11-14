@@ -183,16 +183,40 @@ export class userController {
       }
     }
   }
-  async getDoctorsWithSpecialization(
+  async getDoctorsWithSpecialization(req: Request, res: Response): Promise<void> {
+    try {
+      const { specializationId } = req.params;
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
+      const search = req.query.search as string || ''; // Get search query
+  
+      // Call the service to fetch doctors with the specialization and search query
+      const response = await this.userService.getDoctorsWithSpecialization(specializationId, page, limit, search);
+  
+      // Return the response to the client
+      res.status(200).json({
+        message: "Fetched successfully",
+        data: response.doctors,
+        totalDoctors: response.totalDoctors,
+        totalPages: Math.ceil(response.totalDoctors / limit),
+        currentPage: page,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        message: "An unexpected error occurred",
+        error: error.message,
+      });
+    }
+  }
+  
+  async getDoctors(
     req: Request,
     res: Response
   ): Promise<void> {
     try {
-      const specializationId = req.params.specializationId;
+      
 
-      const response = await this.userService.getDoctorsWithSpecialization(
-        specializationId
-      );
+      const response = await this.userService.getDoctors();
 
       res.status(200).json({ message: "Fetched successfully", response });
     } catch (error: any) {
@@ -254,6 +278,37 @@ export class userController {
     } catch (error: any) {
       if (error.message.includes("something went wrong")) {
         res.status(400).json({ message: "Error fetching doctor slots." });
+      } else {
+        res
+          .status(500)
+          .json({
+            message: "An unexpected error occurred",
+            error: error.message,
+          });
+      }
+    }
+  }
+  async getUserDetails(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.params.userId;
+      
+      console.log("revi", userId);
+
+      const response = await this.userService.getUserData(
+        userId
+      );
+
+      res.status(200).json({ message: "successfully", response });
+    } catch (error: any) {
+      if (
+        error.message ===
+        "Something went wrong while creating the specialization."
+      ) {
+        res
+          .status(400)
+          .json({
+            message: "Something went wrong while creating the specialization.",
+          });
       } else {
         res
           .status(500)
@@ -415,37 +470,36 @@ export class userController {
 
   async getAllAppointments(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.params.userId;
-      const { status } = req.query;
+        const userId = req.params.userId;
+        const { status, page = 1, limit = 4 } = req.query;
 
-      // Fetch appointments using the userId
-      const response = await this.userService.getAppointments(
-        userId,
-        status as string
-      );
+        // Fetch appointments using the userId, status, page, and limit
+        const response = await this.userService.getAppointments(
+            userId,
+            status as string,
+            Number(page),
+            Number(limit)
+        );
 
-      // If successful, send a 200 status with the fetched appointments
-      res
-        .status(200)
-        .json({ message: "Appointments fetched successfully", data: response });
+        res.status(200).json({
+            message: "Appointments fetched successfully",
+            data: response.appointments,
+            totalPages: response.totalPages
+        });
     } catch (error: any) {
-      console.error("Error fetching appointments:", error.message);
+        console.error("Error fetching appointments:", error.message);
 
-      // Send a 400 response if the error is known, else send a 500 for an unexpected error
-      if (error.message.includes("Failed to get appointments")) {
-        res
-          .status(400)
-          .json({ message: `Failed to get appointments: ${error.message}` });
-      } else {
-        res
-          .status(500)
-          .json({
-            message: "An unexpected error occurred",
-            error: error.message,
-          });
-      }
+        if (error.message.includes("Failed to get appointments")) {
+            res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+        } else {
+            res.status(500).json({
+                message: "An unexpected error occurred",
+                error: error.message,
+            });
+        }
     }
-  }
+}
+
   async cancelAppointment(req: Request, res: Response): Promise<void> {
     try {
       const appointmentId = req.params.appointmentId;

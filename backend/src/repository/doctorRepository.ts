@@ -248,28 +248,39 @@ export class doctorRepository {
     }
   }
 
-  async getAllAppointments(doctorId: string, status: string) {
+  async getAllAppointments(doctorId: string, status: string, page: number = 1, limit: number = 10) {
     try {
-      let appointments = [];
-
-      if (status === "All") {
-        appointments = await appointmentModel
-          .find({ docId: doctorId })
-          .populate("userId")
-          .lean();
-      } else {
-        appointments = await appointmentModel
-          .find({ docId: doctorId, status: status })
-          .populate("userId")
-          .lean();
+      let query: any = { docId: doctorId };
+      if (status !== "All") {
+        query.status = status;
       }
 
-      return appointments;
+      // Count total appointments for pagination
+      const totalAppointments = await appointmentModel.countDocuments(query);
+
+      // Calculate total pages
+      const totalPages = Math.ceil(totalAppointments / limit);
+
+      // Fetch appointments with pagination
+      const appointments = await appointmentModel
+        .find(query)
+        .populate("userId")
+        .skip((page - 1) * limit) // Skip records for the current page
+        .limit(limit)             // Limit to the number of records per page
+        .lean();
+
+      return {
+        appointments,
+        totalPages,
+        currentPage: page,
+        totalAppointments,
+      };
     } catch (error: any) {
       console.error("Error getting appointments:", error.message);
       throw new Error(error.message);
     }
   }
+
 
   async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
     try {
@@ -392,36 +403,58 @@ export class doctorRepository {
       throw new Error(error.message); // Propagate the error
     }
   }
-  async getWalletDetails(doctorId: string, status: string) {
+  async getWalletDetails(doctorId: string, status: string, page: number, limit: number) {
     try {
-      let wallet;
-      console.log("status", status);
+        console.log(status, page, limit);
+        
+        const skip = (page - 1) * limit;  // Skip the items for previous pages
+        const query: any = { doctorId };
 
-      if (status === "All") {
-        wallet = await WalletModel.findOne({ doctorId: doctorId }).lean();
-        console.log("re", wallet);
+        // If a specific status is provided, filter by transaction type
+        if (status !== "All") {
+            query["transactions.transactionType"] = status;
+        }
+
+        // Find the wallet document
+        const wallet = await WalletModel.findOne(query).lean();
 
         if (!wallet) {
-          wallet = { transactions: [] };
+            return { transactions: [], totalPages: 0, totalCount: 0, balance: 0 };
         }
-      } else {
-        wallet = await WalletModel.findOne({ doctorId }).lean();
 
-        if (wallet) {
-          wallet.transactions = wallet.transactions.filter(
-            (transaction) => transaction.transactionType === status
-          );
-        } else {
-          wallet = { transactions: [] };
+        // Filter transactions based on the status if provided
+        let filteredTransactions = wallet.transactions;
+        if (status !== "All") {
+            filteredTransactions = wallet.transactions.filter(
+                (transaction) => transaction.transactionType === status
+            );
         }
-      }
 
-      return wallet;
+        // Calculate total count after filtering
+        const totalCount = filteredTransactions.length;
+
+        // Paginate the transactions array
+        const paginatedTransactions = filteredTransactions.slice(skip, skip + limit);
+
+        // Calculate total pages based on filtered data
+        const totalPages = Math.ceil(totalCount / limit);
+
+        // Return the response including wallet balance
+        return {
+            transactions: paginatedTransactions,
+            totalCount,  // Total number of transactions (after filtering)
+            totalPages,  // Total number of pages
+            currentPage: page, // Current page
+            balance: wallet.balance, // Add balance from wallet document
+        };
     } catch (error: any) {
-      console.error("Error getting wallet details:", error.message);
-      throw new Error(error.message);
+        console.error("Error getting wallet details:", error.message);
+        throw new Error(`Failed to get wallet details: ${error.message}`);
     }
-  }
+}
+
+
+
   async withdrawMoney(doctorId: string, withdrawalAmount: number) {
     try {
       const wallet = await WalletModel.findOne({ doctorId });

@@ -24,8 +24,10 @@ route.post('/verifyOtp', userControllerInstance.verifyOtp.bind(userControllerIns
 route.post('/login', userControllerInstance.loginUser.bind(userControllerInstance));
 route.post('/resendOtp', userControllerInstance.resendOtp.bind(userControllerInstance));
 route.get('/getSpecializations', userControllerInstance.getSpecializations.bind(userControllerInstance));
+route.get('/getDoctors', userControllerInstance.getDoctors.bind(userControllerInstance));
 route.get('/getDoctorsWithSpecialization/:specializationId', userControllerInstance.getDoctorsWithSpecialization.bind(userControllerInstance));
 route.get('/getSlots', userControllerInstance.getDoctorSlots.bind(userControllerInstance));
+route.get('/getUserDetails/:userId', userControllerInstance.getUserDetails.bind(userControllerInstance));
 route.put('/updateUser', userControllerInstance.updateUserProfile.bind(userControllerInstance));
 route.put('/updateProfileImage', uploadUserFiles, userControllerInstance.updateProfileImage.bind(userControllerInstance));
 route.post('/checkSlotStatus', userControllerInstance.checkSlotStatus.bind(userControllerInstance));

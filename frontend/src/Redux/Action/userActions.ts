@@ -158,7 +158,7 @@ export const updateUserProfile = createAsyncThunk(
           },
         });
   
-        console.log('Thunkkkkkksssss response:', response.data.response);
+        console.log('img response:', response.data.response.userInfo.image.url);
         return response.data.response // Adjust according to your API response structure
       } catch (error: any) {
         if (error.response) {

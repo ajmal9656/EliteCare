@@ -11,7 +11,7 @@ import BlogCard from "../common/userCommon/BlogCard";
 
 const Blogs = () => {
   return (
-    <div className=" min-h-screen flex flex-col justify-center lg:px-32 px-5 pt-24">
+    <div className=" min-h-screen flex flex-col justify-center lg:px-28 px-5 pt-24">
       <div className=" flex flex-col items-center lg:flex-row justify-between">
         <div>
           <h1 className=" text-4xl font-semibold text-center lg:text-start">
@@ -22,9 +22,7 @@ const Blogs = () => {
             quidem.
           </p>
         </div>
-        <div className=" mt-4 lg:mt-0">
-          <Button title="Our Articles" />
-        </div>
+        
       </div>
       <div className=" my-8">
         <div className=" flex flex-wrap justify-center gap-5">

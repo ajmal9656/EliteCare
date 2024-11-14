@@ -9,8 +9,7 @@ import { SocketProvider } from './Context/SocketIO.tsx';
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
-    <Provider store={store}>
-      
+    <Provider store={store}>     
       <PersistGate loading={null} persistor={persistor}>
       <SocketProvider>
         <App />

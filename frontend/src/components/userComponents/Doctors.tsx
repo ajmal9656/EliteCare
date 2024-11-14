@@ -1,43 +1,37 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
+import axiosUrl from "../../utils/axios";
+
+interface Doctor {
+  _id: string;
+  name: string;
+  department: { name: string };
+  signedImageUrl: string;
+}
 
 const Doctors: React.FC = () => {
-  const data = [
-    {
-      img: "/src/assets/doc1.jpg",
-      name: "Dr. Serena Mitchell",
-      specialties: "Orthopedic Surgeon",
-    },
-    {
-      img: "/src/assets/doc2.jpg",
-      name: "Dr. Julian Bennett",
-      specialties: "Cardiologist",
-    },
-    {
-      img: "/src/assets/doc3.jpg",
-      name: "Dr. Camila Rodriguez",
-      specialties: "Pediatrician",
-    },
-    {
-      img: "/src/assets/doc4.jpg",
-      name: "Dr. Victor Nguyen",
-      specialties: "Neurologist",
-    },
-    {
-      img: "/src/assets/doc5.jpg",
-      name: "Dr. Ethan Carter",
-      specialties: "Dermatologist",
-    },
-    {
-      img: "/src/assets/doc6.jpg",
-      name: "Dr. Olivia Martinez",
-      specialties: "Ophthalmologist",
-    },
-  ];
+
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await axiosUrl.get('/getDoctors'); // Replace with your backend endpoint
+        console.log("docsss",response.data.response);
+        
+        setDoctors(response.data.response); // Assuming response data has the list of doctors
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+  
 
   const slider = useRef<Slider | null>(null);
 
@@ -78,57 +72,60 @@ const Doctors: React.FC = () => {
     ],
   };
 
-  return (
-    <div className=" min-h-screen flex flex-col justify-center lg:px-32 px-5 pt-16">
-      <div className=" flex flex-col items-center lg:flex-row justify-between mb-10 lg:mb-0">
-        <div>
-          <h1 className=" text-4xl font-semibold text-center lg:text-start">
-            Our Doctors
-          </h1>
-          <p className=" mt-2 text-center lg:text-start">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Natus,
-            quidem.
-          </p>
-        </div>
-        <div className="flex gap-5 mt-4 lg:mt-0">
-          <button
-            className=" bg-[#d5f2ec] text-backgroundColor px-4 py-2 rounded-lg active:bg-[#ade9dc]"
-            onClick={() => slider.current?.slickPrev()}
-          >
-            <FaArrowLeft size={25} />
-          </button>
-          <button
-            className=" bg-[#d5f2ec] text-backgroundColor px-4 py-2 rounded-lg active:bg-[#ade9dc]"
-            onClick={() => slider.current?.slickNext()}
-          >
-            <FaArrowRight size={25} />
-          </button>
-        </div>
-      </div>
-      <div className=" mt-5">
-        <Slider ref={slider} {...settings}>
-          {data.map((e, index) => (
-            <div
-              className="h-[390px]  text-black rounded-xl shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] mb-2 cursor-pointer"
-              key={index}
-            >
-              <div>
-                <img
-                  src={e.img}
-                  alt="img"
-                  className=" h-64 rounded-t-xl w-full"
-                />
-              </div>
+  
 
-              <div className=" flex flex-col justify-center items-center">
-                <h1 className=" font-semibold text-xl pt-4">{e.name}</h1>
-                <h3 className=" pt-2">{e.specialties}</h3>
-              </div>
-            </div>
-          ))}
-        </Slider>
-      </div>
+  return (
+    <div className=" min-h-screen flex flex-col justify-center lg:px-28 px-5 pt-16">
+  <div className=" flex flex-col items-center lg:flex-row justify-between mb-10 lg:mb-0">
+    <div>
+      <h1 className=" text-4xl font-semibold text-center lg:text-start">
+        Our Doctors
+      </h1>
+      <p className=" mt-2 text-center lg:text-start">
+        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Natus,
+        quidem.
+      </p>
     </div>
+    <div className="flex gap-5 mt-4 lg:mt-0">
+      <button
+        className=" bg-[#d5f2ec] text-backgroundColor px-4 py-2 rounded-lg active:bg-[#ade9dc]"
+        onClick={() => slider.current?.slickPrev()}
+      >
+        <FaArrowLeft size={25} />
+      </button>
+      <button
+        className=" bg-[#d5f2ec] text-backgroundColor px-4 py-2 rounded-lg active:bg-[#ade9dc]"
+        onClick={() => slider.current?.slickNext()}
+      >
+        <FaArrowRight size={25} />
+      </button>
+    </div>
+  </div>
+  <div className=" mt-5">
+  <Slider ref={slider} {...settings}>
+    {Array.isArray(doctors) && doctors.map((e, index) => (
+      <div
+        className="h-[390px] max-w-sm text-black rounded-xl shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] mb-2 cursor-pointer mx-auto"
+        key={index}
+      >
+        <div className="overflow-hidden h-72 rounded-t-xl w-full">
+          <img
+            src={e.signedImageUrl}
+            alt="img"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className=" flex flex-col justify-center items-center">
+          <h1 className=" font-semibold text-xl pt-4">Dr. {e.name}</h1>
+          <h3 className=" pt-2">{e.department.name}</h3>
+        </div>
+      </div>
+    ))}
+  </Slider>
+</div>
+
+</div>
+
   );
 };
 

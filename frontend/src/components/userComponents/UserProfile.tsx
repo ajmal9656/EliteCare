@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
 import { FaCamera, FaEdit } from "react-icons/fa";
@@ -6,6 +6,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { updateUserProfile,updateUserProfileImage } from "../../Redux/Action/userActions";
 import { useNavigate } from "react-router-dom";
+import axiosUrl from "../../utils/axios";
 
 
 function UserProfile() {
@@ -15,6 +16,7 @@ function UserProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null); 
+  const [userImage, setUserImage] = useState<any>(null);
 
   const dispatch: any = useDispatch();
   const navigate = useNavigate();
@@ -46,6 +48,7 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
 
         const response = await dispatch(updateUserProfile(updatedValues));
         console.log("Updated Data:", response.data);
+        setUserImage(response.data)
 
         setIsModalOpen(false);
       } catch (error) {
@@ -94,7 +97,11 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
         }
   
         const response = await dispatch(updateUserProfileImage(formData));
-        console.log("Image uploaded:", response.data);
+        console.log("Image uploaded:", response.payload.userInfo.image.url);
+        if (response.payload.userInfo.image.url) {
+          setUserImage({ signedImageUrl: response.payload.userInfo.image.url });
+        }
+  
   
         setIsImageModalOpen(false);
       } catch (error) {
@@ -113,6 +120,24 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
       setPreviewImage(previewURL); 
     }
   };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axiosUrl.get(`/getUserDetails/${userData?._id}`); // Replace with your backend endpoint
+        console.log("userrrrr",response.data.response);
+        
+        setUserImage(response.data.response); // Assuming response data has the list of doctors
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  
+ 
   
 
   return (
@@ -123,8 +148,8 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
   <img
     className="rounded-full"
     src={
-      userData?.image?.url && userData.image.url !== ''
-        ? userData.image.url
+      userImage?.signedImageUrl && userImage.signedImageUrl!== ''
+        ? userImage.signedImageUrl
         : "https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg"
     }
     alt="User Profile"

@@ -88,26 +88,20 @@ export class adminService{
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
-    async getSpecialization() {
+    async getSpecialization(page: number, limit: number): Promise<any> {
         try {
-            
-    
-            
-            const response = await this.adminRepository.getAllSpecialization();
-    
-          
+            // Call the repository method to get paginated specializations
+            const response = await this.adminRepository.getAllSpecialization(page, limit);
+
             if (response) {
-                console.log("Specialization successfully fetched:", response);
                 return response;
             } else {
-            
-                console.error("Failed to get specialization: Response is invalid");
                 throw new Error("Something went wrong while fetching the specialization.");
             }
         } catch (error: any) {
-        
-            console.error("Error in addSpecialization:", error.message);
-            throw new Error(`Failed to add specialization: ${error.message}`);
+            // Handle and log error in service
+            console.error("Error in getSpecialization:", error.message);
+            throw new Error(`Failed to fetch specializations: ${error.message}`);
         }
     }
     async editSpecialization(id:number,name:string,description:string) {
@@ -151,26 +145,19 @@ export class adminService{
             throw new Error(`Failed: ${error.message}`);
         }
     }
-    async getApplication() {
+    async getApplication(page: number, limit: number) {
         try {
-            console.log("Entering getSpecialization method in adminService");
+            const response = await this.adminRepository.getAllApplication(page, limit);
     
-            
-            const response = await this.adminRepository.getAllApplication();
-    
-           
-            if (response) {
-                console.log("applicaton successfully fetched:", response);
+            if (response.applications) {
+                console.log("Applications successfully fetched:", response.applications);
                 return response;
             } else {
-                
-                console.error("Failed to get applicatons: Response is invalid");
-                throw new Error("Something went wrong while fetching the applicatons.");
+                throw new Error("Something went wrong while fetching the applications.");
             }
         } catch (error: any) {
-            // Log the error and rethrow it with a message
-            console.error("Error in addSpecialization:", error.message);
-            throw new Error(`Failed to add specialization: ${error.message}`);
+            console.error("Error in getApplication:", error.message);
+            throw new Error(`Failed to fetch applications: ${error.message}`);
         }
     }
     async getDoctorApplication(applicationId:string) {
@@ -267,50 +254,43 @@ export class adminService{
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
-    async getUsers() {
+    async getAllUsers(skip: number, limit: number) {
         try {
-            console.log("Entering getuser method in adminService");
-    
-            
-            const response = await this.adminRepository.getAllUsers();
-    
-          
-            if (response) {
-                console.log("user successfully fetched:", response);
-                return response;
-            } else {
-                
-                console.error("Failed to get user: Response is invalid");
-                throw new Error("Something went wrong while fetching the user.");
-            }
+            // Fetch users with pagination
+            const { users, totalPages } = await this.adminRepository.getAllUsers(skip, limit);
+
+            console.log("Fetched users:", users);
+            console.log("Total pages:", totalPages);
+
+            // Return users along with totalPages
+            return { users, totalPages };
+
         } catch (error: any) {
-            
-            console.error("Error in user:", error.message);
-            throw new Error(`Failed to user: ${error.message}`);
+            console.error("Error in AdminService:", error.message);
+            throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
-    async getDoctors() {
+    async getDoctors(page: number, limit: number) {
         try {
-            console.log("Entering getuser method in adminService");
+            console.log("Entering getDoctors method in adminService");
     
-            
-            const response = await this.adminRepository.getAllDoctors();
+            const skip = (page - 1) * limit; // Calculate the number of documents to skip for pagination
     
-           
+            const response = await this.adminRepository.getAllDoctors(skip, limit);
+    
             if (response) {
-                console.log("user successfully fetched:", response);
+                console.log("Doctors successfully fetched:", response);
                 return response;
             } else {
-                
-                console.error("Failed to get user: Response is invalid");
-                throw new Error("Something went wrong while fetching the user.");
+                console.error("Failed to get doctors: Response is invalid");
+                throw new Error("Something went wrong while fetching doctors.");
             }
         } catch (error: any) {
-            
-            console.error("Error in user:", error.message);
-            throw new Error(`Failed to user: ${error.message}`);
+            console.error("Error in getDoctors service:", error.message);
+            throw new Error(`Failed to fetch doctors: ${error.message}`);
         }
     }
+    
 
     async listUnlistUser(id:string) {
         try {
@@ -378,53 +358,44 @@ export class adminService{
         }
     }
 
-    async getAppointments(status: string) {
+    async getAppointments(status: string, page: number, limit: number) {
         try {
-            
-            const response = await this.adminRepository.getAllAppointments(status);
-    
-           
-    
-            
-            if (Array.isArray(response)) {
-               
-                const formattedAppointments = response.map(appointment => {
-                    return {
-                        ...appointment,
-                        start: this.getTime(appointment.start),
-                        end: this.getTime(appointment.end)
-                    };
-                });
-    
-                return formattedAppointments; 
-            } else {
-                
-                console.error("Failed to get appointments: Response is invalid", response);
-                throw new Error("Something went wrong while fetching the appointments.");
-            }
+          const response = await this.adminRepository.getAllAppointments(status, page, limit);
+      
+          // If response is valid, format the appointments
+          if (Array.isArray(response.appointments)) {
+            const formattedAppointments = response.appointments.map(appointment => {
+              return {
+                ...appointment,
+                start: this.getTime(appointment.start),
+                end: this.getTime(appointment.end),
+              };
+            });
+      
+            return {
+              appointments: formattedAppointments,
+              totalPages: response.totalPages,
+            };
+          } else {
+            console.error("Failed to get appointments: Response is invalid", response);
+            throw new Error("Something went wrong while fetching the appointments.");
+          }
         } catch (error: any) {
-            
-            console.error("Error in getAppointments:", error.stack || error.message);
-            throw new Error(`Failed to get appointments: ${error.message}`);
+          console.error("Error in getAppointments:", error.stack || error.message);
+          throw new Error(`Failed to get appointments: ${error.message}`);
         }
-    }
-    async getTransactions(status: string) {
+      }
+      
+      async getTransactions(status: string, page: number, limit: number) {
         try {
-            
-            const response = await this.adminRepository.getAllTransactions(status);
-    
-           
-    
-            
-            
-                return response; 
-            
+          const response = await this.adminRepository.getAllTransactions(status, page, limit);
+          return response;
         } catch (error: any) {
-            
-            console.error("Error in getAppointments:", error.stack || error.message);
-            throw new Error(`Failed to get appointments: ${error.message}`);
+          console.error("Error in getTransactions:", error.stack || error.message);
+          throw new Error(`Failed to get transactions: ${error.message}`);
         }
-    }
+      }
+      
     getTime(slot:any){
         return moment(slot).tz('UTC').format('h:mm A')
       }

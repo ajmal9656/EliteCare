@@ -13,31 +13,31 @@ interface Appointment {
   appointmentTime: string;
   doctorName: string;
   status: string;
-  date:any
-  start:string,
-  end:string
-  docId:any
+  date: any;
+  start: string;
+  end: string;
+  docId: any;
 }
 
 function AppointmentsList() {
   const userData = useSelector((state: RootState) => state.user.userInfo);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [status, setStatus] = useState<string>("All"); // Default status is 'All'
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  // Function to fetch appointments based on status
-  const fetchAppointments = (status: string) => {
+  // Function to fetch appointments based on status and pagination
+  const fetchAppointments = (status: string, page: number) => {
     if (userData?._id) {
-      console.log("statusssssss", status);
-
       axiosUrl
         .get(`/getAppointments/${userData._id}`, {
-          params: { status }, // Send status as a query parameter
+          params: { status, page, limit: 3 }, // Adding page and limit to the API request
         })
         .then((response) => {
-          console.log("aaaaaaaaaaaaaa",response.data.data);
-          setAppointments(response.data.data); // Assuming response contains appointments data
+          setAppointments(response.data.data);
+          setTotalPages(response.data.totalPages); // Assuming response contains totalPages
         })
         .catch((error) => {
           console.error("Error fetching appointments:", error);
@@ -46,13 +46,13 @@ function AppointmentsList() {
   };
 
   useEffect(() => {
-    // Fetch appointments on component mount
-    fetchAppointments(status);
-  }, [status]); // Fetch appointments when status changes
+    fetchAppointments(status, currentPage); // Fetch appointments on component mount
+  }, [status, currentPage]); // Fetch appointments when status or page changes
 
-  // Button click handler
+  // Button click handler for status change
   const handleStatusChange = (newStatus: string) => {
-    setStatus(newStatus); // Update status
+    setStatus(newStatus);
+    setCurrentPage(1); // Reset to first page when status changes
   };
 
   // Function to cancel an appointment
@@ -67,9 +67,8 @@ function AppointmentsList() {
       confirmButtonText: "Yes, cancel it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        // Make API call to cancel the appointment
         axiosUrl
-          .put(`/cancelAppointment/${appointmentId}`) // Assuming you're using PUT for canceling
+          .put(`/cancelAppointment/${appointmentId}`)
           .then(() => {
             toast.success("Appointment cancelled");
             Swal.fire(
@@ -77,8 +76,7 @@ function AppointmentsList() {
               "The appointment has been cancelled. Your money will be refunded to your bank account.",
               "success"
             );
-            // Refresh the appointments list
-            fetchAppointments(status); // Fetch appointments again after cancellation
+            fetchAppointments(status, currentPage); // Refresh the appointments list
           })
           .catch((error) => {
             console.error("Error canceling appointment:", error);
@@ -86,20 +84,27 @@ function AppointmentsList() {
           });
       }
     });
-
-
   };
 
   const handleViewAppointment = (appointment: any) => {
-    navigate("/userProfile/viewAppointment", { state: { appointmentId:appointment._id } });
+    navigate("/userProfile/viewAppointment", { state: { appointmentId: appointment._id } });
   };
-  
+
+  // Handle pagination logic
+  const handlePagination = (direction: string) => {
+    if (direction === "next" && currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    } else if (direction === "previous" && currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
-    <div className="w-[75%]  pr-10 pb-5">
-      <div className="bg-white object-cover rounded-lg border flex flex-col justify-around p-5">
+    <div className="w-[75%] pr-10 pb-5">
+      <div className="bg-white min-h-[85vh]  rounded-lg border flex flex-col justify-between p-5">
         {/* Buttons for sorting */}
         <div className="flex justify-end items-center space-x-2 mb-2">
+          {/* Sorting buttons */}
           <button
             className={`px-3 py-1 border border-transparent text-sm font-medium ${
               status === "All" ? "bg-backgroundColor text-white" : "bg-white text-gray-500"
@@ -159,36 +164,68 @@ function AppointmentsList() {
                   Patient: {appointment.patientNAme}
                 </div>
                 <p className="block mt-1 text-lg leading-tight font-medium text-black">
-  Appointment Time: <span className="font-normal">{moment(appointment.date).format('MMMM Do YYYY')} from {appointment.start} to {appointment.end}</span>
-</p>
-
+                  Appointment Time:{" "}
+                  <span className="font-normal">
+                    {moment(appointment.date).format("MMMM Do YYYY")} from {appointment.start} to {appointment.end}
+                  </span>
+                </p>
 
                 <p className="mt-2 text-gray-500">Doctor: Dr. {appointment.docId.name}</p>
               </div>
               <div className="flex flex-row p-8 space-x-3">
-                <button className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:bg-indigo-500 transition bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 "
-                onClick={() => handleViewAppointment(appointment)}>
+                <button
+                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white hover:bg-indigo-500 transition bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  onClick={() => handleViewAppointment(appointment)}
+                >
                   View Details
                 </button>
-                {/* Conditionally render Cancel button or 'Cancelled' label */}
                 {appointment.status === "cancelled" || appointment.status === "cancelled by Dr" ? (
-  <span className="px-4 py-2 text-sm font-medium text-red-500">Cancelled</span>
-) : appointment.status === "completed" ? (
-  <span className="px-4 py-2 text-sm font-medium text-green-500">Completed</span>
-) : (
-  <button
-    className="px-7 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:ring-offset-2"
-    onClick={() => handleCancelAppointment(appointment._id)}
-  >
-    Cancel
-  </button>
-)}
-
-
+                  <span className="px-4 py-2 text-sm font-medium text-red-500">Cancelled</span>
+                ) : appointment.status === "completed" ? (
+                  <span className="px-4 py-2 text-sm font-medium text-green-500">Completed</span>
+                ) : (
+                  <button
+                    className="px-7 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-500"
+                    onClick={() => handleCancelAppointment(appointment._id)}
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
             </div>
           </div>
         ))}
+
+        {/* Pagination Controls */}
+        <div className="flex justify-center mt-4 space-x-4">
+  <button
+    className={`px-6 py-3 text-sm font-medium rounded-md transition duration-300 ease-in-out transform ${
+      currentPage === 1
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    }`}
+    disabled={currentPage === 1}
+    onClick={() => handlePagination("previous")}
+  >
+    <i className="fas fa-arrow-left mr-2"></i> {/* Left Arrow Icon */}
+    Previous
+  </button>
+  <button
+    className={`px-6 py-3 text-sm font-medium rounded-md transition duration-300 ease-in-out transform ${
+      currentPage === totalPages
+        ? "bg-gray-400 cursor-not-allowed"
+        : "bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    }`}
+    disabled={currentPage === totalPages}
+    onClick={() => handlePagination("next")}
+  >
+    Next
+    <i className="fas fa-arrow-right ml-2"></i> {/* Right Arrow Icon */}
+  </button>
+</div>
+
+
+
       </div>
     </div>
   );

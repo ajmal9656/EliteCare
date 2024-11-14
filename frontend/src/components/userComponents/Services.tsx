@@ -37,7 +37,7 @@ const Services = () => {
   const defaultDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
 
   return (
-    <div id="services" className="flex flex-col justify-center lg:px-32 px-5 pt-24 lg:pt-32">
+    <div id="services" className="flex flex-col justify-center lg:px-28 px-5 pt-24 lg:pt-32">
       <div className="flex flex-col items-center lg:flex-row justify-between">
         <div>
           <h1 className="text-4xl font-semibold text-center lg:text-start">

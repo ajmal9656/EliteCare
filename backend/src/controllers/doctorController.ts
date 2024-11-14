@@ -300,12 +300,17 @@ export class doctorController {
 
   async getAllAppointments(req: Request, res: Response): Promise<void> {
     try {
+
+      console.log("yyyyyyyyyyyyyy");
+      
       const doctorId = req.params.doctorId;
-      const { status } = req.query;
+      const { status = "All", page = "1", limit = "10" } = req.query;
 
       const response = await this.doctorService.getAppointments(
         doctorId,
-        status as string
+        status as string,
+        parseInt(page as string, 10),
+        parseInt(limit as string, 10)
       );
 
       res
@@ -328,6 +333,7 @@ export class doctorController {
       }
     }
   }
+
 
   async cancelAppointment(req: Request, res: Response): Promise<void> {
     try {
@@ -400,43 +406,41 @@ export class doctorController {
 
   async getWallet(req: Request, res: Response): Promise<void> {
     try {
-      const doctorId = req.params.doctorId;
-      const { status } = req.query;
+        const doctorId = req.params.doctorId;
+        const { status, page = 1, limit = 10 } = req.query;  // Default page 1, limit 10
 
-      if (!doctorId) {
-        res.status(400).json({ message: "Doctor ID is required." });
-        return;
-      }
+        if (!doctorId) {
+            res.status(400).json({ message: "Doctor ID is required." });
+            return;
+        }
 
-      const response = await this.doctorService.getWallet(
-        doctorId,
-        status as string
-      );
+        const response = await this.doctorService.getWallet(
+            doctorId,
+            status as string,
+            parseInt(page as string, 10), // Parse page to integer
+            parseInt(limit as string, 10)  // Parse limit to integer
+        );
 
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Wallet data fetched successfully",
-          response,
+        res.status(200).json({
+            success: true,
+            message: "Wallet data fetched successfully",
+            response,
         });
     } catch (error: any) {
-      console.error("Error fetching wallet data:", error.message);
+        console.error("Error fetching wallet data:", error.message);
 
-      if (error.message.includes("Failed to get wallet details")) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            message: `Failed to get wallet details: ${error.message}`,
-          });
-      } else {
-        res
-          .status(500)
-          .json({ success: false, message: "An unexpected error occurred." });
-      }
+        if (error.message.includes("Failed to get wallet details")) {
+            res.status(400).json({
+                success: false,
+                message: `Failed to get wallet details: ${error.message}`,
+            });
+        } else {
+            res.status(500).json({ success: false, message: "An unexpected error occurred." });
+        }
     }
-  }
+}
+
+
   async withdraw(req: Request, res: Response): Promise<void> {
     try {
       const doctorId = req.params.doctorId;

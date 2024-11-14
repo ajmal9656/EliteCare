@@ -51,18 +51,37 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async getAllSpecialization(){
+    async getAllSpecialization(page: number, limit: number) {
         try {
-            
+            // Calculate the skip value to implement pagination
+            const skip = (page - 1) * limit;
+
+            // Fetch paginated specializations from the model
             const specializations = await specializationModel.find()
-    
-           
-    
-            
-            return specializations
+                .skip(skip)  // Skip records for pagination
+                .limit(limit)  // Limit the number of records
+                .exec();
+
+            // Fetch the total count of specializations (for pagination info)
+            const totalCount = await specializationModel.countDocuments();
+
+            // If no specializations are found, throw an error
+            if (!specializations || specializations.length === 0) {
+                console.error("No specializations found");
+                throw new Error("No specializations found");
+            }
+
+            // Return the paginated result along with total count for pagination info
+            return {
+                specializations,
+                totalCount,
+                page,
+                totalPages: Math.ceil(totalCount / limit),
+            };
         } catch (error: any) {
-            console.error("Error getting specialization:", error.message);
-            throw new Error(error.message);
+            // Handle error and throw with a custom message
+            console.error("Error getting specializations:", error.message);
+            throw new Error("An error occurred while fetching specializations.");
         }
     }
     async updateSpecialization(id:number,name:string,description:string){
@@ -97,20 +116,26 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async getAllApplication(){
+    async getAllApplication(page: number, limit: number) {
         try {
+            const skip = (page - 1) * limit;
             
+            // Fetch applications with pagination
             const applications = await doctorApplicationModel.find()
+                .skip(skip)
+                .limit(limit);
     
-           
+            // Calculate total pages
+            const totalApplications = await doctorApplicationModel.countDocuments();
+            const totalPages = Math.ceil(totalApplications / limit);
     
-            
-            return applications
+            return { applications, totalPages };
         } catch (error: any) {
-            console.error("Error getting specialization:", error.message);
+            console.error("Error getting applications:", error.message);
             throw new Error(error.message);
         }
     }
+    
     async getApplication(doctorId:string){
         try {
             
@@ -190,38 +215,54 @@ export class adminRepository {
         }
     }
 
-    async getAllUsers(){
+    async getAllUsers(skip: number, limit: number) {
         try {
-            
-            const users = await userModel.find();
-            console.log("users",users);
-            
-    
-           
-    
-            
-            return users
+            // Fetch users with pagination
+            const users = await userModel.find()
+                .skip(skip)        // Skip the first 'skip' documents
+                .limit(limit);     // Limit the result to 'limit' documents
+
+            // Count the total number of users to calculate totalPages
+            const totalCount = await userModel.countDocuments();
+
+            const totalPages = Math.ceil(totalCount / limit); // Calculate total pages
+
+            console.log("Users fetched:", users);
+            console.log("Total users:", totalCount);
+            console.log("Total pages:", totalPages);
+
+            // Return users and totalPages
+            return { users, totalPages };
+
         } catch (error: any) {
-            console.error("Error getting users:", error.message);
-            throw new Error(error.message);
+            console.error("Error in AdminRepository:", error.message);
+            throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
-    async getAllDoctors(){
+    async getAllDoctors(skip: number, limit: number) {
         try {
-            
-            const doctors = await doctorModel.find({kycStatus:"approved"});
-            console.log("doctors",doctors);
-            
+            // Fetch the total count of doctors with approved kycStatus
+            const totalCount = await doctorModel.countDocuments({ kycStatus: "approved" });
     
-           
+            // Fetch the doctors with the "approved" kycStatus and apply pagination
+            const doctors = await doctorModel.find({ kycStatus: "approved" })
+                .skip(skip)          // Skip the first 'skip' documents
+                .limit(limit);       // Limit the result to 'limit' documents
     
-            
-            return doctors
+            // Calculate total pages based on the total count and limit
+            const totalPages = Math.ceil(totalCount / limit);
+    
+            console.log("Fetched doctors:", doctors.map(doctor => doctor.name)); // Log names only
+    
+            // Return the doctors, total count, and total pages
+            return { doctors, totalCount, totalPages };
         } catch (error: any) {
             console.error("Error getting doctors:", error.message);
-            throw new Error(error.message);
+            throw new Error(`Failed to fetch doctors: ${error.message}`);
         }
     }
+    
+    
 
     async changeUserStatus(id: string) {
         try {
@@ -414,60 +455,82 @@ export class adminRepository {
         }
     }
 
-    async getAllAppointments(status:string) {
+    async getAllAppointments(status: string, page: number, limit: number) {
         try {
-          
-          
-        
+          // Calculate the number of documents to skip based on the current page
+          const skip = (page - 1) * limit;
       
-          
-         
-            
-            let appointments = [];
-    
-        
-            if (status === "All") {
-              appointments = await appointmentModel.find().populate("docId").lean();
-            } else {
-              
-              appointments = await appointmentModel.find({status: status }).populate("docId").lean();
-            }
-          
+          // Build the query based on the status
+          const query = status === "All" ? {} : { status };
       
-          
-          
-          
-          return appointments;
+          // Fetch appointments from the database with pagination and status filtering
+          const appointments = await appointmentModel
+            .find(query)
+            .skip(skip)
+            .limit(limit)
+            .populate("docId")
+            .lean();
+      
+          // Get the total number of appointments for pagination
+          const totalAppointments = await appointmentModel.countDocuments(query);
+      
+          // Calculate total pages
+          const totalPages = Math.ceil(totalAppointments / limit);
+      
+          return {
+            appointments,
+            totalPages,
+          };
         } catch (error: any) {
           console.error("Error getting appointments:", error.message);
           throw new Error(error.message);
         }
       }
-
-      async getAllTransactions(status: string) {
-        try {
-          let appointments:any[] = [];
       
-          if ( status === "Credit") {
-            // Fetch all appointments or credit transactions
-            appointments = await appointmentModel.find().populate("docId").lean();
+
+      async getAllTransactions(status: string, page: number = 1, limit: number = 5) {
+        try {
+          let appointments: any[] = [];
+          const skip = (page - 1) * limit;
+      
+          if (status === "Credit") {
+            appointments = await appointmentModel
+              .find()
+              .populate("docId")
+              .skip(skip)
+              .limit(limit)
+              .lean();
           } else if (status === "Paid") {
-            // Fetch only completed (paid) appointments
-            appointments = await appointmentModel.find({ status: "completed" }).populate("docId").lean();
+            appointments = await appointmentModel
+              .find({ status: "completed" })
+              .populate("docId")
+              .skip(skip)
+              .limit(limit)
+              .lean();
           } else if (status === "Refunded") {
-            // Fetch cancelled or refunded appointments using $or
-            appointments = await appointmentModel.find({
-              $or: [{ status: "cancelled" }, { status: "cancelled by Dr" }]
-            }).populate("docId").lean();
+            appointments = await appointmentModel
+              .find({ $or: [{ status: "cancelled" }, { status: "cancelled by Dr" }] })
+              .populate("docId")
+              .skip(skip)
+              .limit(limit)
+              .lean();
           }
       
-          return appointments;
+          const totalCount = await appointmentModel.countDocuments(
+            status === "Credit"
+              ? {}
+              : status === "Paid"
+              ? { status: "completed" }
+              : { $or: [{ status: "cancelled" }, { status: "cancelled by Dr" }] }
+          );
+          const totalPages = Math.ceil(totalCount / limit);
+      
+          return { appointments, totalPages, currentPage: page };
         } catch (error: any) {
           console.error("Error getting appointments:", error.message);
           throw new Error(error.message);
         }
       }
-      
     
     
     

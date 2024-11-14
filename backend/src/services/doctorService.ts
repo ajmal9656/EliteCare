@@ -385,15 +385,17 @@ export class doctorService {
     }
   }
 
-  async getAppointments(doctorId: string, status: string) {
+  async getAppointments(doctorId: string, status: string, page: number = 1, limit: number = 10) {
     try {
       const response = await this.doctorRepository.getAllAppointments(
         doctorId,
-        status
+        status,
+        page,
+        limit
       );
 
-      if (Array.isArray(response)) {
-        const formattedAppointments = response.map((appointment) => {
+      if (response && Array.isArray(response.appointments)) {
+        const formattedAppointments = response.appointments.map((appointment) => {
           return {
             ...appointment,
             start: this.getTime(appointment.start),
@@ -401,7 +403,12 @@ export class doctorService {
           };
         });
 
-        return formattedAppointments;
+        return {
+          appointments: formattedAppointments,
+          totalPages: response.totalPages,
+          currentPage: response.currentPage,
+          totalAppointments: response.totalAppointments,
+        };
       } else {
         console.error(
           "Failed to get appointments: Response is invalid",
@@ -416,6 +423,7 @@ export class doctorService {
       throw new Error(`Failed to get appointments: ${error.message}`);
     }
   }
+
 
   getTime(slot: any) {
     return moment(slot).tz("UTC").format("h:mm A");
@@ -473,19 +481,21 @@ export class doctorService {
     }
   }
 
-  async getWallet(doctorId: string, status: string) {
+  async getWallet(doctorId: string, status: string, page: number, limit: number) {
     try {
-      const response = await this.doctorRepository.getWalletDetails(
-        doctorId,
-        status
-      );
-
-      return response;
+        const response = await this.doctorRepository.getWalletDetails(
+            doctorId,
+            status,
+            page,
+            limit
+        );
+        return response;
     } catch (error: any) {
-      console.error("Error in getWallet:", error.stack || error.message);
-      throw new Error(`Failed to get wallet details: ${error.message}`);
+        console.error("Error in getWallet:", error.stack || error.message);
+        throw new Error(`Failed to get wallet details: ${error.message}`);
     }
-  }
+}
+
   async withdraw(doctorId: string, withdrawalAmount: number) {
     try {
       const response = await this.doctorRepository.withdrawMoney(

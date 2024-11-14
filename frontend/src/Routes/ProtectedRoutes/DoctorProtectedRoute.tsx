@@ -39,7 +39,6 @@ function  DoctorProtectedRoute({ children }: DoctorProtectedRouteProps) {
     
   }else{
     return (
-      
       <>{children}</>
     );
     

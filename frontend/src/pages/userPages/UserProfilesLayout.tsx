@@ -3,11 +3,14 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { RootState } from "../../Redux/store";
 import { logoutUser } from "../../Redux/Action/userActions";
 import Navbar from "../../components/common/userCommon/Navbar";
+import { useEffect, useState } from "react";
+import axiosUrl from "../../utils/axios";
 
 
 
 
 function UserProfilesLayout() {
+  const [userImage, setUserImage] = useState<any>(null);
     const navigate = useNavigate();
     const dispatch:any = useDispatch()
   const userData = useSelector((state: RootState) => state.user.userInfo);
@@ -33,17 +36,35 @@ function UserProfilesLayout() {
     }
   };
   console.log("kjsvbkjsbvs")
+
+  const fetchUser = async () => {
+    try {
+      const response = await axiosUrl.get(`/getUserDetails/${userData?._id}`); // Replace with your backend endpoint
+      console.log("userrrrr",response.data.response);
+      
+      setUserImage(response.data.response); // Assuming response data has the list of doctors
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (userData?._id) {
+      fetchUser();
+    }
+  }, [userData]);
+  
   return (
     <>
     <Navbar/>
-    <div className="bg-gray-100 h-screen flex overflow-hidden pt-28">
+    <div className="bg-gray-100 h-auto flex overflow-hidden pt-24">
       <div className="w-[25%] h-full pl-20  ">
       <div className="object-cover p-3 space-y-2 w-60 bg-white text-gray-100 border rounded-lg">
           <div className="flex items-center p-2 space-x-4">
             <img
               src={
-                userData?.image?.url && userData.image.url !== ''
-                  ? userData.image.url
+                userImage?.signedImageUrl && userImage.signedImageUrl!== ''
+                  ? userImage.signedImageUrl
                   : "https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg"
               }
               alt=""
@@ -108,27 +129,7 @@ function UserProfilesLayout() {
 
               
 
-              <li>
-                <NavLink
-                  to="/userProfile/security"
-                  className={({ isActive }) =>
-                    `flex items-center p-2 space-x-3 rounded-md ${
-                      isActive
-                        ? "bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] text-slate-600"
-                        : "text-gray-500 hover:bg-gradient-to-r from-[#ADE9DC] to-[#D2EFEA] hover:text-gray-600"
-                    }`
-                  }
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 512 512"
-                    className="w-5 h-5 fill-current"
-                  >
-                    <path d="M448.205,392.507c30.519-27.2,47.8-63.455,47.8-101.078,0-39.984-18.718-77.378-52.707-105.3C410.218,158.963,366.432,144,320,144s-90.218,14.963-123.293,42.131C162.718,214.051,144,251.445,144,291.429s18.718,77.378,52.707,105.3c33.075,27.168,76.861,42.13,123.293,42.13,6.187,0,12.412-.273,18.585-.816l10.546,9.141A199.849,199.849,0,0,0,480,496h16V461.943l-4.686-4.685A199.17,199.17,0,0,1,448.205,392.507ZM370.089,423l-21.161-18.341-7.056.865A180.275,180.275,0,0,1,320,406.857c-79.4,0-144-51.781-144-115.428S240.6,176,320,176s144,51.781,144,115.429c0,31.71-15.82,61.314-44.546,83.358l-9.215,7.071,4.252,12.035a231.287,231.287,0,0,0,37.882,67.817A167.839,167.839,0,0,1,370.089,423Z"></path>
-                  </svg>
-                  <span>Security</span>
-                </NavLink>
-              </li>
+              
 
               {/* Logout button */}
               <li> 

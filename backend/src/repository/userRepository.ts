@@ -69,11 +69,30 @@ export class userRepository {
       throw new Error(error.message);
     }
   }
-  async getAllDoctorsWithSpecialization(specializationId: string) {
+  async getAllDoctorsWithSpecialization(
+    specializationId: string, 
+    page: number = 1, 
+    limit: number = 5, 
+    search: string = ''
+  ) {
     try {
+      const skip = (page - 1) * limit;
+  
+      // Construct the search filter (case-insensitive search for doctor's name)
+      const searchFilter = search
+        ? {
+            name: { $regex: search, $options: 'i' }, // Case-insensitive search
+          }
+        : {};
+  
+      // Fetch doctors with pagination and search filter
       const doctors = await doctorModel
         .find(
-          { department: new ObjectId(specializationId), isBlocked: false },
+          {
+            department: new ObjectId(specializationId),
+            isBlocked: false,
+            ...searchFilter, // Add the search filter to the query
+          },
           {
             name: 1,
             _id: 1,
@@ -84,17 +103,58 @@ export class userRepository {
             image: 1,
           }
         )
-        .populate("department", "name")
-        .lean();
+        .populate("department", "name") // Populate department name (specialization name)
+        .skip(skip) // Skip the appropriate number of documents for pagination
+        .limit(limit) // Limit the number of documents fetched per page
+        .lean(); // Return plain objects for better performance
+  
+      // Get total count of doctors for pagination info
+      const totalDoctors = await doctorModel.countDocuments({
+        department: new ObjectId(specializationId),
+        isBlocked: false,
+        ...searchFilter, // Include the search filter in the total count query
+      });
+  
+      return {
+        doctors,
+        totalDoctors,
+      };
+    } catch (error: any) {
+      console.error("Error in getAllDoctorsWithSpecialization:", error.message);
+      throw new Error(
+        `Failed to fetch doctors for specialization ${specializationId}: ${error.message}`
+      );
+    }
+  }
+  
+  async getAllDoctors() {
+    try {
+      const doctors = await doctorModel
+  .find(
+    {kycStatus:"approved"},
+    {
+      name: 1,
+      _id: 1,
+      doctorId: 1,
+      email: 1,
+      department: 1,
+      fees: 1,
+      image: 1,
+    }
+  )
+  .populate("department", "name") // Populate department with only the name field
+  .limit(9) 
+  .lean();
+
 
       return doctors;
     } catch (error: any) {
       console.error(
-        "Error getting doctors with specialization:",
+        "Error getting doctors",
         error.message
       );
       throw new Error(
-        `Failed to fetch doctors for specialization ${specializationId}: ${error.message}`
+        `Failed to fetch doctors : ${error.message}`
       );
     }
   }
@@ -193,6 +253,29 @@ export class userRepository {
       throw new Error(`Failed to fetch slots: ${error.message}`);
     }
   }
+
+  async getUser(userId: string) {
+    try {
+      console.log("Fetching user with ID:", userId);
+      
+      // Replace this with the actual logic to retrieve the user data, e.g.:
+      const user = await userModel.findById(userId,{
+        
+        image:1,
+        
+      }).lean() // Fetch user data
+  
+      if (!user) {
+        throw new Error("User not found");
+      }
+  
+      return user;
+    } catch (error: any) {
+      console.error("Error getting user:", error.message);
+      throw new Error(`Failed to fetch user: ${error.message}`);
+    }
+  }
+  
   async updateProfile(
     userId: string,
     updateData: { name: string; DOB: Date; address: string }
@@ -457,28 +540,32 @@ export class userRepository {
       throw new Error(error.message);
     }
   }
-  async getAllAppointments(userId: string, status: string) {
+  async getAllAppointments(userId: string, status: string, page: number = 1, limit: number = 10) {
     try {
-      let appointments = [];
+        if (!userId) throw new Error("User ID is required to fetch appointments");
 
-      if (status == "All") {
-        appointments = await appointmentModel
-          .find({ userId: userId })
-          .populate("docId")
-          .lean();
-      } else {
-        appointments = await appointmentModel
-          .find({ userId: userId, status: status })
-          .populate("docId")
-          .lean();
-      }
+        // Define the filter based on status
+        const filter = status === "All" ? { userId } : { userId, status };
 
-      return appointments;
+        // Query appointments with pagination and populate doctor details
+        const appointments = await appointmentModel
+            .find(filter)
+            .populate("docId")
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
+
+        // Calculate total pages for pagination
+        const totalRecords = await appointmentModel.countDocuments(filter);
+        const totalPages = Math.ceil(totalRecords / limit);
+
+        return { appointments, totalPages };
     } catch (error: any) {
-      console.error("Error getting application:", error.message);
-      throw new Error(error.message);
+        console.error("Error getting appointments:", error.message);
+        throw new Error(error.message);
     }
-  }
+}
+
 
   async cancelAppointment(appointmentId: string): Promise<any> {
     try {

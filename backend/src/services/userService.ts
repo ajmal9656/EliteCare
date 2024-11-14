@@ -251,12 +251,47 @@ export class userService {
       throw new Error(`Failed to get specialization: ${error.message}`);
     }
   }
-  async getDoctorsWithSpecialization(specializationId: string) {
+  async getDoctorsWithSpecialization(
+    specializationId: string, 
+    page: number = 1, 
+    limit: number = 5, 
+    search: string = ''
+  ) {
+    try {
+      // Fetch doctors from the repository with the given parameters
+      const { doctors, totalDoctors } = await this.userRepository.getAllDoctorsWithSpecialization(
+        specializationId, page, limit, search
+      );
+  
+      // Add signed URLs to doctors' images
+      const doctorsWithSignedUrls = await Promise.all(
+        doctors.map(async (doctor) => {
+          if (doctor.image && doctor.image.url && doctor.image.type) {
+            const folderPath = this.getFolderPathByFileType(doctor.image.type);
+            const signedUrl = await this.S3Services.getFile(doctor.image.url, folderPath);
+            return {
+              ...doctor,
+              signedImageUrl: signedUrl, // Include the signed URL for the image
+            };
+          }
+          return doctor; // Return the doctor as is if no image
+        })
+      );
+  
+      return {
+        doctors: doctorsWithSignedUrls,
+        totalDoctors,
+      };
+    } catch (error: any) {
+      console.error("Error in getDoctorsWithSpecialization:", error.message);
+      throw new Error(`Failed to get doctors with specialization: ${error.message}`);
+    }
+  }
+  
+  async getDoctors() {
     try {
       const response =
-        await this.userRepository.getAllDoctorsWithSpecialization(
-          specializationId
-        );
+        await this.userRepository.getAllDoctors();
 
       if (response && Array.isArray(response)) {
         // Iterate through the list of doctors and handle the image for each
@@ -284,10 +319,10 @@ export class userService {
         return doctorsWithSignedUrls;
       } else {
         console.error(
-          "Failed to get specialization: Response is invalid or not an array"
+          "Failed to get doc: Response is invalid or not an array"
         );
         throw new Error(
-          "Something went wrong while fetching the specialization."
+          "Something went wrong while fetching the doc"
         );
       }
     } catch (error: any) {
@@ -352,6 +387,30 @@ export class userService {
     } catch (error: any) {
       console.error("Error in getSlots:", error.message);
       throw new Error(`Failed to get slots: ${error.message}`);
+    }
+  }
+
+  async getUserData(userId: string) {
+    try {
+      const response = await this.userRepository.getUser(
+        userId
+      );
+
+      if (response?.image && response.image.url && response.image.type) {
+        const folderPath = this.getFolderPathByFileType(response.image.type);
+        const signedUrl = await this.S3Services.getFile(
+          response.image.url,
+          folderPath
+        );
+
+        return {
+          ...response,
+          signedImageUrl: signedUrl,
+        };
+      }
+    } catch (error: any) {
+      console.error("Error in getDoctor:", error.message);
+      throw new Error(`Failed to get specialization: ${error.message}`);
     }
   }
 
@@ -551,32 +610,28 @@ export class userService {
     }
   }
 
-  async getAppointments(userId: string, status: string) {
+  async getAppointments(userId: string, status: string, page: number, limit: number) {
     try {
-      const response = await this.userRepository.getAllAppointments(
-        userId,
-        status
-      );
+        const response = await this.userRepository.getAllAppointments(userId, status, page, limit);
 
-      if (response) {
-        const updatedAppointments = response.map((appointment: any) => ({
-          ...appointment,
-          start: this.getTime(appointment.start),
-          end: this.getTime(appointment.end),
-        }));
+        if (response.appointments) {
+            const updatedAppointments = response.appointments.map((appointment: any) => ({
+                ...appointment,
+                start: this.getTime(appointment.start),
+                end: this.getTime(appointment.end),
+            }));
 
-        return updatedAppointments;
-      } else {
-        console.error("Failed to get appointments: Response is invalid");
-        throw new Error(
-          "Something went wrong while fetching the appointments."
-        );
-      }
+            return { appointments: updatedAppointments, totalPages: response.totalPages };
+        } else {
+            console.error("Failed to get appointments: Response is invalid");
+            throw new Error("Something went wrong while fetching the appointments.");
+        }
     } catch (error: any) {
-      console.error("Error in getAppointments:", error.message);
-      throw new Error(`Failed to get appointments: ${error.message}`);
+        console.error("Error in getAppointments:", error.message);
+        throw new Error(`Failed to get appointments: ${error.message}`);
     }
-  }
+}
+
 
   getTime(slot: any) {
     return moment(slot).tz("UTC").format("h:mm A");
