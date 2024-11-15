@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { adminService } from "../services/adminServices";
+import { log } from "util";
 
 
 export class adminController {
@@ -280,14 +281,20 @@ export class adminController {
   }
   async getUsers(req: Request, res: Response): Promise<void> {
     try {
-        const page = parseInt(req.query.page as string) || 1;  // Default to page 1
-        const limit = parseInt(req.query.limit as string) || 5;  // Default to 5 users per page
+      const { page = 1, limit = 10,search } = req.query;
+
+        console.log("query",search);
+        console.log("query",page);
+        console.log("query",limit);
+        
         
         // Calculate skip based on page and limit
-        const skip = (page - 1) * limit;
+        const pageNumber = parseInt(page as string, 10);
+      const pageLimit = parseInt(limit as string, 10);
+        const skip = (pageNumber - 1) * pageLimit;
 
         // Fetch users with pagination
-        const { users, totalPages } = await this.adminService.getAllUsers(skip, limit);
+        const { users, totalPages } = await this.adminService.getAllUsers(skip, pageLimit,search);
 
         // Send the response with users and pagination details
         res.status(200).json({
@@ -302,16 +309,16 @@ export class adminController {
 }
 async getDoctors(req: Request, res: Response): Promise<void> {
   try {
-      console.log("Entering getDoctors method in adminController");
+      console.log("Entering getDoctors searc method in adminController");
 
-      const { page = 1, limit = 10 } = req.query; // Default page is 1, limit is 10
+      const { page = 1, limit = 10,search } = req.query; // Default page is 1, limit is 10
 
       // Convert the page and limit to integers
       const pageNumber = parseInt(page as string, 10);
       const pageLimit = parseInt(limit as string, 10);
 
       // Pass pagination parameters to the service
-      const response = await this.adminService.getDoctors(pageNumber, pageLimit);
+      const response = await this.adminService.getDoctors(pageNumber, pageLimit,search);
 
       console.log("Doctors successfully fetched", response);
 
@@ -400,36 +407,37 @@ async getDashboardData(req: Request, res: Response): Promise<void> {
 }
 
 async getAllAppointments(req: Request, res: Response): Promise<void> {
-    try {
-      // Extract status, page, and limit from query parameters
-      const { status = "All", page = 1, limit = 10 } = req.query;
-  
-      // Ensure page and limit are numbers
-      const pageNumber = Number(page);
-      const limitNumber = Number(limit);
-  
-      // Call the service method to get the appointments with pagination
-      const response = await this.adminService.getAppointments(status as string, pageNumber, limitNumber);
-  
-      // Respond with success and data
-      res.status(200).json({ message: "Appointments fetched successfully", data: response });
-    } catch (error: any) {
-      console.error("Error fetching appointments:", error.message);
-      if (error.message.includes("Failed to get appointments")) {
-        res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
-      } else {
-        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
-      }
+  try {
+    // Extract status, page, limit, startDate, and endDate from query parameters
+    const { status = "All", page = 1, limit = 10, startDate, endDate } = req.query;
+
+    // Ensure page and limit are numbers
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    // Call the service method to get the appointments with pagination and date filtering
+    const response = await this.adminService.getAppointments(status as string, pageNumber, limitNumber, startDate as string, endDate as string);
+
+    // Respond with success and data
+    res.status(200).json({ message: "Appointments fetched successfully", data: response });
+  } catch (error: any) {
+    console.error("Error fetching appointments:", error.message);
+    if (error.message.includes("Failed to get appointments")) {
+      res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+    } else {
+      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
     }
   }
+}
+
   
   async getAllTransactions(req: Request, res: Response): Promise<void> {
     try {
-      const { status } = req.query;
+      const { status, startDate, endDate  } = req.query;
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 5;
   
-      const response = await this.adminService.getTransactions(status as string, page, limit);
+      const response = await this.adminService.getTransactions(status as string, page, limit, startDate as string, endDate as string);
   
       res.status(200).json({
         message: "Appointments fetched successfully",

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axiosUrl from '../../utils/axios';
+import DatePicker from 'react-datepicker';
 
 function Appointments() {
   // State to store fetched appointments
@@ -7,12 +8,19 @@ function Appointments() {
   const [status, setStatus] = useState<string>('All'); 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   // Function to fetch appointments from the backend
-  const fetchAppointments = async (status: string, page:number) => {
+  const fetchAppointments = async (status: string, page:number,startDate: Date | null, endDate: Date | null) => {
     try {
+      const params: { [key: string]: any } = { status, page, limit: 2 };
+      if (startDate) params.startDate = startDate
+      if (endDate) params.endDate = endDate
+      console.log("paramss",params);
+      
       const response = await axiosUrl.get('/admin/getAppointments',{
-        params: { status,page, limit: 5  }
+        params
       });
       console.log('tt', response.data.data);
       setAppointments(response.data.data.appointments);
@@ -24,7 +32,7 @@ function Appointments() {
 
   // useEffect to fetch appointments when the component mounts
   useEffect(() => {
-    fetchAppointments(status, currentPage);
+    fetchAppointments(status, currentPage, startDate, endDate);
   }, [status, currentPage]);
 
   const viewAppointment = (id: string) => {
@@ -64,10 +72,15 @@ function Appointments() {
     }
   };
 
+  const handleSearch = () => {
+    setCurrentPage(1); // Reset to first page on search
+    fetchAppointments(status, currentPage, startDate, endDate);
+  };
+
   return (
-    <div className="flex flex-col pl-64 p-4 ml-3 mt-14">
-      <div className="flex flex-row justify-end items-center mb-4">
-        <div className="flex space-x-2">
+    <div className="flex flex-col pl-64 p-10 ml-3 mt-14">
+      <div className="flex flex-row justify-between items-center mb-4">
+      <div className="flex space-x-2">
           <button
             className={`px-3 py-1 rounded border border-transparent text-sm font-medium ${status === 'All' ? 'bg-blue-600 text-white' : 'bg-white text-gray-500'}`}
             onClick={() => handleStatusChange('All')}
@@ -110,6 +123,28 @@ function Appointments() {
             Cancelled by Dr
           </button>
         </div>
+      <div className="flex space-x-4 items-center ">
+        
+          <DatePicker
+            selected={startDate}
+            onChange={(date: Date | null) => setStartDate(date)}
+            placeholderText="Start Date"
+            className="text-sm px-1 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-28"
+          />
+          <DatePicker
+            selected={endDate}
+            onChange={(date: Date|null) => setEndDate(date)}
+            placeholderText="End Date"
+            className="text-sm px-1 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 w-28"
+          />
+          <button
+            className="text-sm px-2 py-1 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600"
+            onClick={handleSearch}
+          >
+            Search
+          </button>
+        </div>
+        
       </div>
 
       <table className="min-w-full bg-white border border-gray-300 shadow-md rounded-lg overflow-hidden">

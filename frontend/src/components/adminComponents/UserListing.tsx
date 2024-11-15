@@ -9,11 +9,15 @@ function UserListing() {
     const [users, setUsers] = useState<UserDetails[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-    const fetchUsers = async (page:number,) => {
+
+    const fetchUsers = async (page:number,search:string) => {
         try {
+          console.log("searchhh",search);
+          
             const response = await axiosUrl.get('/admin/getUsers',{
-                params: { page, limit: 5  }
+                params: { page, limit: 1 ,search }
               });
             setUsers(response.data.response.users);
             setTotalPages(response.data.response.totalPages)
@@ -23,7 +27,7 @@ function UserListing() {
     };
 
     useEffect(() => {
-        fetchUsers(currentPage);
+        fetchUsers(currentPage,searchQuery);
     }, [currentPage]);
 
     const toggleListState = async (id: string) => {
@@ -43,12 +47,33 @@ function UserListing() {
         }
       };
 
+      const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value); // Update search query as user types
+      };
+    
+      const handleSearch = () => {
+        setCurrentPage(1); // Reset to the first page when searching
+        fetchUsers(currentPage, searchQuery); // Re-fetch with search query
+      };
+
     return (
-        <div className="flex flex-col pl-64 p-4 ml-3 mt-14">
-            <div className='flex flex-row justify-between'>
-                <div className="flex justify-between items-center mb-4">
-                    
-                </div>
+        <div className="flex flex-col pl-64 p-10 ml-3 mt-14">
+            <div className='flex flex-row justify-end '>
+            <div className="flex space-x-4 items-center mb-4">
+            <input
+              type="text"
+              placeholder="Search Doctors"
+              value={searchQuery} // Controlled input
+              onChange={handleSearchChange} // Update state on input change
+              className="p-1 rounded-lg border border-gray-300"
+            />
+          <button
+            className="text-sm px-2 py-1 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600"
+            onClick={handleSearch}
+          >
+            Search
+          </button>
+        </div> 
             </div>
 
             <table className="min-w-full bg-white border border-gray-200 shadow-md rounded-lg overflow-hidden">

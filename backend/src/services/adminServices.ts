@@ -254,10 +254,10 @@ export class adminService{
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
-    async getAllUsers(skip: number, limit: number) {
+    async getAllUsers(skip: number, limit: number,search:any) {
         try {
             // Fetch users with pagination
-            const { users, totalPages } = await this.adminRepository.getAllUsers(skip, limit);
+            const { users, totalPages } = await this.adminRepository.getAllUsers(skip, limit,search);
 
             console.log("Fetched users:", users);
             console.log("Total pages:", totalPages);
@@ -270,13 +270,13 @@ export class adminService{
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
-    async getDoctors(page: number, limit: number) {
+    async getDoctors(page: number, limit: number,search:any) {
         try {
-            console.log("Entering getDoctors method in adminService");
+            console.log("Entering getDoctors search method in adminService");
     
             const skip = (page - 1) * limit; // Calculate the number of documents to skip for pagination
     
-            const response = await this.adminRepository.getAllDoctors(skip, limit);
+            const response = await this.adminRepository.getAllDoctors(skip, limit,search);
     
             if (response) {
                 console.log("Doctors successfully fetched:", response);
@@ -358,9 +358,9 @@ export class adminService{
         }
     }
 
-    async getAppointments(status: string, page: number, limit: number) {
+    async getAppointments(status: string, page: number, limit: number, startDate?: string, endDate?: string) {
         try {
-          const response = await this.adminRepository.getAllAppointments(status, page, limit);
+          const response = await this.adminRepository.getAllAppointments(status, page, limit, startDate, endDate);
       
           // If response is valid, format the appointments
           if (Array.isArray(response.appointments)) {
@@ -386,9 +386,10 @@ export class adminService{
         }
       }
       
-      async getTransactions(status: string, page: number, limit: number) {
+      
+      async getTransactions(status: string, page: number, limit: number, startDate?: string, endDate?: string) {
         try {
-          const response = await this.adminRepository.getAllTransactions(status, page, limit);
+          const response = await this.adminRepository.getAllTransactions(status, page, limit, startDate, endDate);
           return response;
         } catch (error: any) {
           console.error("Error in getTransactions:", error.stack || error.message);

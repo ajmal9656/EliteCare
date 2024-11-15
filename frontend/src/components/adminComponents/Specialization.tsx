@@ -123,7 +123,7 @@ const Specialization: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-full mx-auto pl-64 p-4 ml-3 mt-14">
+    <div className="flex flex-col w-full mx-auto pl-64 p-10 ml-3 mt-14">
       <div className='flex flex-row justify-between '>
         <div className="flex justify-between items-center mb-4">
           

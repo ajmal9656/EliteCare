@@ -215,15 +215,23 @@ export class adminRepository {
         }
     }
 
-    async getAllUsers(skip: number, limit: number) {
+    async getAllUsers(skip: number, limit: number,search:string) {
         try {
+            const searchFilter = search
+        ? {
+            name: { $regex: search, $options: 'i' }, // Case-insensitive search
+          }
+        : {};
+
+        console.log("filter",searchFilter);
+        
             // Fetch users with pagination
-            const users = await userModel.find()
+            const users = await userModel.find({...searchFilter})
                 .skip(skip)        // Skip the first 'skip' documents
                 .limit(limit);     // Limit the result to 'limit' documents
 
             // Count the total number of users to calculate totalPages
-            const totalCount = await userModel.countDocuments();
+            const totalCount = await userModel.countDocuments({...searchFilter});
 
             const totalPages = Math.ceil(totalCount / limit); // Calculate total pages
 
@@ -239,13 +247,20 @@ export class adminRepository {
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
-    async getAllDoctors(skip: number, limit: number) {
+    async getAllDoctors(skip: number, limit: number,search:string) {
         try {
+            console.log("search",search);
+            
             // Fetch the total count of doctors with approved kycStatus
-            const totalCount = await doctorModel.countDocuments({ kycStatus: "approved" });
+            const searchFilter = search
+        ? {
+            name: { $regex: search, $options: 'i' }, // Case-insensitive search
+          }
+        : {};
+            const totalCount = await doctorModel.countDocuments({ kycStatus: "approved",...searchFilter});
     
             // Fetch the doctors with the "approved" kycStatus and apply pagination
-            const doctors = await doctorModel.find({ kycStatus: "approved" })
+            const doctors = await doctorModel.find({ kycStatus: "approved" ,...searchFilter })
                 .skip(skip)          // Skip the first 'skip' documents
                 .limit(limit);       // Limit the result to 'limit' documents
     
@@ -455,15 +470,34 @@ export class adminRepository {
         }
     }
 
-    async getAllAppointments(status: string, page: number, limit: number) {
+    async getAllAppointments(status: string, page: number, limit: number, startDate?: string, endDate?: string) {
         try {
           // Calculate the number of documents to skip based on the current page
           const skip = (page - 1) * limit;
       
-          // Build the query based on the status
-          const query = status === "All" ? {} : { status };
+          // Build the query based on the status and optional date range
+          const query: any = {};
       
-          // Fetch appointments from the database with pagination and status filtering
+          // Filter by status if specified
+          if (status && status !== "All") {
+            query.status = status;
+          }
+      
+          // Filter by startDate if specified
+          if (startDate) {
+            const startOfDay = new Date(startDate);
+            startOfDay.setUTCHours(0, 0, 0, 0); // Start at 00:00:00 UTC
+            query.start = { $gte: startOfDay }; // Filter appointments starting on or after startDate
+          }
+      
+          // Filter by endDate if specified
+          if (endDate) {
+            const endOfDay = new Date(endDate);
+            endOfDay.setUTCHours(23, 59, 59, 999); // End at 23:59:59.999 UTC
+            query.end = { $lte: endOfDay }; // Filter appointments ending on or before endDate
+          }
+      
+          // Fetch appointments from the database with pagination, status, and date filtering
           const appointments = await appointmentModel
             .find(query)
             .skip(skip)
@@ -487,42 +521,51 @@ export class adminRepository {
         }
       }
       
+      
+      
 
-      async getAllTransactions(status: string, page: number = 1, limit: number = 5) {
+      async getAllTransactions(
+        status: string,
+        page: number = 1,
+        limit: number = 5,
+        startDate?: string,
+        endDate?: string
+      ) {
         try {
           let appointments: any[] = [];
           const skip = (page - 1) * limit;
       
+          // Build the base query based on the status
+          const query: any = {};
+      
           if (status === "Credit") {
-            appointments = await appointmentModel
-              .find()
-              .populate("docId")
-              .skip(skip)
-              .limit(limit)
-              .lean();
+            // No status filter needed; fetching all documents
           } else if (status === "Paid") {
-            appointments = await appointmentModel
-              .find({ status: "completed" })
-              .populate("docId")
-              .skip(skip)
-              .limit(limit)
-              .lean();
+            query.status = "completed";
           } else if (status === "Refunded") {
-            appointments = await appointmentModel
-              .find({ $or: [{ status: "cancelled" }, { status: "cancelled by Dr" }] })
-              .populate("docId")
-              .skip(skip)
-              .limit(limit)
-              .lean();
+            query.status = { $in: ["cancelled", "cancelled by Dr"] };
           }
       
-          const totalCount = await appointmentModel.countDocuments(
-            status === "Credit"
-              ? {}
-              : status === "Paid"
-              ? { status: "completed" }
-              : { $or: [{ status: "cancelled" }, { status: "cancelled by Dr" }] }
-          );
+          // Add date range filtering if both startDate and endDate are provided
+          if (startDate && endDate) {
+            const start = new Date(startDate);
+            start.setUTCHours(0, 0, 0, 0); // Start at 00:00:00 UTC
+            const end = new Date(endDate);
+            end.setUTCHours(23, 59, 59, 999); // End at 23:59:59 UTC
+      
+            query.createdAt = { $gte: start, $lte: end }; // Assuming createdAt is the date field
+          }
+      
+          // Fetch appointments with pagination and filters
+          appointments = await appointmentModel
+            .find(query)
+            .populate("docId")
+            .skip(skip)
+            .limit(limit)
+            .lean();
+      
+          // Get the total count of filtered documents for pagination
+          const totalCount = await appointmentModel.countDocuments(query);
           const totalPages = Math.ceil(totalCount / limit);
       
           return { appointments, totalPages, currentPage: page };
@@ -531,6 +574,7 @@ export class adminRepository {
           throw new Error(error.message);
         }
       }
+      
     
     
     
