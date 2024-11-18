@@ -84,6 +84,8 @@ export class userRepository {
             name: { $regex: search, $options: 'i' }, // Case-insensitive search
           }
         : {};
+        console.log(searchFilter);
+        
   
       // Fetch doctors with pagination and search filter
       const doctors = await doctorModel

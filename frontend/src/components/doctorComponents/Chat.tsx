@@ -49,9 +49,14 @@ const Chat = () => {
         const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,sender:"DOCTOR" } });
         console.log("aaaaaa.data",response.data );
         
+        if(response.data.chatResult!=null){
+          setChatHistory(response.data.chatResult.messages);
+
+        }else{
+          setChatHistory([])
+        }
         
-        setChatHistory(response.data.chatResult.messages);
-        console.log("ccc",chatDetails);
+        console.log("ccc",response.data);
         
         setChatDetails(response.data)
         
@@ -60,7 +65,7 @@ const Chat = () => {
           
           navigate("/login", { state: { message: "Authorization failed, please login" } });
         } else {
-          toast.error("Something wrong, Can't fetch chat history. Please try again later");
+          toast.error("Ssssomething wrong, Can't fetch chat history. Please try again later");
         }
       }
     })();

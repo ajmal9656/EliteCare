@@ -60,6 +60,7 @@ const Navbar = () => {
   };
 
   useEffect(() => {
+    
     const fetchNotificationCount = async () => {
       try {
         const response = await axiosUrl.get(`/chat/notificationCount/${userData?._id}`);

@@ -125,11 +125,16 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
     const fetchUser = async () => {
       try {
         const response = await axiosUrl.get(`/getUserDetails/${userData?._id}`); // Replace with your backend endpoint
-        console.log("userrrrr",response.data.response);
+        console.log("userrrrr",response);
         
         setUserImage(response.data.response); // Assuming response data has the list of doctors
-      } catch (error) {
-        console.error('Error fetching doctors:', error);
+      } catch (error:any) {
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login page.");
+          navigate("/login"); // Navigate to the login page if unauthorized
+        } else {
+          console.error("Error fetching user details:", error);
+        }
       }
     };
 

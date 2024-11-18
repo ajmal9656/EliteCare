@@ -5,6 +5,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
 import axiosUrl from "../../utils/axios";
+import { Link } from "react-router-dom";
 
 interface Doctor {
   _id: string;
@@ -103,23 +104,28 @@ const Doctors: React.FC = () => {
   </div>
   <div className=" mt-5">
   <Slider ref={slider} {...settings}>
-    {Array.isArray(doctors) && doctors.map((e, index) => (
-      <div
-        className="h-[390px] max-w-sm text-black rounded-xl shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] mb-2 cursor-pointer mx-auto"
-        key={index}
-      >
-        <div className="overflow-hidden h-72 rounded-t-xl w-full">
-          <img
-            src={e.signedImageUrl}
-            alt="img"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className=" flex flex-col justify-center items-center">
-          <h1 className=" font-semibold text-xl pt-4">Dr. {e.name}</h1>
-          <h3 className=" pt-2">{e.department.name}</h3>
-        </div>
+    {Array.isArray(doctors) && doctors.map((doctor, index) => (
+      <Link
+      key={doctor._id}
+              to={{
+                pathname: `/doctorProfile/profile`,
+              }}
+              state={{ doctor}}
+      className="h-[390px] max-w-sm text-black rounded-xl shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] mb-2 cursor-pointer mx-auto"
+    >
+      <div className="overflow-hidden h-72 rounded-t-xl w-full">
+        <img
+          src={doctor.signedImageUrl}
+          alt="img"
+          className="w-full h-full object-cover"
+        />
       </div>
+      <div className="flex flex-col justify-center items-center">
+        <h1 className="font-semibold text-xl pt-4">Dr. {doctor.name}</h1>
+        <h3 className="pt-2">{doctor.department.name}</h3>
+      </div>
+    </Link>
+    
     ))}
   </Slider>
 </div>

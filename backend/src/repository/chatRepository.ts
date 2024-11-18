@@ -45,8 +45,7 @@ export class chatRepository{
     }
     async createNotification(messageDetails: any) {
         try {
-            console.log("message data",messageDetails)
-            console.log("message data", messageDetails);
+            
 
         const { receiverID, message,appointmentId } = messageDetails;
         let notificationMessage;
@@ -75,6 +74,79 @@ export class chatRepository{
         );
 
         console.log("Notification created/updated:", notification);
+            
+        } catch (error: any) {
+            console.error("Error in chatRepository:", error);
+            throw error; // Propagate the error
+        }
+    }
+    async createVideocallNotification(messageDetails: any) {
+        try {
+            console.log("message data",messageDetails)
+            
+
+        const { to,from,name,sender,appointmentId,senderId} = messageDetails;
+    
+
+        
+           let userNotificationMessage
+           let doctorNotificationMessage
+           if(messageDetails.sender === "doctor"){
+            userNotificationMessage = `You Missed a video chat from Dr.${messageDetails.from}`
+           doctorNotificationMessage = `${messageDetails.name} Missed your video chat`
+
+           }else{
+            userNotificationMessage = `You Missed a video chat from Dr.${messageDetails.name}`
+           doctorNotificationMessage = `${messageDetails.from} Missed your video chat`
+
+           }
+
+        
+
+        // Create notification content
+        const userNotificationContent = {
+            content: userNotificationMessage,
+            type: "message",  // Assume "message" type for chat notifications; adjust as needed
+            read: false,
+            appointmentId:appointmentId
+        };
+        const doctorNotificationContent = {
+            content: doctorNotificationMessage,
+            type: "message",  // Assume "message" type for chat notifications; adjust as needed
+            read: false,
+            appointmentId:appointmentId
+        };
+
+        // Find the receiver's notification document, or create a new one if it doesn't exist
+
+        if(messageDetails.sender === "doctor"){
+            const userNotification = await NotificationModel.findOneAndUpdate(
+                { receiverId: new mongoose.Types.ObjectId(to) },
+                { $push: { notifications: userNotificationContent } },
+                { new: true, upsert: true }  // Creates document if not found
+            );
+            const doctorNotification = await NotificationModel.findOneAndUpdate(
+                { receiverId: new mongoose.Types.ObjectId(senderId) },
+                { $push: { notifications: doctorNotificationContent } },
+                { new: true, upsert: true }  // Creates document if not found
+            );
+
+        }else{
+            const userNotification = await NotificationModel.findOneAndUpdate(
+                { receiverId: new mongoose.Types.ObjectId(to) },
+                { $push: { notifications: doctorNotificationContent } },
+                { new: true, upsert: true }  // Creates document if not found
+            );
+            const doctorNotification = await NotificationModel.findOneAndUpdate(
+                { receiverId: new mongoose.Types.ObjectId(senderId) },
+                { $push: { notifications: userNotificationContent } },
+                { new: true, upsert: true }  // Creates document if not found
+            );
+
+        }
+       
+
+        
             
         } catch (error: any) {
             console.error("Error in chatRepository:", error);

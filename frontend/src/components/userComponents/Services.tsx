@@ -81,6 +81,7 @@ const Services = () => {
               icon={icon}
               title={specialization.name}
               description={specialization.description || defaultDescription}
+              id={specialization._id}
             />
           );
         })}

@@ -4,6 +4,7 @@ import { io, Socket } from 'socket.io-client';
 import { RootState } from '../Redux/store';
 import { setShowIncomingVideoCall,endCallUser } from '../Redux/Slice/userSlice';
 import { endCallDoctor, setRoomId, setShowVideoCall } from '../Redux/Slice/doctorSlice';
+import { toast } from 'sonner';
 
 
 interface SocketContextType {
@@ -82,6 +83,15 @@ export const SocketProvider: React.FC<any> = ({ children }) => {
   })
 
   socket?.on('call-rejected', () => {
+    if(userInRedux.userInfo===null){
+      toast.error("Your call has been rejected")
+
+    }else{
+
+      toast.error("Call ended")
+  
+    }
+    
     dispatch(endCallDoctor())
     dispatch(endCallUser())
 })

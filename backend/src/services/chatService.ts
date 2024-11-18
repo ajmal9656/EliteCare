@@ -34,6 +34,18 @@ export class chatService{
             throw error; // Propagate the error for further handling
         }
     }
+    async createVideocallNotification(notificationDetails: any) {
+        try {
+            console.log("jiiii");
+            
+            // Call the repository to save the chat
+            const savedNotification = await chatRepositoryInstance.createVideocallNotification(notificationDetails);
+            return savedNotification;
+        } catch (error: any) {
+            console.error("Error in chatService:", error);
+            throw error; // Propagate the error for further handling
+        }
+    }
     async deleteMessage(messageDetails: any) {
         try {
             // Call the repository to save the chat

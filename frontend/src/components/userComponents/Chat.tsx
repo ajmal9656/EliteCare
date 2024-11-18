@@ -30,7 +30,12 @@ function Chat() {
         console.log("aaaaaa.data",response.data);
         
         
-        setChatHistory(response.data.chatResult.messages);
+        if(response.data.chatResult!=null){
+          setChatHistory(response.data.chatResult.messages);
+
+        }else{
+          setChatHistory([])
+        }
         setChatDetails(response.data)
         
       } catch (error:any) {
@@ -204,12 +209,12 @@ function Chat() {
                           )}
                       </div>
                   </div>
-                  <img src={chatDetails.signedDoctorImageUrl} alt="Doctor profile" className="w-6 h-6 rounded-full" />
+                  <img src={chatDetails?.signedUserImageUrl} alt="Doctor profile" className="w-6 h-6 rounded-full" />
               </div>
               
                 ) : (
                   <div className="flex items-end">
-                  <img src={chatDetails?.signedUserImageUrl} alt="User profile" className="w-6 h-6 rounded-full" />
+                  <img src={chatDetails.signedDoctorImageUrl} alt="User profile" className="w-6 h-6 rounded-full" />
                   <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-start">
                       <div>
                           {chat.delete ? (

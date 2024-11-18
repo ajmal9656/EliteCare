@@ -7,12 +7,15 @@ import { endCallUser, setRoomId, setShowVideoCall} from "../../Redux/Slice/userS
 
 function IncomingVideocall() {
 
-    const { showIncomingVideoCall } = useSelector((state: RootState) => state.user)
+    const { showIncomingVideoCall,userInfo } = useSelector((state: RootState) => state.user)
     const dispatch = useDispatch()
     const { socket } = useSocket()
 
-    const handleEndCall = () => {
-        socket?.emit('reject-call', ({ to: showIncomingVideoCall?._id }))
+    console.log("incoming",userInfo);
+    
+
+    const handleEndCall = async() => {
+        await socket?.emit('reject-call', ({ to: showIncomingVideoCall?._id,sender:"user",name:showIncomingVideoCall.name,from:userInfo?.name,appointmentId:showIncomingVideoCall.appointmentId,senderId:userInfo?._id }))
         dispatch(endCallUser())
     }
 

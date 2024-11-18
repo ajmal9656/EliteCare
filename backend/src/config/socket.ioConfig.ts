@@ -129,14 +129,7 @@ const configSocketIO = (server: HttpServer) => {
           messageDetails: connectionDetails
         });
 
-        if(messageDetails){
-
-          // console.log("qqqqqqqqqqqqqqqqqqq",messageDetails.receiverID);
-          
-
-          
-
-        }
+        
     
         
     
@@ -202,12 +195,13 @@ const configSocketIO = (server: HttpServer) => {
       if (userSocketId) {
         //  console.log("dddddddddd",userSocketMap);
         //  console.log("cccccccc",data);
+         console.log("calldata",data);
          
         socket.to(userSocketId).emit('incoming-video-call', {
           from: data.from,
           roomId: data.roomId,
           callType: data.callType,
-          appointmentId:data.appointmentId
+          appointmentId:data.from.appointmentId
         })
       }
     })
@@ -228,12 +222,21 @@ const configSocketIO = (server: HttpServer) => {
       }
     });
 
-    socket.on('reject-call', (data) => {
+    socket.on('reject-call', async (data) => {
       // console.log('data coming through reject call is ',data)
       const friendSocketId = getReceiverSocketId(data.to)
       if (friendSocketId) {
         socket.to(friendSocketId).emit('call-rejected')
       }
+
+      await chatServices.createVideocallNotification(data);
+    
+        
+      //   // console.log("receiever",messageDetails.receiverID)
+        const recieverSocketId = getReceiverSocketId(data.to)
+        const senderSocketId = getReceiverSocketId(data.senderId)
+        io.to(recieverSocketId).emit("receiveNotification");
+        io.to(senderSocketId).emit("receiveNotification");
     })
  
        socket.on("disconnect", () => {

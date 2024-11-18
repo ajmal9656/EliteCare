@@ -146,7 +146,7 @@ const Transactions = () => {
                 {/* Calculate the fee based on the selected status */}
                 {calculateFee(transaction)}
               </td>
-              <td className="py-2 px-4 border-b border-gray-300">{transaction.date}</td>
+              <td className="py-2 px-4 border-b border-gray-300">{new Date(transaction.date).toLocaleDateString()}</td>
               <td className="py-2 px-4 border-b border-gray-300">{transaction.status}</td>
             </tr>
           ))}

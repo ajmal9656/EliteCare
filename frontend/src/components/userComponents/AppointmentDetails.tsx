@@ -288,22 +288,38 @@ function AppointmentDetails() {
         </p>
       )}
 
-      {appointment?.status === "pending" && (
-        <>
-          <button
-            className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
-            onClick={navigateChat}
-          >
-            Chat
-          </button>
-          <button
-            className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
-            
-          >
-            Cancel
-          </button>
-        </>
-      )}
+{appointment?.status === "pending" && (
+  <div>
+    {/* Chat Button: Show only if appointment date is today and within the next 2 days */}
+    {moment(appointment.date).isSame(moment(), 'day') && moment(appointment.date).isBetween(
+      moment().startOf('day'),
+      moment().add(2, 'days').endOf('day'),
+      undefined,
+      '[]' // Includes boundary dates
+    ) && (
+      <button
+        className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
+        onClick={navigateChat}
+      >
+        Chat
+      </button>
+    )}
+
+    {/* Cancel Button: Hide if appointment date is today */}
+    {!moment(appointment.date).isBefore(moment(), 'day') && !moment(appointment.date).isSame(moment(), 'day') && (
+  <button
+    className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+  >
+    Cancel
+  </button>
+)}
+
+  </div>
+)}
+
+
+
+
     </div>
   </div>
 

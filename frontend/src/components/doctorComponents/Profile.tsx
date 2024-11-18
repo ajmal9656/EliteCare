@@ -273,7 +273,7 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
                     <img
                       alt="Profile"
                       src={profileData?.signedImageUrl || "default-image-url.jpg"}
-                      className="shadow-xl rounded-3xl h-44 align-middle border-none -m-16 mx-auto max-w-150-px ml-52"
+                      className="shadow-xl rounded-3xl h-44 align-middle border-none -m-16 mx-auto max-w-150-px ml-60"
                     />
                     {/* Camera Icon */}
                     <div className="absolute ml-96 mt-7">
