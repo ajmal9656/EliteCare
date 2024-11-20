@@ -39,7 +39,7 @@ async function makeThePayment(data: any, appointmentId: any) {
   try {
     const session = await stripe.checkout.sessions.create({
       success_url: `http://localhost:5173/confirmPayment/${appointmentId}/${doctorId}`,
-      cancel_url: `http://localhost:5000/paymentFailed`,
+      cancel_url: `http://localhost:5173/paymentFailed`,
       line_items: line_items,
       mode: "payment",
     });

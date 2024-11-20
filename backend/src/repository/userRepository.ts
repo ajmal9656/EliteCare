@@ -456,7 +456,8 @@ export class userRepository {
     try {
       const updatedAppointment = await appointmentModel.findByIdAndUpdate(
         appointmentId,
-        { paymentId: sessionId },
+        { paymentId: sessionId,
+          paymentStatus: "payment completed" },
         { new: true }
       );
 
