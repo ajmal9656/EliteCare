@@ -47,8 +47,8 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
         };
 
         const response = await dispatch(updateUserProfile(updatedValues));
-        console.log("Updated Data:", response.data);
-        setUserImage(response.data)
+        console.log("Updated Data:", response);
+        
 
         setIsModalOpen(false);
       } catch (error) {

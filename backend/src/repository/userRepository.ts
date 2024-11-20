@@ -1,6 +1,6 @@
 import userModel from "../model/userModel";
-import { userImage, userType } from "../interface/userInterface/interface";
-import { Document } from "mongoose";
+import { BookAppointment, Doctors, GetAppointments, GetDoctorsResponse, MedicalField, ScheduleSlot, SingleDoctor,  userImage, UserProfile, UserProfileData, UserProfileDetails, userType } from "../interface/userInterface/interface";
+import { Document, ObjectId } from "mongoose";
 import specializationModel from "../model/SpecializationModel";
 import doctorModel from "../model/doctorModel";
 import mongoose from "mongoose";
@@ -10,10 +10,11 @@ import appointmentModel from "../model/AppoinmentModel";
 import { sendAppointmentCancellationNotification, sendAppointmentNotification } from "../config/socket.ioConfig";
 import { randomInt } from "crypto";
 import NotificationModel from "../model/notificationModel";
+import { IUserRepository } from "../interface/user.repository.interface";
 
 const ObjectId = mongoose.Types.ObjectId;
 
-export class userRepository {
+export class userRepository implements IUserRepository {
   async existUser(
     email: string,
     phone: string
@@ -47,53 +48,80 @@ export class userRepository {
       throw new Error(`Error creating user : ${error.message}`);
     }
   }
-  async userCheck(email: string) {
+  async userCheck(email: string): Promise<UserProfile | null> {
     try {
-      const userData = await userModel.findOne({ email: email });
+      const userData = await userModel.findOne(
+        { email: email }
+      ).lean();
+      
       if (userData) {
-        return userData;
+        
+        return {
+          _id: userData._id as ObjectId,
+          userId: userData.userId,
+          name: userData.name,
+          email: userData.email,
+          phone: userData.phone,
+          createdAt: userData.createdAt,
+          DOB: userData.DOB,
+          address: userData.address,
+          isBlocked: userData.isBlocked,
+          image: userData.image,
+          password:userData.password
+         
+        }; ;
       }
       throw new Error("User Doesn't exist");
     } catch (error: any) {
       throw new Error(error.message);
     }
   }
-  async getAllSpecialization() {
+  async getAllSpecialization(): Promise<MedicalField[]> {
     try {
-      const specializations = await specializationModel.find({
-        isListed: true,
-      });
-
-      return specializations;
+      // Use lean() to return plain JavaScript objects
+      const specializations = await specializationModel
+        .find({ isListed: true })
+        .lean();
+  
+      // Map the data to match the MedicalField interface
+      const result: MedicalField[] = specializations.map(item => ({
+        _id: item._id.toString(), // Ensure _id is a string
+        createdAt: new Date(item.createdAt), // Ensure createdAt is a Date object
+        name: item.name,
+        description: item.description,
+        isListed: item.isListed,
+      }));
+  
+     
+  
+      return result;
     } catch (error: any) {
       throw new Error(error.message);
     }
   }
+  
+  
   async getAllDoctorsWithSpecialization(
-    specializationId: string, 
-    page: number = 1, 
-    limit: number = 5, 
+    specializationId: string,
+    page: number = 1,
+    limit: number = 5,
     search: string = ''
-  ) {
+  ): Promise<GetDoctorsResponse> {
     try {
       const skip = (page - 1) * limit;
   
-      // Construct the search filter (case-insensitive search for doctor's name)
       const searchFilter = search
         ? {
-            name: { $regex: search, $options: 'i' }, // Case-insensitive search
+            name: { $regex: search, $options: 'i' },
           }
         : {};
-        console.log(searchFilter);
-        
   
-      // Fetch doctors with pagination and search filter
       const doctors = await doctorModel
         .find(
           {
             department: new ObjectId(specializationId),
             isBlocked: false,
-            ...searchFilter, // Add the search filter to the query
+            ...searchFilter,
           },
           {
             name: 1,
@@ -105,62 +133,92 @@ export class userRepository {
             image: 1,
           }
         )
-        .populate("department", "name") // Populate department name (specialization name)
-        .skip(skip) // Skip the appropriate number of documents for pagination
-        .limit(limit) // Limit the number of documents fetched per page
-        .lean(); // Return plain objects for better performance
+        .populate('department', 'name').skip(skip) // Skip the appropriate number of documents for pagination
+        .limit(limit) // Populating the department name
+        .lean();
   
-      // Get total count of doctors for pagination info
+      // Transform data to match the Doctors interface
+      const transformedDoctors: Doctors[] = doctors.map((doc:any) => ({
+        _id: doc._id as ObjectId, // Explicitly cast _id to ObjectId
+        doctorId: doc.doctorId,
+        name: doc.name,
+        email: doc.email,
+        department: {
+          _id: doc.department._id , // Ensure department matches the Department interface
+          name: doc.department.name,
+        },
+        fees: doc.fees,
+        image: {
+          _id: doc.image._id , // Ensure image matches the Image interface
+          type: doc.image.type,
+          url: doc.image.url,
+        },
+      }));
+  
       const totalDoctors = await doctorModel.countDocuments({
         department: new ObjectId(specializationId),
         isBlocked: false,
-        ...searchFilter, // Include the search filter in the total count query
+        ...searchFilter,
       });
   
       return {
-        doctors,
+        doctors: transformedDoctors,
         totalDoctors,
       };
     } catch (error: any) {
-      console.error("Error in getAllDoctorsWithSpecialization:", error.message);
+      console.error('Error in getAllDoctorsWithSpecialization:', error.message);
       throw new Error(
         `Failed to fetch doctors for specialization ${specializationId}: ${error.message}`
       );
     }
   }
   
-  async getAllDoctors() {
+  async getAllDoctors(): Promise<Doctors[]> {
     try {
       const doctors = await doctorModel
-  .find(
-    {kycStatus:"approved"},
-    {
-      name: 1,
-      _id: 1,
-      doctorId: 1,
-      email: 1,
-      department: 1,
-      fees: 1,
-      image: 1,
-    }
-  )
-  .populate("department", "name") // Populate department with only the name field
-  .limit(9) 
-  .lean();
+        .find(
+          { kycStatus: "approved" },
+          {
+            name: 1,
+            _id: 1,
+            doctorId: 1,
+            email: 1,
+            department: 1,
+            fees: 1,
+            image: 1,
+          }
+        )
+        .populate("department", "name") // Populate department with only the name field
+        .limit(9)
+        .lean(); // This returns plain JavaScript objects, not Mongoose documents
 
-
-      return doctors;
+        const transformedDoctors: Doctors[] = doctors.map((doc:any) => ({
+          _id: doc._id as ObjectId, // Explicitly cast _id to ObjectId
+          doctorId: doc.doctorId,
+          name: doc.name,
+          email: doc.email,
+          department: {
+            _id: doc.department._id , // Ensure department matches the Department interface
+            name: doc.department.name,
+          },
+          fees: doc.fees,
+          image: {
+            _id: doc.image._id , // Ensure image matches the Image interface
+            type: doc.image.type,
+            url: doc.image.url,
+          },
+        }));
+  
+      
+  
+      // Cast the result to the Doctor[] type (array of Doctor objects)
+      return transformedDoctors;
     } catch (error: any) {
-      console.error(
-        "Error getting doctors",
-        error.message
-      );
-      throw new Error(
-        `Failed to fetch doctors : ${error.message}`
-      );
+      console.error("Error getting doctors:", error.message);
+      throw new Error(`Failed to fetch doctors: ${error.message}`);
     }
   }
-  async getDoctor(doctorId: string, reviewData: any) {
+  async getDoctor(doctorId: string, reviewData: any): Promise<SingleDoctor|null>  {
     try {
       const isReviewDataPresent = reviewData === "true";
 
@@ -221,6 +279,8 @@ export class userRepository {
         return null;
       }
 
+      
+
       return doctor[0];
     } catch (error: any) {
       console.error("Error getting doctor:", error.message);
@@ -228,7 +288,7 @@ export class userRepository {
     }
   }
 
-  async getAllSlots(date: Date, doctorId: string) {
+  async getAllSlots(date: Date, doctorId: string): Promise<ScheduleSlot[]> {
     try {
       const doctorSlots = await doctorSlotsModel.findOne({
         doctorId: doctorId,
@@ -236,95 +296,124 @@ export class userRepository {
           $eq: date,
         },
       });
-
+  
       if (!doctorSlots) {
         return [];
       }
-
-      const availableSlots = doctorSlots.slots.filter(
-        (slot) => slot.availability
-      );
-
-      if (availableSlots.length === 0) {
-        return [];
-      }
-
-      return availableSlots;
+  
+      const availableSlots = doctorSlots.slots
+        .filter((slot) => slot.availability)
+        .map((slot) => ({
+          start: slot.start,
+          end: slot.end,
+          availability: slot.availability,
+          locked: slot.locked,
+          lockedBy: slot.lockedBy?.toString(), // Convert ObjectId to string
+          lockExpiration: slot.lockExpiration || null,
+          bookedBy: slot.bookedBy?.toString() || null,
+          _id: slot._id?.toString(), // Convert ObjectId to string
+        }));
+  
+      
+  
+      return availableSlots; // Return transformed slots
     } catch (error: any) {
       console.error("Error getting slots:", error.message);
       throw new Error(`Failed to fetch slots: ${error.message}`);
     }
   }
 
-  async getUser(userId: string) {
+  async getUser(userId: string): Promise<UserProfileDetails> {
     try {
-      console.log("Fetching user with ID:", userId);
-      
-      // Replace this with the actual logic to retrieve the user data, e.g.:
-      const user = await userModel.findById(userId,{
-        
-        image:1,
-        
-      }).lean() // Fetch user data
+      const user = await userModel
+        .findById(userId, {
+          image: 1,
+        })
+        .lean(); // Fetch user data as plain JavaScript object
   
       if (!user) {
         throw new Error("User not found");
       }
   
-      return user;
+      // Ensure the returned object matches the UserProfileDetails type
+      const userProfile: UserProfileDetails = {
+        _id: user._id.toString(), // Convert ObjectId to string if necessary
+        image: user.image,
+      };
+  
+      
+  
+      return userProfile;
     } catch (error: any) {
       console.error("Error getting user:", error.message);
       throw new Error(`Failed to fetch user: ${error.message}`);
     }
   }
   
+  
   async updateProfile(
     userId: string,
     updateData: { name: string; DOB: Date; address: string }
-  ) {
+  ): Promise<UserProfileData> {
     try {
-      // Find the user by ID
-      const user = await userModel.findById(userId);
-      if (!user) {
+      const updatedUser = await userModel
+        .findByIdAndUpdate(
+          userId,
+          { $set: updateData }, // Update fields
+          { new: true, lean: true } // Return the updated document as a plain object
+        )
+        .select("_id userId name email phone password createdAt DOB address isBlocked image __v"); // Ensure selected fields match UserProfileData
+  
+      if (!updatedUser) {
         throw new Error("User not found");
       }
-
-      Object.assign(user, updateData);
-
-      const updatedUser = await user.save();
-
-      return updatedUser;
+  
+      
+  
+      return updatedUser as UserProfileData; // Safely cast to your interface
     } catch (error: any) {
       console.error("Error updating profile:", error.message);
       throw new Error(`Failed to update profile: ${error.message}`);
     }
   }
-  async uploadProfileImage(userID: string, imageData: userImage) {
+  
+  async uploadProfileImage(
+    userID: string,
+    imageData: userImage
+  ): Promise<UserProfileData> {
     try {
       const user = await userModel.findById(userID);
-
+  
       if (!user) {
         throw new Error("User not found");
       }
-
+  
+      // Update the image fields
       user.image.url = imageData.profileUrl.url;
       user.image.type = imageData.profileUrl.type;
-
+  
+      // Save the updated user
       const updatedUser = await user.save();
-
-      return updatedUser;
+  
+      // Convert to plain object to ensure compatibility with the UserProfileData interface
+      const plainUser = updatedUser.toObject();
+  
+      
+  
+      return plainUser as UserProfileData; // Explicitly cast to UserProfileData
     } catch (error: any) {
       console.error("Repository error:", error.message);
       throw new Error(error.message);
     }
   }
+  
 
   async checkSlotAvailability(
     doctorId: string,
     slotId: Slot,
     date: string,
     userId: string
-  ) {
+  ): Promise<boolean>  {
     try {
       const doctorSlot = await doctorSlotsModel.findOne({
         doctorId: new mongoose.Types.ObjectId(doctorId),
@@ -342,6 +431,8 @@ export class userRepository {
             slot._id.equals(new mongoose.Types.ObjectId(slotId._id))
           ) {
             if (!slot.locked) {
+              console.log("slottt",slot);
+              
               const currentLocalTime = new Date();
 
               const lockExpirationLocalTime = new Date(
@@ -369,6 +460,7 @@ export class userRepository {
 
               return true;
             } else {
+              console.log("slotttyy",slot);
               return false;
             }
           }
@@ -381,7 +473,7 @@ export class userRepository {
       throw new Error(error.message);
     }
   }
-  async createAppointment(patientData: any) {
+  async createAppointment(patientData: any): Promise<BookAppointment|undefined>  {
     try {
       const doctorSlot = await doctorSlotsModel.findOne({
         doctorId: new mongoose.Types.ObjectId(patientData.doctor._id as string),
@@ -441,6 +533,8 @@ export class userRepository {
               await newAppointment.save();
             }, 1 * 60 * 1000);
 
+           
+
             return savedAppointment;
           }
         }
@@ -452,7 +546,7 @@ export class userRepository {
       throw new Error(error.message); // Throw the error to be handled in the service layer
     }
   }
-  async updateAppointment(sessionId: any, appointmentId: any) {
+  async updateAppointment(sessionId: any, appointmentId: any): Promise<BookAppointment|null>  {
     try {
       const updatedAppointment = await appointmentModel.findByIdAndUpdate(
         appointmentId,
@@ -467,7 +561,7 @@ export class userRepository {
       throw new Error(error.message);
     }
   }
-  async confirmAppointmentPayment(appointmentId: string) {
+  async confirmAppointmentPayment(appointmentId: string): Promise<BookAppointment>  {
     try {
       const updatedAppointment = await appointmentModel.findById(appointmentId);
       if (updatedAppointment?.locked == null) {
@@ -534,7 +628,7 @@ export class userRepository {
       }
 
       
-      console.log("nnnnnnnnnn",updatedAppointment);
+      
       
 
       return updatedAppointment;
@@ -543,7 +637,7 @@ export class userRepository {
       throw new Error(error.message);
     }
   }
-  async getAllAppointments(userId: string, status: string, page: number = 1, limit: number = 10) {
+  async getAllAppointments(userId: string, status: string, page: number = 1, limit: number = 10): Promise<GetAppointments>  {
     try {
         if (!userId) throw new Error("User ID is required to fetch appointments");
 
@@ -570,7 +664,7 @@ export class userRepository {
 }
 
 
-  async cancelAppointment(appointmentId: string): Promise<any> {
+  async cancelAppointment(appointmentId: string): Promise<BookAppointment> {
     try {
       const appointment = await appointmentModel.findOneAndUpdate(
         { _id: appointmentId },
@@ -644,7 +738,7 @@ export class userRepository {
     appointmentId: string,
     rating: number,
     reviewText: string
-  ): Promise<any> {
+  ): Promise<BookAppointment> {
     try {
       const updatedAppointment = await appointmentModel.findOneAndUpdate(
         { _id: appointmentId },
@@ -668,7 +762,7 @@ export class userRepository {
     }
   }
 
-  async getAppointment(appointmentId: string) {
+  async getAppointment(appointmentId: string): Promise<BookAppointment>  {
     try {
       const appointment = await appointmentModel
         .findById(appointmentId)

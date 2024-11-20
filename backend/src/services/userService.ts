@@ -2,9 +2,20 @@ import { userRepository } from "../repository/userRepository";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import {
+  BookAppointment,
+  Doctors,
   FileData,
+  GetAppointments,
+  GetDoctorsResponse,
+  
+  GetUserData,
+  MedicalField,
+  ScheduleSlot,
+  SingleDoctor,
   Slot,
   userImage,
+  UserProfileData,
+  UserProfileDetails,
   userType,
 } from "../interface/userInterface/interface";
 import sendMail from "../config/emailConfig";
@@ -16,13 +27,15 @@ import makeThePayment, { refund } from "../config/stripeConfig";
 import moment from "moment";
 import { cropAndSave } from "../helper/sharp";
 import sharp from "sharp";
+import { IUserService } from "../interface/user.service.interface";
+import { IUserRepository } from "../interface/user.repository.interface";
 
 dotenv.config();
 
 const S3Services = new S3Service();
-export class userService {
+export class userService implements IUserService {
   private S3Services = new S3Service();
-  private userRepository: userRepository;
+  private userRepository: IUserRepository;
   private OTP: string | null = null;
   private expiryOTP_time: Date | null = null;
   private userData: userType | null = null;
@@ -37,7 +50,7 @@ export class userService {
     phone: string;
     password: string;
     confirmpassword: string;
-  }) {
+  }): Promise<{token:string}>  {
     try {
       const response = await this.userRepository.existUser(
         userData.email,
@@ -94,13 +107,15 @@ export class userService {
         }
       );
 
+
+
       return { token };
     } catch (error: any) {
       throw error;
     }
   }
 
-  async otpCheck(otp: string, token: string) {
+  async otpCheck(otp: string, token: string):Promise<{valid:boolean}> {
     try {
       const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
 
@@ -130,7 +145,7 @@ export class userService {
       throw error;
     }
   }
-  async verifyUser(email: string, password: string) {
+  async verifyUser(email: string, password: string): Promise<GetUserData>  {
     try {
       const userData = await this.userRepository.userCheck(email);
 
@@ -179,6 +194,8 @@ export class userService {
           image: userData.image,
           _id: userData._id,
         };
+        console.log("userInfo",userInfo);
+        
 
         return {
           userInfo,
@@ -193,7 +210,7 @@ export class userService {
     }
   }
 
-  async resendOtpCheck(userToken: string) {
+  async resendOtpCheck(userToken: string): Promise<{token:string}> {
     try {
       const decoded: any = jwt.decode(userToken);
 
@@ -234,7 +251,7 @@ export class userService {
     }
   }
 
-  async getSpecialization() {
+  async getSpecialization(): Promise<MedicalField[]> {
     try {
       const response = await this.userRepository.getAllSpecialization();
 
@@ -256,7 +273,7 @@ export class userService {
     page: number = 1, 
     limit: number = 5, 
     search: string = ''
-  ) {
+  ) : Promise<GetDoctorsResponse>{
     try {
       // Fetch doctors from the repository with the given parameters
       const { doctors, totalDoctors } = await this.userRepository.getAllDoctorsWithSpecialization(
@@ -265,7 +282,7 @@ export class userService {
   
       // Add signed URLs to doctors' images
       const doctorsWithSignedUrls = await Promise.all(
-        doctors.map(async (doctor) => {
+        doctors.map(async (doctor:any) => {
           if (doctor.image && doctor.image.url && doctor.image.type) {
             const folderPath = this.getFolderPathByFileType(doctor.image.type);
             const signedUrl = await this.S3Services.getFile(doctor.image.url, folderPath);
@@ -277,6 +294,8 @@ export class userService {
           return doctor; // Return the doctor as is if no image
         })
       );
+
+      console.log("docccccc",doctors)
   
       return {
         doctors: doctorsWithSignedUrls,
@@ -288,7 +307,7 @@ export class userService {
     }
   }
   
-  async getDoctors() {
+  async getDoctors(): Promise<Doctors[]> {
     try {
       const response =
         await this.userRepository.getAllDoctors();
@@ -330,7 +349,7 @@ export class userService {
       throw new Error(`Failed to get specialization: ${error.message}`);
     }
   }
-  async getDoctorData(doctorId: string, reviewData: any) {
+  async getDoctorData(doctorId: string, reviewData: any): Promise<SingleDoctor|null|undefined> {
     try {
       const response = await this.userRepository.getDoctor(
         doctorId,
@@ -369,7 +388,7 @@ export class userService {
     }
   }
 
-  async getSlots(date: string, doctorId: string) {
+  async getSlots(date: string, doctorId: string): Promise<ScheduleSlot[]> {
     try {
       // Validate the inputs
       if (!date || !doctorId) {
@@ -390,7 +409,7 @@ export class userService {
     }
   }
 
-  async getUserData(userId: string) {
+  async getUserData(userId: string): Promise<UserProfileDetails|undefined> {
     try {
       const response = await this.userRepository.getUser(
         userId
@@ -417,7 +436,7 @@ export class userService {
   async updateProfile(
     _id: string,
     updateData: { name: string; DOB: Date; address: string }
-  ): Promise<any> {
+  ): Promise<{userInfo:UserProfileData}> {
     try {
       const updatedUser = await this.userRepository.updateProfile(
         _id,
@@ -452,7 +471,7 @@ export class userService {
       throw new Error(`Failed to update profile: ${error.message}`);
     }
   }
-  async updateImage(userID: string, file: FileData) {
+  async updateImage(userID: string, file: FileData): Promise<{userInfo:UserProfileData}|undefined> {
     try {
       const userProfileImage: userImage = {
         profileUrl: {
@@ -462,7 +481,7 @@ export class userService {
       };
 
       if (file) {
-        console.log("File received for upload:", file);
+        
 
         // Load the image buffer into sharp and get metadata
         const image = await sharp(file.buffer);
@@ -589,6 +608,8 @@ export class userService {
             session.id,
             appointment._id
           );
+          console.log("session",session);
+          
 
           return session;
         }
@@ -598,7 +619,7 @@ export class userService {
       throw new Error(error.message);
     }
   }
-  async confirmAppointment(appointmentId: string): Promise<any> {
+  async confirmAppointment(appointmentId: string): Promise<BookAppointment|null> {
     try {
       const confirmAppointment =
         await this.userRepository.confirmAppointmentPayment(appointmentId);
@@ -610,7 +631,7 @@ export class userService {
     }
   }
 
-  async getAppointments(userId: string, status: string, page: number, limit: number) {
+  async getAppointments(userId: string, status: string, page: number, limit: number): Promise<GetAppointments> {
     try {
         const response = await this.userRepository.getAllAppointments(userId, status, page, limit);
 
@@ -637,7 +658,7 @@ export class userService {
     return moment(slot).tz("UTC").format("h:mm A");
   }
 
-  async cancelAppointment(appointmentId: string): Promise<any> {
+  async cancelAppointment(appointmentId: string): Promise<BookAppointment|undefined> {
     try {
       const response = await this.userRepository.cancelAppointment(
         appointmentId
@@ -663,7 +684,7 @@ export class userService {
     appointmentId: string,
     rating: number,
     review: string
-  ): Promise<any> {
+  ): Promise<BookAppointment> {
     try {
       const response = await this.userRepository.addReview(
         appointmentId,
@@ -683,7 +704,7 @@ export class userService {
     }
   }
 
-  async getAppointment(appointmentId: string) {
+  async getAppointment(appointmentId: string): Promise<BookAppointment> {
     try {
       const response = await this.userRepository.getAppointment(appointmentId);
 

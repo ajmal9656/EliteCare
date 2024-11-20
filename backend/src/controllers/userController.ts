@@ -1,8 +1,9 @@
+import { IUserService } from "../interface/user.service.interface";
 import { userService } from "../services/userService";
 import { Request, Response } from "express";
 
 export class userController {
-  private userService: userService;
+  private userService: IUserService;
 
   constructor(userServiceInstance: userService) {
     this.userService = userServiceInstance;
@@ -292,7 +293,7 @@ export class userController {
     try {
       const userId = req.params.userId;
       
-      console.log("revi", userId);
+      
 
       const response = await this.userService.getUserData(
         userId
