@@ -1,25 +1,28 @@
-import mongoose,{ Document } from "mongoose";
+import mongoose,{ Document, UpdateWriteOpResult } from "mongoose";
 import adminModel from "../model/adminModel";
-import { Console } from "console";
 import specializationModel from "../model/SpecializationModel";
 import doctorApplicationModel from "../model/doctorApplicationModel";
 import doctorModel from "../model/doctorModel";
 import RejectDoctorModel from "../model/RejectDoctorSchema";
 import userModel from "../model/userModel";
 import appointmentModel from "../model/AppoinmentModel";
-import { MonthlyStats } from "../interface/adminInterface/adminInterface";
+import { AdminDetails, Application, Doctor, GetApplication, getAppointments, GetDoctor, getSpecialization, getTransaction, GetUser, MonthlyDashboardStats, MonthlyStats, Specialization, User} from "../interface/adminInterface/adminInterface";
+
+
 
 
 
 export class adminRepository {
     
 
-    async adminCheck(email:string){
+    async adminCheck(email:string):Promise<AdminDetails>{
         try {
-            console.log("login adminrep");
+            
             const adminData = await adminModel.findOne({email:email})
-            console.log(adminData)
+            
             if(adminData){
+                
+                
                 return adminData
             }
             throw new Error("Doctor Doesn't exist")
@@ -34,7 +37,7 @@ export class adminRepository {
             throw new Error(error.message)
         }
     }
-    async createSpecialization(name:string,description:string){
+    async createSpecialization(name:string,description:string):Promise<Specialization>{
         try {
           
             const newSpecialization = new specializationModel({
@@ -44,6 +47,9 @@ export class adminRepository {
     
           
             const savedSpecialization = await newSpecialization.save();
+
+            
+            
     
             return savedSpecialization;
         } catch (error: any) {
@@ -51,7 +57,7 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async getAllSpecialization(page: number, limit: number) {
+    async getAllSpecialization(page: number, limit: number):Promise<getSpecialization> {
         try {
             // Calculate the skip value to implement pagination
             const skip = (page - 1) * limit;
@@ -67,11 +73,13 @@ export class adminRepository {
 
             // If no specializations are found, throw an error
             if (!specializations || specializations.length === 0) {
-                console.error("No specializations found");
+                
                 throw new Error("No specializations found");
             }
 
             // Return the paginated result along with total count for pagination info
+            
+          
             return {
                 specializations,
                 totalCount,
@@ -84,21 +92,21 @@ export class adminRepository {
             throw new Error("An error occurred while fetching specializations.");
         }
     }
-    async updateSpecialization(id:number,name:string,description:string){
+    async updateSpecialization(id:number,name:string,description:string):Promise<UpdateWriteOpResult>{
         try {
             
-            const specializations = await specializationModel.updateOne({_id:id},{name:name,description:description})
-            console.log("qq",specializations)
-           
-    
+            const updateSpecialization = await specializationModel.updateOne({_id:id},{name:name,description:description})
             
-            return specializations
+           
+            
+            
+            return updateSpecialization
         } catch (error: any) {
             console.error("Error update specialization:", error.message);
             throw new Error(error.message);
         }
     }
-    async changeSpecializationStatus(id: number) {
+    async changeSpecializationStatus(id: number):Promise<Specialization> {
         try {
             const specialization = await specializationModel.findOne({ _id: id });
             if (!specialization) {
@@ -108,7 +116,9 @@ export class adminRepository {
             specialization.isListed = !specialization.isListed;
     
             const updatedSpecialization = await specialization.save();
-            console.log("Updated Specialization:", updatedSpecialization);
+
+           
+           
     
             return updatedSpecialization;
         } catch (error: any) {
@@ -116,7 +126,7 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async getAllApplication(page: number, limit: number) {
+    async getAllApplication(page: number, limit: number) :Promise<GetApplication>{
         try {
             const skip = (page - 1) * limit;
             
@@ -128,6 +138,8 @@ export class adminRepository {
             // Calculate total pages
             const totalApplications = await doctorApplicationModel.countDocuments();
             const totalPages = Math.ceil(totalApplications / limit);
+
+            
     
             return { applications, totalPages };
         } catch (error: any) {
@@ -136,12 +148,12 @@ export class adminRepository {
         }
     }
     
-    async getApplication(doctorId:string){
+    async getApplication(doctorId:string):Promise<Application|null>{
         try {
             
             const application = await doctorApplicationModel.findById(doctorId).populate("department")
     
-           console.log("pppp",application)
+          
     
             
             return application
@@ -150,7 +162,7 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async approveDoctorApplication(doctorId: string) {
+    async approveDoctorApplication(doctorId: string) :Promise<{status:boolean}>{
         try {
             
             const application = await doctorApplicationModel.findOne({ doctorId: doctorId });
@@ -158,7 +170,6 @@ export class adminRepository {
                 throw new Error("Doctor application not found");
             }
             
-            console.log("Doctor application:", application);
             
           
             const updatedDoctor = await doctorModel.findByIdAndUpdate(
@@ -180,11 +191,11 @@ export class adminRepository {
                 throw new Error("Doctor not found");
             }
             
-            console.log("Updated doctor details:", updatedDoctor);
+            
             
             
             await doctorApplicationModel.deleteOne({ doctorId: doctorId });
-            console.log("Doctor application deleted");
+            
     
             return {status:true};
         } catch (error: any) {
@@ -192,7 +203,7 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async rejectDoctorApplication(doctorId: string, reason: string) {
+    async rejectDoctorApplication(doctorId: string, reason: string):Promise<{ success: boolean }> {
         try {
             
             const rejectEntry = new RejectDoctorModel({
@@ -215,7 +226,7 @@ export class adminRepository {
         }
     }
 
-    async getAllUsers(skip: number, limit: number,search:string) {
+    async getAllUsers(skip: number, limit: number,search:string):Promise<GetUser> {
         try {
             const searchFilter = search
         ? {
@@ -223,7 +234,7 @@ export class adminRepository {
           }
         : {};
 
-        console.log("filter",searchFilter);
+        
         
             // Fetch users with pagination
             const users = await userModel.find({...searchFilter})
@@ -235,9 +246,10 @@ export class adminRepository {
 
             const totalPages = Math.ceil(totalCount / limit); // Calculate total pages
 
-            console.log("Users fetched:", users);
-            console.log("Total users:", totalCount);
-            console.log("Total pages:", totalPages);
+            
+            
+
+          
 
             // Return users and totalPages
             return { users, totalPages };
@@ -247,9 +259,9 @@ export class adminRepository {
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
-    async getAllDoctors(skip: number, limit: number,search:string) {
+    async getAllDoctors(skip: number, limit: number,search:string):Promise<GetDoctor> {
         try {
-            console.log("search",search);
+            
             
             // Fetch the total count of doctors with approved kycStatus
             const searchFilter = search
@@ -267,7 +279,7 @@ export class adminRepository {
             // Calculate total pages based on the total count and limit
             const totalPages = Math.ceil(totalCount / limit);
     
-            console.log("Fetched doctors:", doctors.map(doctor => doctor.name)); // Log names only
+            console.log("doctor",doctors);
     
             // Return the doctors, total count, and total pages
             return { doctors, totalCount, totalPages };
@@ -279,7 +291,7 @@ export class adminRepository {
     
     
 
-    async changeUserStatus(id: string) {
+    async changeUserStatus(id: string):Promise<User> {
         try {
             const user = await userModel.findOne({ _id: id });
             if (!user) {
@@ -289,7 +301,7 @@ export class adminRepository {
             user.isBlocked = !user.isBlocked;
     
             const updatedUser = await user.save();
-            console.log("Updated user:", updatedUser);
+            
     
             return updatedUser;
         } catch (error: any) {
@@ -297,7 +309,7 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async changeDoctorStatus(id: string) {
+    async changeDoctorStatus(id: string):Promise<Doctor> {
         try {
             const doctor = await doctorModel.findOne({ _id: id });
             if (!doctor) {
@@ -307,7 +319,7 @@ export class adminRepository {
             doctor.isBlocked = !doctor.isBlocked;
     
             const updatedDoctor = await doctor.save();
-            console.log("Updated doctor:", updatedDoctor);
+           
     
             return updatedDoctor;
         } catch (error: any) {
@@ -315,7 +327,7 @@ export class adminRepository {
             throw new Error(error.message);
         }
     }
-    async getAllStatistics() {
+    async getAllStatistics():Promise<MonthlyDashboardStats> {
         try {
             const totalDoctors = await doctorModel.countDocuments();
             const totalUsers = await userModel.countDocuments();
@@ -451,6 +463,11 @@ export class adminRepository {
                     adminRevenue: monthlyStatistics[key].adminRevenue,
                 };
             });
+
+            
+            console.log("userDoctorChartData",userDoctorChartData);
+            
+            
     
             // Return the object with all the statistics and chart data
             return {
@@ -470,7 +487,7 @@ export class adminRepository {
         }
     }
 
-    async getAllAppointments(status: string, page: number, limit: number, startDate?: string, endDate?: string) {
+    async getAllAppointments(status: string, page: number, limit: number, startDate?: string, endDate?: string):Promise<getAppointments> {
         try {
           // Calculate the number of documents to skip based on the current page
           const skip = (page - 1) * limit;
@@ -510,6 +527,9 @@ export class adminRepository {
       
           // Calculate total pages
           const totalPages = Math.ceil(totalAppointments / limit);
+
+          console.log("appoiny",appointments);
+          
       
           return {
             appointments,
@@ -530,7 +550,7 @@ export class adminRepository {
         limit: number = 5,
         startDate?: string,
         endDate?: string
-      ) {
+      ) :Promise<getTransaction>{
         try {
           let appointments: any[] = [];
           const skip = (page - 1) * limit;

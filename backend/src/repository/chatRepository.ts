@@ -1,14 +1,17 @@
+import { chatData, GetChatResult, messageDetails, NotificationData } from "../interface/chatInterface/chatInterface";
 import appointmentModel from "../model/AppoinmentModel";
 import ChatModel from "../model/chatModel";
 import doctorModel from "../model/doctorModel";
 import NotificationModel from "../model/notificationModel";
 import userModel from "../model/userModel";
-import mongoose from 'mongoose';
+import mongoose, { UpdateWriteOpResult } from 'mongoose';
 
 export class chatRepository{
 
-    async createChat(messageDetails: any) {
+    async createChat(messageDetails: messageDetails):Promise<chatData> {
         try {
+            
+            
             // Determine whether the sender is a doctor or a user and adjust the query accordingly
             const query =
                 messageDetails.sender === 'doctor'
@@ -36,6 +39,8 @@ export class chatRepository{
                 },
                 { new: true, upsert: true } // 'upsert' creates a new document if none exists
             );
+
+           
     
             return existingChat;
         } catch (error: any) {
@@ -43,7 +48,7 @@ export class chatRepository{
             throw error; // Propagate the error
         }
     }
-    async createNotification(messageDetails: any) {
+    async createNotification(messageDetails: messageDetails):Promise<void> {
         try {
             
 
@@ -73,16 +78,16 @@ export class chatRepository{
             { new: true, upsert: true }  // Creates document if not found
         );
 
-        console.log("Notification created/updated:", notification);
+        
             
         } catch (error: any) {
             console.error("Error in chatRepository:", error);
             throw error; // Propagate the error
         }
     }
-    async createVideocallNotification(messageDetails: any) {
+    async createVideocallNotification(messageDetails: messageDetails):Promise<void> {
         try {
-            console.log("message data",messageDetails)
+            
             
 
         const { to,from,name,sender,appointmentId,senderId} = messageDetails;
@@ -153,7 +158,7 @@ export class chatRepository{
             throw error; // Propagate the error
         }
     }
-    async deleteMessage(messageDetails: any) {
+    async deleteMessage(messageDetails: messageDetails):Promise<chatData> {
         try {
             const query =
                 messageDetails.sender === 'doctor'
@@ -180,6 +185,9 @@ export class chatRepository{
                     arrayFilters: [{ "elem._id": messageDetails.messageId }] // Filter the message with the specific messageId
                 }
             );
+
+            console.log("updateChat",updateChat);
+            
     
             return updateChat;
         } catch (error: any) {
@@ -190,17 +198,31 @@ export class chatRepository{
     
     
 
-    getChat = async (doctorID: string, userID: string,sender:string): Promise<any> => {
+    async getChat (doctorID: string, userID: string,sender:string): Promise<GetChatResult>  {
         try {
           const chatResult = await ChatModel.findOne({doctorId:doctorID,userId:userID})
+          if (!chatResult) {
+            throw new Error(`chat not found.`);
+          }
           
 
             const user = await userModel.findById(userID,{name:1,image:1})
+            if (!user) {
+                throw new Error(`User with ID ${userID} not found.`);
+              }
             
 
           
           
             const doctor = await doctorModel.findById(doctorID,{name:1,image:1})
+            if (!doctor) {
+                throw new Error(`Doctor with ID ${doctorID} not found.`);
+              }
+
+            console.log("doctor",doctor);
+            console.log("user",user);
+            console.log("chatResult",chatResult);
+            
             return {
                 doctor:doctor,
                 user:user,
@@ -213,7 +235,7 @@ export class chatRepository{
           throw error;
         }
       };
-      getNotificationCount = async (receiverId: string): Promise<any> => {
+    async getNotificationCount (receiverId: string): Promise<{notificationCount:number}>  {
         try {
             const notificationCount = await NotificationModel.aggregate([
                 { $match: { receiverId: new mongoose.Types.ObjectId(receiverId) } },
@@ -229,12 +251,15 @@ export class chatRepository{
             throw error;
         }
     };
-      getAllNotifications = async (receiverId: string): Promise<any> => {
+    async getAllNotifications (receiverId: string): Promise<NotificationData[]>  {
         try {
             const notifications = await NotificationModel.aggregate([
                 { $match: { receiverId: new mongoose.Types.ObjectId(receiverId) } },
                 { $unwind: "$notifications" }
             ]);
+
+           
+            
            
     
             return notifications;
@@ -242,19 +267,22 @@ export class chatRepository{
             throw error;
         }
     };
-    readAllNotifications = async (receiverId: string): Promise<any> => {
+    async readAllNotifications (receiverId: string): Promise<UpdateWriteOpResult> {
         try {
             const result = await NotificationModel.updateOne(
                 { receiverId }, // Find the document by receiverId
                 { $set: { "notifications.$[].read": true } } // Set 'read' to true for each item in 'notifications' array
             );
+
+            
+            
     
             return result;
         } catch (error) {
             throw error;
         }
     };
-    updateAppointment = async (appointmentId: string): Promise<any> => {
+    async updateAppointment (appointmentId: string): Promise<any>  {
         try {
             
             
@@ -263,6 +291,10 @@ export class chatRepository{
                 { status: "prescription pending" },
                 { new: true }                   // Return the updated document
             );
+
+            console.log("resulttttt",result);
+
+            
     
             return result;
         } catch (error) {

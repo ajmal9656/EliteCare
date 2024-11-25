@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import { adminService } from "../services/adminServices";
 import { log } from "util";
+import { IAdminService } from "../interface/admin.service.interface";
 
 
 export class adminController {
-    private adminService: adminService;
+    private adminService: IAdminService;
 
 
 
-    constructor(adminServiceInstance: adminService) {
+    constructor(adminServiceInstance: IAdminService) {
         this.adminService = adminServiceInstance;
       }
 

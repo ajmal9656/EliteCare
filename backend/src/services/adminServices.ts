@@ -1,9 +1,11 @@
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import { adminRepository } from '../repository/adminRepository';
-import { Admin,adminType } from '../interface/adminInterface/adminInterface';
+import { Admin,AdminDetails,adminType, Application, Appointment, Doctor, GetApplication, GetDoctor, getSpecialization, getTransaction, MonthlyDashboardStats, Specialization, User } from '../interface/adminInterface/adminInterface';
 import { S3Service } from '../config/s3client';
 import moment from 'moment';
+import { UpdateWriteOpResult } from 'mongoose';
+import { IAdminRepository } from '../interface/admin.repository.interface';
 
 
 
@@ -11,14 +13,14 @@ import moment from 'moment';
 
 
 
-export class adminService{
-    private adminRepository: adminRepository;
+export class adminService {
+    private adminRepository: IAdminRepository;
     private S3Service: S3Service;
 
    private adminData: adminType | null = null;
 
 
-    constructor(adminRepository: adminRepository,S3ServiceInstance: S3Service) {
+    constructor(adminRepository: IAdminRepository,S3ServiceInstance: S3Service) {
         this.adminRepository = adminRepository;
         this.S3Service = S3ServiceInstance;
      };
@@ -26,9 +28,9 @@ export class adminService{
 
      
     
-    async verifyAdmin(email: string, password: string) {
+    async verifyAdmin(email: string, password: string):Promise<{adminInfo:Admin,accessToken:string,refreshToken:string}> {
         try {
-            console.log("login adminService");
+            
             const adminData = await this.adminRepository.adminCheck(email);
             if (adminData) {
                 
@@ -58,7 +60,7 @@ export class adminService{
                     refreshToken
                 };
             } else {
-                console.log("Admindata not found")
+                
                 throw new Error("Admin Doesn't exist");
             }
         } catch (error: any) {
@@ -66,20 +68,19 @@ export class adminService{
             throw new Error(error.message);
         }
     }
-    async addSpecialization(name: string, description: string) {
+    async addSpecialization(name: string, description: string):Promise<Specialization> {
         try {
-            console.log("Entering addSpecialization method in adminService");
+           
     
             
             const response = await this.adminRepository.createSpecialization(name, description);
     
            
             if (response) {
-                console.log("Specialization successfully created:", response);
+                
                 return response;
             } else {
               
-                console.error("Failed to create specialization: Response is invalid");
                 throw new Error("Something went wrong while creating the specialization.");
             }
         } catch (error: any) {
@@ -88,7 +89,7 @@ export class adminService{
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
-    async getSpecialization(page: number, limit: number): Promise<any> {
+    async getSpecialization(page: number, limit: number): Promise<getSpecialization> {
         try {
             // Call the repository method to get paginated specializations
             const response = await this.adminRepository.getAllSpecialization(page, limit);
@@ -104,16 +105,16 @@ export class adminService{
             throw new Error(`Failed to fetch specializations: ${error.message}`);
         }
     }
-    async editSpecialization(id:number,name:string,description:string) {
+    async editSpecialization(id:number,name:string,description:string):Promise<UpdateWriteOpResult> {
         try {
-            console.log("Entering editSpecialization method in adminService");
+            
     
             
             const response = await this.adminRepository.updateSpecialization(id,name,description);
     
            
             if (response) {
-                console.log("Specialization successfully edited:", response);
+              
                 return response;
             } else {
                
@@ -127,9 +128,9 @@ export class adminService{
         }
     }
     
-    async listUnlistSpecialization(id:number) {
+    async listUnlistSpecialization(id:number):Promise<Specialization> {
         try {
-            console.log("Entering editSpecialization method in adminService");
+            
     
             
             const response = await this.adminRepository.changeSpecializationStatus(id);
@@ -138,19 +139,22 @@ export class adminService{
             if (response) {
                
                 return response;
-            } 
+            } else{
+                throw new Error("Something went wrong while editing the specialization.");
+
+            }
         } catch (error: any) {
             
             
             throw new Error(`Failed: ${error.message}`);
         }
     }
-    async getApplication(page: number, limit: number) {
+    async getApplication(page: number, limit: number):Promise<GetApplication> {
         try {
             const response = await this.adminRepository.getAllApplication(page, limit);
     
             if (response.applications) {
-                console.log("Applications successfully fetched:", response.applications);
+                
                 return response;
             } else {
                 throw new Error("Something went wrong while fetching the applications.");
@@ -160,7 +164,7 @@ export class adminService{
             throw new Error(`Failed to fetch applications: ${error.message}`);
         }
     }
-    async getDoctorApplication(applicationId:string) {
+    async getDoctorApplication(applicationId:string):Promise<{response:Application,files:any}> {
         try {
            
     
@@ -174,7 +178,7 @@ export class adminService{
     
             
             if (response) {
-                console.log("data successfully fetched:", response);
+                
                 documents.push(response.image);
                 documents.push(
                     response.kycDetails.certificateImage,
@@ -182,7 +186,7 @@ export class adminService{
                     response.kycDetails.adharFrontImage,
                     response.kycDetails.adharBackImage
                   );
-                  console.log(documents);
+                  
                   const signedFiles = await Promise.all(
                     documents.map(async (file: { type: string, url: string }) => {
                         const folderPath = this.getFolderPathByFileType(file.type);
@@ -191,6 +195,8 @@ export class adminService{
                     })
                 );
                  const files = signedFiles
+                 console.log("filess",files);
+                 
                 return {response,files};
             } else {
                
@@ -214,9 +220,9 @@ export class adminService{
                 throw new Error(`Unknown file type: ${fileType}`);
         }
     }
-    async approveApplication(doctorId:string) {
+    async approveApplication(doctorId:string):Promise<{ status: boolean }> {
         try {
-            console.log("Entering approve method in adminService");
+            
     
             
             const response = await this.adminRepository.approveDoctorApplication(doctorId);
@@ -234,9 +240,9 @@ export class adminService{
             throw new Error(`Failed : ${error.message}`);
         }
     }
-    async rejectApplication(doctorId:string,reason:string) {
+    async rejectApplication(doctorId:string,reason:string):Promise<{ success: boolean }> {
         try {
-            console.log("Entering reject method in adminService");
+            
     
             
             const response = await this.adminRepository.rejectDoctorApplication(doctorId,reason);
@@ -254,13 +260,12 @@ export class adminService{
             throw new Error(`Failed to add specialization: ${error.message}`);
         }
     }
-    async getAllUsers(skip: number, limit: number,search:any) {
+    async getAllUsers(skip: number, limit: number,search:any):Promise<{users:User[],totalPages:number}> {
         try {
             // Fetch users with pagination
             const { users, totalPages } = await this.adminRepository.getAllUsers(skip, limit,search);
 
-            console.log("Fetched users:", users);
-            console.log("Total pages:", totalPages);
+           
 
             // Return users along with totalPages
             return { users, totalPages };
@@ -270,16 +275,16 @@ export class adminService{
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
-    async getDoctors(page: number, limit: number,search:any) {
+    async getDoctors(page: number, limit: number,search:any):Promise<GetDoctor> {
         try {
-            console.log("Entering getDoctors search method in adminService");
+            
     
             const skip = (page - 1) * limit; // Calculate the number of documents to skip for pagination
     
             const response = await this.adminRepository.getAllDoctors(skip, limit,search);
     
             if (response) {
-                console.log("Doctors successfully fetched:", response);
+                
                 return response;
             } else {
                 console.error("Failed to get doctors: Response is invalid");
@@ -292,16 +297,16 @@ export class adminService{
     }
     
 
-    async listUnlistUser(id:string) {
+    async listUnlistUser(id:string):Promise<User> {
         try {
-            console.log("Entering edituser method in adminService");
+            
     
             
             const response = await this.adminRepository.changeUserStatus(id);
     
            
             if (response) {
-                console.log("user successfully edited:", response);
+               
                 return response;
             } else {
                 
@@ -314,16 +319,16 @@ export class adminService{
             throw new Error(`Failed to edit user: ${error.message}`);
         }
     }
-    async listUnlistDoctor(id:string) {
+    async listUnlistDoctor(id:string):Promise<Doctor> {
         try {
-            console.log("Entering editoctor method in adminService");
+            
     
             
             const response = await this.adminRepository.changeDoctorStatus(id);
     
            
             if (response) {
-                console.log("octor successfully edited:", response);
+                
                 return response;
             } else {
                
@@ -336,15 +341,15 @@ export class adminService{
             throw new Error(`Failed to edit user: ${error.message}`);
         }
     }
-    async getDashboardData() {
+    async getDashboardData():Promise<MonthlyDashboardStats> {
         try {
-            console.log("Entering getDashboardData method in adminService");
+            
     
             const response = await this.adminRepository.getAllStatistics();
     
            
             if (response) {
-                console.log("Dashboardsss data successfully retrieved:", response);
+                
                 return response;
             } else {
                 
@@ -358,13 +363,16 @@ export class adminService{
         }
     }
 
-    async getAppointments(status: string, page: number, limit: number, startDate?: string, endDate?: string) {
+    async getAppointments(status: string, page: number, limit: number, startDate?: string, endDate?: string):Promise<{
+        appointments: Appointment[],
+        totalPages: number,
+      }> {
         try {
           const response = await this.adminRepository.getAllAppointments(status, page, limit, startDate, endDate);
       
           // If response is valid, format the appointments
           if (Array.isArray(response.appointments)) {
-            const formattedAppointments = response.appointments.map(appointment => {
+            const formattedAppointments = response.appointments.map((appointment:any) => {
               return {
                 ...appointment,
                 start: this.getTime(appointment.start),
@@ -387,7 +395,7 @@ export class adminService{
       }
       
       
-      async getTransactions(status: string, page: number, limit: number, startDate?: string, endDate?: string) {
+      async getTransactions(status: string, page: number, limit: number, startDate?: string, endDate?: string):Promise<getTransaction> {
         try {
           const response = await this.adminRepository.getAllTransactions(status, page, limit, startDate, endDate);
           return response;

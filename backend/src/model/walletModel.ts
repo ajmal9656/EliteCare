@@ -1,4 +1,4 @@
-import { Document, Schema, model } from 'mongoose';
+import { Document, Schema, Types, model } from 'mongoose';
 
 export interface ITransaction {
   amount: number;
@@ -9,6 +9,8 @@ export interface ITransaction {
 }
 
 export interface IWallet extends Document {
+  
+  _id: Types.ObjectId
   doctorId: string;
   balance: number;
   transactions: ITransaction[];

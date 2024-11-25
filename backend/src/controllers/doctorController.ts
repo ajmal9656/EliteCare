@@ -2,9 +2,10 @@ import { doctorService } from "../services/doctorService";
 import { DoctorFiles } from "../interface/doctorInterface/doctorInterface";
 import { S3Service } from "../config/s3client";
 import { Request, Response } from "express";
+import { IDoctorService } from "../interface/doctor.service.interface";
 
 export class doctorController {
-  private doctorService: doctorService;
+  private doctorService: IDoctorService;
 
   constructor(doctorServiceInstance: doctorService) {
     this.doctorService = doctorServiceInstance;

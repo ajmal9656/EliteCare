@@ -7,14 +7,24 @@ import {
   docDetails,
   TimeSlot,
   doctorImage,
+  DoctorResult,
+  DoctorSchedule,
+  Slot,
+  GetAppointmentData,
+  AppointmentData,
+  GetTransactionData,
+  Wallet,
+  IDoctor,
+  IDashboardStats,
+  IMedicalReport,
+  
 } from "../interface/doctorInterface/doctorInterface";
 import doctorApplicationModel from "../model/doctorApplicationModel";
 import RejectDoctorModel from "../model/RejectDoctorSchema";
 import doctorSlotsModel from "../model/doctorSlotModel";
 import moment from "moment-timezone";
 import appointmentModel from "../model/AppoinmentModel";
-import WalletModel, { ITransaction } from "../model/walletModel";
-import { log } from "console";
+import WalletModel, { ITransaction, IWallet } from "../model/walletModel";
 import NotificationModel from "../model/notificationModel";
 import { sendAppointmentCancellationNotification } from "../config/socket.ioConfig";
 
@@ -54,7 +64,7 @@ export class doctorRepository {
     }
   }
 
-  async doctorCheck(email: string) {
+  async doctorCheck(email: string): Promise<DoctorResult> {
     try {
       const doctorData = await doctorModel.findOne({ email: email });
 
@@ -71,6 +81,9 @@ export class doctorRepository {
           }
         }
 
+       
+        
+
         return result;
       }
 
@@ -81,7 +94,7 @@ export class doctorRepository {
     }
   }
 
-  async uploadDoctorData(data: DoctorData, docDetails: docDetails) {
+  async uploadDoctorData(data: DoctorData, docDetails: docDetails): Promise<boolean> {
     try {
       const doctorData = await doctorModel.findOneAndUpdate(
         { email: data.email },
@@ -111,6 +124,8 @@ export class doctorRepository {
         );
 
         return true;
+      }else{
+        return false
       }
     } catch (error: any) {
       console.log("rep error");
@@ -118,14 +133,14 @@ export class doctorRepository {
     }
   }
 
-  async createSlot(data: TimeSlot) {
+  async createSlot(data: TimeSlot): Promise<DoctorSchedule> {
     try {
       const dateStartOfDay = new Date(data.selectedDate);
-
+  
       const updatedDoctorSlot = await doctorSlotsModel.findOneAndUpdate(
         {
           doctorId: data.doctorId,
-          date: dateStartOfDay, // Find by doctorId and date
+          date: dateStartOfDay,
         },
         {
           $addToSet: {
@@ -138,19 +153,29 @@ export class doctorRepository {
           },
         },
         {
-          new: true, // Return the updated document
-          upsert: true, // Create a new document if it doesn't exist
+          new: true,
+          upsert: true,
         }
       );
-
-      return updatedDoctorSlot;
+  
+      if (!updatedDoctorSlot) {
+        throw new Error("Failed to create or update slot");
+      }
+  
+      // Transform _id to string if necessary
+      const transformedSchedule: DoctorSchedule = {
+        ...updatedDoctorSlot.toObject(),
+        _id: updatedDoctorSlot._id.toString(), // Convert ObjectId to string
+      };
+  
+      return transformedSchedule;
     } catch (error: any) {
       console.error("Error creating/updating slot:", error);
       throw new Error(error.message);
     }
   }
 
-  async getSlots(date: string, doctorId: string) {
+  async getSlots(date: string, doctorId: string): Promise<Slot[]> {
     try {
       const formattedDate = new Date(date);
 
@@ -171,6 +196,9 @@ export class doctorRepository {
           };
         });
 
+        
+        
+
         return slotsArray;
       } else {
         return [];
@@ -185,7 +213,7 @@ export class doctorRepository {
     return moment(slot).tz("UTC").format("h:mm A");
   }
 
-  async checkSlots(date: string, doctorId: string, start: string, end: string) {
+  async checkSlots(date: string, doctorId: string, start: string, end: string): Promise<boolean> {
     try {
       const parsedDate = new Date(date);
       const startTime = new Date(start);
@@ -218,7 +246,7 @@ export class doctorRepository {
       throw new Error(error.message);
     }
   }
-  async deleteTimeSlot(date: Date, doctorId: string, slotId: string) {
+  async deleteTimeSlot(date: Date, doctorId: string, slotId: string): Promise<boolean> {
     try {
       const doctorSlots = await doctorSlotsModel.findOne({
         doctorId: doctorId,
@@ -255,7 +283,7 @@ export class doctorRepository {
     limit: number = 10,
     startDate: Date | null = null,
     endDate: Date | null = null
-  ) {
+  ) : Promise<GetAppointmentData>{
     try {
       let query: any = { docId: doctorId };
   
@@ -289,9 +317,21 @@ export class doctorRepository {
         .skip((page - 1) * limit) // Skip records for the current page
         .limit(limit)             // Limit to the number of records per page
         .lean();
+
+        
+
+const mappedAppointments: any = appointments.map((appointment) => ({
+  ...appointment,
+  _id: appointment._id as ObjectId, // Ensure the `_id` is explicitly typed
+}));
+
+
+       
+
+        
   
       return {
-        appointments,
+        appointments:mappedAppointments,
         totalPages,
         currentPage: page,
         totalAppointments,
@@ -305,7 +345,7 @@ export class doctorRepository {
   
 
 
-  async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
+  async cancelAppointment(appointmentId: string, reason: string): Promise<AppointmentData> {
     try {
       const appointment = await appointmentModel.findOneAndUpdate(
         { _id: appointmentId },
@@ -344,6 +384,8 @@ export class doctorRepository {
             await slotUpdation.save();
           }
         }
+        
+    
 
         const userNotificationContent = {
           content: "Appointment has been cancelled by doctor",
@@ -373,7 +415,38 @@ export class doctorRepository {
       sendAppointmentCancellationNotification(appointment.docId,appointment.userId)
       }
 
-      return appointment;
+
+
+      
+
+      const appointmentData: any = {
+        _id: appointment._id as mongoose.Types.ObjectId, 
+        appointmentId: appointment.appointmentId,
+        userId: appointment.userId , 
+        docId: appointment.docId as mongoose.Types.ObjectId,
+        patientNAme: appointment.patientNAme,
+        age: appointment.age,
+        description: appointment.description,
+        date: appointment.date,
+        start: appointment.start,
+        end: appointment.end,
+        locked: appointment.locked,
+        status: appointment.status,
+        fees: appointment.fees,
+        review: appointment.review,
+        paymentMethod: appointment.paymentMethod,
+        paymentStatus: appointment.paymentStatus,
+        paymentId: appointment.paymentId,
+        prescription: appointment.prescription,
+        reason: appointment.reason,
+        medicalRecords: appointment.medicalRecords,
+        createdAt: appointment.createdAt,
+        updatedAt: appointment.updatedAt,
+        __v: appointment.__v,
+      };
+      
+
+      return appointmentData;
     } catch (error: any) {
       console.error("Error canceling appointment:", error.message);
       throw new Error(error.message);
@@ -382,7 +455,7 @@ export class doctorRepository {
   async completeAppointment(
     appointmentId: string,
     prescription: string
-  ): Promise<any> {
+  ): Promise<AppointmentData> {
     try {
       const appointment = await appointmentModel.findOneAndUpdate(
         { _id: appointmentId },
@@ -393,6 +466,31 @@ export class doctorRepository {
       if (!appointment) {
         throw new Error("Appointment not found");
       }
+      const appointmentData: any = {
+        _id: appointment._id as mongoose.Types.ObjectId, 
+        appointmentId: appointment.appointmentId,
+        userId: appointment.userId , 
+        docId: appointment.docId as mongoose.Types.ObjectId,
+        patientNAme: appointment.patientNAme,
+        age: appointment.age,
+        description: appointment.description,
+        date: appointment.date,
+        start: appointment.start,
+        end: appointment.end,
+        locked: appointment.locked,
+        status: appointment.status,
+        fees: appointment.fees,
+        review: appointment.review,
+        paymentMethod: appointment.paymentMethod,
+        paymentStatus: appointment.paymentStatus,
+        paymentId: appointment.paymentId,
+        prescription: appointment.prescription,
+        reason: appointment.reason,
+        medicalRecords: appointment.medicalRecords,
+        createdAt: appointment.createdAt,
+        updatedAt: appointment.updatedAt,
+        __v: appointment.__v,
+      };
 
       let wallet = await WalletModel.findOne({ doctorId: appointment.docId });
 
@@ -420,13 +518,13 @@ export class doctorRepository {
         await wallet.save();
       }
 
-      return appointment;
+      return appointmentData;
     } catch (error: any) {
       console.error("Error completing appointment:", error.message);
       throw new Error(error.message); // Propagate the error
     }
   }
-  async getWalletDetails(doctorId: string, status: string, page: number, limit: number) {
+  async getWalletDetails(doctorId: string, status: string, page: number, limit: number): Promise<GetTransactionData> {
     try {
         console.log(status, page, limit);
         
@@ -442,7 +540,7 @@ export class doctorRepository {
         const wallet = await WalletModel.findOne(query).lean();
 
         if (!wallet) {
-            return { transactions: [], totalPages: 0, totalCount: 0, balance: 0 };
+            return { transactions: [], totalPages: 0, totalCount: 0, balance: 0 ,currentPage: page};
         }
 
         // Filter transactions based on the status if provided
@@ -463,6 +561,8 @@ export class doctorRepository {
         const totalPages = Math.ceil(totalCount / limit);
 
         // Return the response including wallet balance
+        
+
         return {
             transactions: paginatedTransactions,
             totalCount,  // Total number of transactions (after filtering)
@@ -478,49 +578,52 @@ export class doctorRepository {
 
 
 
-  async withdrawMoney(doctorId: string, withdrawalAmount: number) {
-    try {
-      const wallet = await WalletModel.findOne({ doctorId });
+async withdrawMoney(doctorId: string, withdrawalAmount: number): Promise<IWallet> {
+  try {
+    const wallet = await WalletModel.findOne({ doctorId });
 
-      if (!wallet) {
-        throw new Error("Wallet not found for the specified doctor.");
-      }
-
-      if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
-        throw new Error("A valid withdrawal amount is required.");
-      }
-      if (wallet.balance < withdrawalAmount) {
-        throw new Error("Insufficient balance for withdrawal.");
-      }
-
-      wallet.balance -= withdrawalAmount;
-
-      const transactionId =
-        "txn_" + Date.now() + Math.floor(Math.random() * 10000);
-      const transaction: ITransaction = {
-        amount: withdrawalAmount,
-        transactionId: transactionId,
-        transactionType: "debit",
-      };
-
-      wallet.transactions.push(transaction);
-
-      await wallet.save();
-
-      return wallet;
-    } catch (error: any) {
-      console.error("Error processing withdrawal:", error.message);
-      throw new Error(error.message);
+    if (!wallet) {
+      throw new Error("Wallet not found for the specified doctor.");
     }
-  }
 
-  async getDoctor(doctorId: string, reviewData: any) {
+    if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
+      throw new Error("A valid withdrawal amount is required.");
+    }
+
+    if (wallet.balance < withdrawalAmount) {
+      throw new Error("Insufficient balance for withdrawal.");
+    }
+
+    wallet.balance -= withdrawalAmount;
+
+    const transactionId =
+      "txn_" + Date.now() + Math.floor(Math.random() * 10000);
+    const transaction: ITransaction = {
+      amount: withdrawalAmount,
+      transactionId: transactionId,
+      transactionType: "debit",
+    };
+
+    wallet.transactions.push(transaction);
+
+    await wallet.save();
+
+    
+
+    return wallet;
+  } catch (error: any) {
+    console.error("Error processing withdrawal:", error.message);
+    throw new Error(error.message);
+  }
+}
+
+
+  async getDoctor(doctorId: string, reviewData: any): Promise<IDoctor | null> {
     try {
-      console.log(doctorId);
-      console.log(reviewData);
+      
 
       const isReviewDataPresent = reviewData === "true";
-      console.log(isReviewDataPresent);
+      
 
       const doctor = await doctorModel.aggregate([
         {
@@ -596,7 +699,7 @@ export class doctorRepository {
         return null;
       }
 
-      console.log("review", doctor[0]);
+      
 
       return doctor[0];
     } catch (error: any) {
@@ -608,7 +711,7 @@ export class doctorRepository {
   async updateProfile(
     doctorId: string,
     updateData: { fees: number; DOB: Date; phone: string }
-  ) {
+  ): Promise<DoctorResult> {
     try {
       // Find the doctor by ID
       const doctor = await doctorModel.findById(
@@ -622,6 +725,8 @@ export class doctorRepository {
 
       const updatedDoctor = await doctor.save();
 
+      
+
       return updatedDoctor;
     } catch (error: any) {
       console.error("Error updating profile:", error.message);
@@ -629,7 +734,7 @@ export class doctorRepository {
     }
   }
 
-  async getAllStatistics(doctorId: string) {
+  async getAllStatistics(doctorId: string): Promise<IDashboardStats>{
     try {
       // Get wallet details
       const wallet = await WalletModel.findOne({ doctorId });
@@ -720,6 +825,8 @@ export class doctorRepository {
         docId: doctorId,
       });
 
+      
+
       return {
         totalRevenue,
         monthlyRevenue: monthlyRevenueArray,
@@ -733,7 +840,7 @@ export class doctorRepository {
     }
   }
 
-  async uploadProfileImage(doctorID: string, imageData: doctorImage) {
+  async uploadProfileImage(doctorID: string, imageData: doctorImage): Promise<DoctorResult> {
     try {
       const doctor = await doctorModel.findById(doctorID);
 
@@ -753,13 +860,16 @@ export class doctorRepository {
     }
   }
 
-  async getMedicalRecords(userId: string) {
+  async getMedicalRecords(userId: string): Promise<IMedicalReport[]> {
     try {
       // Query appointments where the userId matches and prescription is not null
       const medicalRecords = await appointmentModel.find({
         userId: userId,
         prescription: { $ne: null }, // Filters appointments where prescription is not null
       });
+
+     
+      
 
       return medicalRecords;
     } catch (error: any) {

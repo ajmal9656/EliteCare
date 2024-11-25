@@ -12,24 +12,38 @@ import {
   TimeSlot,
   doctorImage,
   FileData,
+  DoctorResult,
+  IDoctorInfo,
+  DoctorSchedule,
+  Slot,
+  GetAppointmentData,
+  AppointmentData,
+  GetTransactionData,
+  IDoctor,
+  IDoctorInformation,
+  IDashboardStats,
+  IDoctorImageInfo,
+  IMedicalReport,
 } from "../interface/doctorInterface/doctorInterface";
 import { S3Service } from "../config/s3client";
 import moment from "moment";
 import { refund } from "../config/stripeConfig";
 import { cropAndSave } from "../helper/sharp";
 import sharp from "sharp";
+import { IWallet } from "../model/walletModel";
+import { IDoctorRepository } from "../interface/doctor.repository.interface";
 
 dotenv.config();
 
 export class doctorService {
-  private doctorRepository: doctorRepository;
+  private doctorRepository: IDoctorRepository;
   private OTP: string | null = null;
   private expiryOTP_time: Date | null = null;
   private doctorData: doctorType | null = null;
   private S3Service: S3Service;
 
   constructor(
-    doctorRepository: doctorRepository,
+    doctorRepository:IDoctorRepository,
     S3ServiceInstance: S3Service
   ) {
     this.doctorRepository = doctorRepository;
@@ -42,7 +56,7 @@ export class doctorService {
     phone: string;
     password: string;
     confirmPassword: string;
-  }) {
+  }): Promise<{token:string}> {
     try {
       const response = await this.doctorRepository.existDoctor(
         doctorData.email,
@@ -106,7 +120,7 @@ export class doctorService {
     }
   }
 
-  async otpCheck(otp: string, token: string) {
+  async otpCheck(otp: string, token: string): Promise<{ valid: boolean }> {
     try {
       const decoded: any = jwt.verify(token, process.env.JWT_SECRET as string);
 
@@ -142,7 +156,7 @@ export class doctorService {
     }
   }
 
-  async resendOtpCheck(doctorToken: string) {
+  async resendOtpCheck(doctorToken: string): Promise<{token:string}> {
     try {
       const decoded: any = jwt.decode(doctorToken);
 
@@ -184,7 +198,11 @@ export class doctorService {
     }
   }
 
-  async verifyDoctor(email: string, password: string) {
+  async verifyDoctor(email: string, password: string): Promise<{
+    doctorInfo:IDoctorInfo,
+    accessToken:string,
+    refreshToken:string,
+  }> {
     try {
       const doctorData = await this.doctorRepository.doctorCheck(email);
       if (doctorData) {
@@ -220,7 +238,7 @@ export class doctorService {
           docStatus: doctorData.kycStatus,
           rejectedReason: doctorData.rejectedReason,
         };
-        console.log("sdvcsdvc", doctorInfo);
+        
 
         return {
           doctorInfo,
@@ -235,7 +253,7 @@ export class doctorService {
       throw new Error(error.message);
     }
   }
-  async uploadData(data: DoctorData, files: DoctorFiles) {
+  async uploadData(data: DoctorData, files: DoctorFiles): Promise<boolean|undefined> {
     try {
       const docDetails: docDetails = {
         profileUrl: {
@@ -313,7 +331,7 @@ export class doctorService {
       throw new Error(error.message);
     }
   }
-  async createSlot(data: TimeSlot) {
+  async createSlot(data: TimeSlot): Promise<DoctorSchedule> {
     try {
       const response = await this.doctorRepository.createSlot(data);
 
@@ -327,7 +345,7 @@ export class doctorService {
       throw new Error(error.message);
     }
   }
-  async getSlots(date: string, doctorId: string) {
+  async getSlots(date: string, doctorId: string): Promise<Slot[]> {
     try {
       const response = await this.doctorRepository.getSlots(date, doctorId);
 
@@ -346,7 +364,7 @@ export class doctorService {
     doctorId: string,
     start: string,
     end: string
-  ) {
+  ): Promise<boolean> {
     try {
       const response = await this.doctorRepository.checkSlots(
         date,
@@ -365,7 +383,7 @@ export class doctorService {
       throw new Error(error.message);
     }
   }
-  async deleteSlot(date: Date, doctorId: string, slotId: string) {
+  async deleteSlot(date: Date, doctorId: string, slotId: string): Promise<boolean> {
     try {
       const response = await this.doctorRepository.deleteTimeSlot(
         date,
@@ -392,7 +410,7 @@ export class doctorService {
     limit: number = 10,
     startDate: Date | null = null,
     endDate: Date | null = null
-  ) {
+  ): Promise<GetAppointmentData> {
     try {
       const response = await this.doctorRepository.getAllAppointments(
         doctorId,
@@ -404,7 +422,7 @@ export class doctorService {
       );
   
       if (response && Array.isArray(response.appointments)) {
-        const formattedAppointments = response.appointments.map((appointment) => {
+        const formattedAppointments = response.appointments.map((appointment:any) => {
           return {
             ...appointment,
             start: this.getTime(appointment.start),
@@ -434,7 +452,7 @@ export class doctorService {
     return moment(slot).tz("UTC").format("h:mm A");
   }
 
-  async cancelAppointment(appointmentId: string, reason: string): Promise<any> {
+  async cancelAppointment(appointmentId: string, reason: string): Promise<AppointmentData> {
     try {
       const response = await this.doctorRepository.cancelAppointment(
         appointmentId,
@@ -442,12 +460,12 @@ export class doctorService {
       );
 
       if (response) {
-        console.log("Cancellation response:", response);
+        
 
         const paymentId = response.paymentId;
 
         if (paymentId) {
-          console.log("paymentid", paymentId);
+          
 
           const refundResponse = await refund(paymentId, "cancelled by doctor");
 
@@ -466,7 +484,7 @@ export class doctorService {
   async addPrescription(
     appointmentId: string,
     prescription: string
-  ): Promise<any> {
+  ): Promise<AppointmentData> {
     try {
       const response = await this.doctorRepository.completeAppointment(
         appointmentId,
@@ -486,7 +504,7 @@ export class doctorService {
     }
   }
 
-  async getWallet(doctorId: string, status: string, page: number, limit: number) {
+  async getWallet(doctorId: string, status: string, page: number, limit: number): Promise<GetTransactionData> {
     try {
         const response = await this.doctorRepository.getWalletDetails(
             doctorId,
@@ -501,7 +519,7 @@ export class doctorService {
     }
 }
 
-  async withdraw(doctorId: string, withdrawalAmount: number) {
+  async withdraw(doctorId: string, withdrawalAmount: number): Promise<IWallet> {
     try {
       const response = await this.doctorRepository.withdrawMoney(
         doctorId,
@@ -515,7 +533,7 @@ export class doctorService {
     }
   }
 
-  async getDoctorData(doctorId: string, reviewData: any) {
+  async getDoctorData(doctorId: string, reviewData: any): Promise<IDoctor|undefined> {
     try {
       const response = await this.doctorRepository.getDoctor(
         doctorId,
@@ -557,7 +575,7 @@ export class doctorService {
   async updateProfile(
     _id: string,
     updateData: { fees: number; DOB: Date; phone: string }
-  ): Promise<any> {
+  ): Promise<{doctorInfo:IDoctorInformation}> {
     try {
       const updatedDoctor = await this.doctorRepository.updateProfile(
         _id,
@@ -594,16 +612,16 @@ export class doctorService {
     }
   }
 
-  async getDashboardData(doctorId: string) {
+  async getDashboardData(doctorId: string): Promise<IDashboardStats> {
     try {
-      console.log("Entering getDashboardData method in docService");
+      
 
       const response = await this.doctorRepository.getAllStatistics(
         doctorId as string
       );
 
       if (response) {
-        console.log("Dashboarddd data successfully retrieved:", response);
+        
         return response;
       } else {
         console.error("Failed to retrieve dashboard data: Response is invalid");
@@ -617,7 +635,7 @@ export class doctorService {
     }
   }
 
-  async updateImage(userID: string, file: FileData) {
+  async updateImage(userID: string, file: FileData): Promise<{doctorInfo:IDoctorImageInfo}> {
     try {
       const doctorProfileImage: doctorImage = {
         profileUrl: {
@@ -627,7 +645,7 @@ export class doctorService {
       };
 
       if (file) {
-        console.log("File received for upload:", file);
+        
 
         // Load the image buffer into sharp and get metadata
         const image = await sharp(file.buffer);
@@ -686,14 +704,20 @@ export class doctorService {
           image: signedUrl,
         };
 
+        console.log("docccccccccccccc",doctorInfo);
+        
+
         return { doctorInfo };
+      }else{
+        throw new Error("Image metadata could not be retrieved.");
+
       }
     } catch (error: any) {
       throw new Error(error.message);
     }
   }
 
-  async getMedicalRecords(userId: string) {
+  async getMedicalRecords(userId: string): Promise<IMedicalReport[]> {
     try {
       const response = await this.doctorRepository.getMedicalRecords(userId);
 

@@ -1,20 +1,23 @@
-import mongoose from "mongoose";
+
+import { UpdateWriteOpResult } from "mongoose";
 import { S3Service } from "../config/s3client";
+import { chatData, GetChatResult, NotificationData } from "../interface/chatInterface/chatInterface";
 import { chatRepository } from "../repository/chatRepository";
-import NotificationModel from "../model/notificationModel";
+import { IChatRepository } from "../interface/chat.repository.interface";
+
 
 const chatRepositoryInstance = new chatRepository()
 const S3Services = new S3Service()
 export class chatService{
 
-    private chatRepository:chatRepository
+    private chatRepository:IChatRepository
 
     constructor(chatRepository:chatRepository){
         this.chatRepository = chatRepository
 
     }
 
-    async createChat(messageDetails: any) {
+    async createChat(messageDetails: any):Promise<chatData> {
         try {
             // Call the repository to save the chat
             const savedChat = await chatRepositoryInstance.createChat(messageDetails);
@@ -24,19 +27,21 @@ export class chatService{
             throw error; // Propagate the error for further handling
         }
     }
-    async createNotification(messageDetails: any) {
+    async createNotification(messageDetails: any):Promise<void> {
         try {
             // Call the repository to save the chat
             const savedNotification = await chatRepositoryInstance.createNotification(messageDetails);
+            
+            
             return savedNotification;
         } catch (error: any) {
             console.error("Error in chatService:", error);
             throw error; // Propagate the error for further handling
         }
     }
-    async createVideocallNotification(notificationDetails: any) {
+    async createVideocallNotification(notificationDetails: any):Promise<void> {
         try {
-            console.log("jiiii");
+            
             
             // Call the repository to save the chat
             const savedNotification = await chatRepositoryInstance.createVideocallNotification(notificationDetails);
@@ -46,7 +51,7 @@ export class chatService{
             throw error; // Propagate the error for further handling
         }
     }
-    async deleteMessage(messageDetails: any) {
+    async deleteMessage(messageDetails: any):Promise<chatData> {
         try {
             // Call the repository to save the chat
             const savedChat = await chatRepositoryInstance.deleteMessage(messageDetails);
@@ -57,10 +62,10 @@ export class chatService{
         }
     }
 
-    getChat = async (doctorID: string, userID: string,sender:string): Promise<any> => {
+     async getChat (doctorID: string, userID: string,sender:string): Promise<GetChatResult> {
         try {
           const response = await this.chatRepository.getChat(doctorID, userID,sender);
-          console.log("aaaaaaaaa",response)
+         
 
           let signedDoctorUrl: string | undefined;
           let signedUserUrl: string | undefined;
@@ -88,9 +93,10 @@ export class chatService{
           throw error;
         };
       };
-      getNotificationCount = async (receiverId: string): Promise<any> => {
+      async getNotificationCount (receiverId: string): Promise<{notificationCount:{notificationCount:number}}>  {
         try {
             const notificationCount = await chatRepositoryInstance.getNotificationCount(receiverId)
+            
     
             return {
                 notificationCount: notificationCount
@@ -99,7 +105,7 @@ export class chatService{
             throw error;
         }
     };
-    getAllNotifications = async (receiverId: string): Promise<any> => {
+    async getAllNotifications (receiverId: string): Promise<NotificationData[]>  {
         try {
 
             const notifications = await chatRepositoryInstance.getAllNotifications(receiverId)
@@ -110,7 +116,7 @@ export class chatService{
             throw error;
         }
     };
-    readAllNotifications = async (receiverId: string): Promise<any> => {
+     async readAllNotifications (receiverId: string): Promise<UpdateWriteOpResult>  {
         try {
 
             const notifications = await chatRepositoryInstance.readAllNotifications(receiverId)
@@ -121,10 +127,10 @@ export class chatService{
             throw error;
         }
     };
-    updateAppointment = async (appointmentId: string): Promise<any> => {
+     async updateAppointment (appointmentId: string): Promise<any>  {
         try {
 
-            console.log("appoinmttt",appointmentId);
+            
 
             const response = await chatRepositoryInstance.updateAppointment(appointmentId)
             

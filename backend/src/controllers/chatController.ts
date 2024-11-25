@@ -1,17 +1,18 @@
 import { Request, Response } from "express";
 import { chatRepository } from "../repository/chatRepository";
 import { chatService } from "../services/chatService";
+import { IChatService } from "../interface/chat.service.interface";
 
 export class chatController {
 
-    private chatService:chatService;
+    private chatService:IChatService;
 
     constructor(chatService:chatService){
         this.chatService = chatService;
 
     }
 
-    getChat = async (req: Request, res: Response) => {
+    async getChat (req: Request, res: Response)  {
         try {
           const doctorID = req.query.doctorID as string;
           const userID = req.query.userID as string;
@@ -25,7 +26,7 @@ export class chatController {
           res.status(400).json(error);
         };
       };
-      getNotificationCount = async (req: Request, res: Response) => {
+       async getNotificationCount (req: Request, res: Response)  {
         try {
           const recieverID = req.params.recieverId as string;
          
@@ -38,7 +39,7 @@ export class chatController {
           res.status(400).json(error);
         };
       };
-      getAllNotifications = async (req: Request, res: Response) => {
+       async getAllNotifications (req: Request, res: Response) {
         try {
           const recieverID = req.params.recieverId as string;
           
@@ -52,7 +53,7 @@ export class chatController {
           res.status(400).json(error);
         };
       };
-      readAllNotifications = async (req: Request, res: Response) => {
+       async readAllNotifications (req: Request, res: Response)  {
         try {
           const recieverID = req.params.recieverId as string;
           
@@ -66,7 +67,7 @@ export class chatController {
           res.status(400).json(error);
         };
       };
-      updateAppointment = async (req: Request, res: Response) => {
+       async updateAppointment (req: Request, res: Response) {
         try {
           const {appointmentId} = req.body;
 
