@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { setVideoCall } from "../../Redux/Slice/doctorSlice";
 import { useSocket } from "../../Context/SocketIO";
 import { MdDeleteOutline } from "react-icons/md";
-import { login } from "../../Redux/Action/userActions";
+
 
 
 
@@ -29,6 +29,7 @@ const Chat = () => {
   const [chatHistory, setChatHistory] = useState<any>(null);
   const [chatDetails, setChatDetails] = useState<any>(null);
   const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number; messageId: string } | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   
   let {socket} = useSocket()
  
@@ -77,6 +78,12 @@ const Chat = () => {
       socket?.emit("joinChatRoom", { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,online:"DOCTOR" });
     }    
   },[socket])
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatHistory]);
 
   const sendMessage = (newMsg:string) => {
     if (newMsg.trim()) {
@@ -215,7 +222,7 @@ const handleCloseContextMenu = () => {
 
 
   return (
-    <div className="flex flex-col w-full mx-auto pl-80 p-4 ml-3 mt-4 h-screen px-10 space-y-3">
+    <div className="flex flex-col w-full mx-auto pl-80 p-4 ml-3 mt-7 h-screen px-10 space-y-3">
       <div className="flex-1 sm:p-6 justify-between flex flex-col h-screen">
         {/* Chat header */}
         <div className="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
@@ -232,7 +239,7 @@ const handleCloseContextMenu = () => {
               <div className="text-2xl mt-1 flex items-center">
                 <span className="text-gray-700 mr-3">{chatDetails?.user?.name}</span>
               </div>
-              <span className="text-lg text-gray-600">Junior Developer</span>
+              <span className="text-lg text-gray-600">online</span>
             </div>
           </div>
           <button onClick={navigateVideoChat} className="inline-flex items-center justify-center rounded-lg h-10 w-10 transition text-gray-500 hover:bg-gray-300">
@@ -242,80 +249,133 @@ const handleCloseContextMenu = () => {
 
         {/* Chat messages */}
         <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto">
-          {chatHistory?.length > 0 ? (
-            chatHistory.map((chat: any, index: any) => (
-              <div key={index} className="chat-message">
-                {chat.sender === "doctor" ? (
-                  <div className="flex items-end justify-end">
-                  <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-end">
-                      <div onContextMenu={(e) => handleRightClick(e, chat._id)}>
-                          {chat.delete ? (
-                              <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
-                                  This message was deleted
-                              </span>
-                          ) : (
-                              <span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white">
-                                  {chat.message}
-                              </span>
-                          )}
-                      </div>
-                  </div>
-                  <img src={chatDetails.signedDoctorImageUrl} alt="Doctor profile" className="w-6 h-6 rounded-full" />
-              </div>
-              
-                ) : (
-                  <div className="flex items-end">
-    <img src={chatDetails?.signedUserImageUrl} alt="User profile" className="w-6 h-6 rounded-full" />
-    <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-start">
-        <div>
-            {chat.delete ? (
-                <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
-                    This message was deleted
-                </span>
-            ) : (
-                <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                    {chat.message}
-                </span>
-            )}
-        </div>
-    </div>
-</div>
+  {chatHistory?.length > 0 ? (
+    chatHistory.map((chat: any, index: any) => {
+      // Format the timestamp to show only the time (HH:mm)
+      const time = new Date(chat.createdAt).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
 
-                )}
+      return (
+        <div key={index} className="chat-message relative">
+          {chat.sender === "doctor" ? (
+            <div className="flex items-end justify-end">
+              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-end">
+                <div
+                  onContextMenu={(e) => handleRightClick(e, chat._id)}
+                  className="relative"
+                >
+                  {chat.delete ? (
+                    <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
+                      This message was deleted
+                    </span>
+                  ) : (
+                    <span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white">
+                      {chat.message}
+                    </span>
+                  )}
+                  {/* Delete button (positioned just above the message) */}
+                  {contextMenu?.messageId === chat._id && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-30px',
+                        right: '0',
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        padding: '4px',
+                        zIndex: 1000,
+                      }}
+                      onClick={() => onDeleteMessage(chat._id)}
+                    >
+                      <button
+                        style={{
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <MdDeleteOutline /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {/* Display time below the message */}
+                <span className="text-xs text-gray-500">{time}</span>
               </div>
-            ))
+              <img
+                src={chatDetails?.signedDoctorImageUrl}
+                alt="Doctor profile"
+                className="w-6 h-6 rounded-full"
+              />
+            </div>
           ) : (
-            <p>No messages yet...</p>
+            <div className="flex items-end">
+              <img
+                src={chatDetails?.signedUserImageUrl}
+                alt="User profile"
+                className="w-6 h-6 rounded-full"
+              />
+              <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-start">
+                <div
+                  onContextMenu={(e) => handleRightClick(e, chat._id)}
+                  className="relative"
+                >
+                  {chat.delete ? (
+                    <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
+                      This message was deleted
+                    </span>
+                  ) : (
+                    <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                      {chat.message}
+                    </span>
+                  )}
+                  {/* Delete button (positioned just above the message) */}
+                  {contextMenu?.messageId === chat._id && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: '-30px',
+                        left: '0',
+                        backgroundColor: 'white',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        padding: '4px',
+                        zIndex: 1000,
+                      }}
+                      onClick={() => onDeleteMessage(chat._id)}
+                    >
+                      <button
+                        style={{
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <MdDeleteOutline /> Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+                {/* Display time below the message */}
+                <span className="text-xs text-gray-500">{time}</span>
+              </div>
+            </div>
           )}
         </div>
-
-        {/* Context Menu for Deleting a Message */}
-        {contextMenu && (
-          <>
-            <div
-  style={{
-    position: "absolute",
-    top: contextMenu.mouseY,
-    left: contextMenu.mouseX,
-    backgroundColor: "white",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-    padding: "4px",
-    zIndex: 1000,
-  }}
-  onClick={() => onDeleteMessage(contextMenu.messageId)}
->
-  <button style={{ fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
-    <MdDeleteOutline /> Delete Message
-  </button>
+      );
+    })
+  ) : (
+    <p>No messages yet...</p>
+  )}
+  <div ref={messagesEndRef} />
+  
 </div>
-
-            <div onClick={handleCloseContextMenu} className="fixed inset-0" />
-          </>
-        )}
-
-        {/* Chat input */}
-        <div className="border-t-2 border-gray-200 px-4 pt-4">
+<div className="border-t-2 border-gray-200 px-2 pt-2">
           <div className="relative flex">
             <input
               type="text"
@@ -323,13 +383,25 @@ const handleCloseContextMenu = () => {
               placeholder="Type a message..."
               value={newMsg}
               onChange={(e) => setNewMsg(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && sendMessage(newMsg)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage(newMsg)}
             />
             <button onClick={() => sendMessage(newMsg)} className="text-blue-500 px-4">
               <BsSendFill />
             </button>
           </div>
         </div>
+
+
+        {/* Context Menu for Deleting a Message */}
+      {contextMenu && (
+        <div
+          onClick={handleCloseContextMenu}
+          className="fixed inset-0"
+        />
+      )}
+
+        {/* Chat input */}
+       
       </div>
     </div>
   );

@@ -93,46 +93,56 @@ function OTPForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="max-w-lg w-full mx-4 sm:mx-auto shadow px-6 py-7 rounded overflow-hidden bg-white">
-        <h2 className="text-2xl uppercase font-medium mb-1 text-center">Enter OTP</h2>
-        <p className="text-gray-600 mb-6 text-sm text-center">Enter Your OTP Here</p>
-        <form autoComplete="off" onSubmit={handleSubmit}>
-          <p className="text-red-500"></p>
-          <div className="flex space-x-2 mb-4 justify-center">
-            {/* Input Fields for OTP */}
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                type="text"
-                id={`otp-${index}`}
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleChange(e, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                className="w-12 h-12 border border-gray-300 px-4 py-3 text-gray-600 text-lg rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400 text-center"
-                placeholder="0"
-              />
-            ))}
-          </div>
-          <div className="mt-4 flex flex-col items-center">
-            <button 
-              type="submit" 
-              className="w-48 block py-2 text-center text-white bg-gradient-to-l from-cyan-500 to-blue-500 border  rounded hover:bg-blue-400  transition uppercase font-roboto font-medium"
-            >
-              {buttonText}
-            </button>
-            <div className="text-gray-600 mt-4">
-              {timer > 0 ? (
-                <>Resend OTP in <span className="text-blue-400">{timer}s</span></>
-              ) : (
-                "OTP expired"
-              )}
-            </div>
-          </div>
-        </form>
+    <div
+  className="flex items-center justify-center min-h-screen bg-gray-100"
+  style={{
+    backgroundImage: 'url("https://images.unsplash.com/photo-1666887364752-29dcc75d6aee?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    
+  }}
+>
+  <div className="absolute inset-0 bg-black opacity-30"></div>
+  <div className="relative max-w-lg w-full mx-4 sm:mx-auto shadow px-6 py-7 rounded overflow-hidden bg-white">
+    <h2 className="text-2xl uppercase font-medium mb-1 text-center">Enter OTP</h2>
+    <p className="text-gray-600 mb-6 text-sm text-center">Enter Your OTP Here</p>
+    <form autoComplete="off" onSubmit={handleSubmit}>
+      <p className="text-red-500"></p>
+      <div className="flex space-x-2 mb-4 justify-center">
+        {/* Input Fields for OTP */}
+        {otp.map((digit, index) => (
+          <input
+            key={index}
+            type="text"
+            id={`otp-${index}`}
+            maxLength={1}
+            value={digit}
+            onChange={(e) => handleChange(e, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            className="w-12 h-12 border border-gray-300 px-4 py-3 text-gray-600 text-lg rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400 text-center"
+            placeholder="0"
+          />
+        ))}
       </div>
-    </div>
+      <div className="mt-4 flex flex-col items-center">
+        <button 
+          type="submit" 
+          className="w-48 block py-2 text-center text-white bg-gradient-to-l from-cyan-500 to-blue-500 border rounded hover:bg-blue-400 transition uppercase font-roboto font-medium"
+        >
+          {buttonText}
+        </button>
+        <div className="text-gray-600 mt-4">
+          {timer > 0 ? (
+            <>Resend OTP in <span className="text-blue-400">{timer}s</span></>
+          ) : (
+            "OTP expired"
+          )}
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
   );
 }
 

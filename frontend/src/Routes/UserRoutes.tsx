@@ -12,7 +12,7 @@ import DoctorProfilePage from '../pages/userPages/DoctorProfilePage';
 import UserLayout from '../pages/userPages/UserLayout';
 import DoctorProfileLayout from '../pages/userPages/DoctorProfileLayout';
 import TimeSlotsPage from '../pages/userPages/TimeSlotsPage';
-
+import UserLoginProtectRoute from './ProtectedRoutes/UserLoginProtectRoute';
 import UserProfilePage from '../pages/userPages/UserProfilePage';
 import UserProfilesLayout from '../pages/userPages/UserProfilesLayout';
 import SecurityPage from '../pages/userPages/SecurityPage';
@@ -31,7 +31,7 @@ function UserRoutes() {
     <Routes>
       <Route path="/signup" element={<Signup/>} />
       <Route path="/otp" element={<Otp/>} />
-      <Route path="/login" element={<Login/>} />
+      <Route path="/login" element={<UserLoginProtectRoute><Login/></UserLoginProtectRoute>} />
       
          <Route path='/' element={<UserLayout/>}>
              <Route index path="/" element={<LandingPage/>} />
@@ -47,7 +47,7 @@ function UserRoutes() {
                 </Route>
                 
          </Route>
-         <Route path='/userProfile' element={<UserProfilesLayout/>} >
+         <Route path='/userProfile' element={<UserProtectRoute><UserProfilesLayout/></UserProtectRoute>} >
                     <Route path="profile" element={<UserProfilePage/>} />
                     <Route path="security" element={<SecurityPage/>} />
                     <Route path="appointments" element={<AppointmentPage/>} />

@@ -72,11 +72,20 @@ function Signup() {
   });
 
   return (
-    <div className="contain py-16">
-      <div className="max-w-lg mx-auto shadow px-6 py-7 rounded overflow-hidden">
-        <h2 className="text-2xl uppercase font-medium mb-1">Register</h2>
-        <p className="text-gray-600 mb-6 text-sm">Welcome! So good to have you here!</p>
-        <form onSubmit={formik.handleSubmit} autoComplete="off">
+    
+
+
+
+
+<div className="contain py-16 bg-cover bg-center" style={{
+    backgroundImage: 'url("https://images.unsplash.com/photo-1666887364752-29dcc75d6aee?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }}>
+  <div className="max-w-lg mx-auto shadow px-6 py-7 bg-white bg-opacity-90 rounded overflow-hidden">
+    <h2 className="text-2xl uppercase font-medium mb-1">Register</h2>
+    <p className="text-gray-600 mb-6 text-sm">Welcome! So good to have you here!</p>
+    <form onSubmit={formik.handleSubmit} autoComplete="off">
           <div className="space-y-2">
             <div>
               <label htmlFor="name" className="text-gray-600 mb-2 block">Name</label>
@@ -145,27 +154,7 @@ function Signup() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                 />
-                <div className="cursor-pointer absolute inset-y-0 right-0 flex items-center px-8 text-gray-600 border-l border-gray-300">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    strokeWidth="1.5"
-                    stroke="currentColor" 
-                    className="w-5 h-5"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                    />
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
+                
               </div>
               {formik.touched.password && formik.errors.password ? (
                 <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
@@ -180,33 +169,13 @@ function Signup() {
                   type="password" 
                   name="confirmPassword" 
                   id="confirmPassword" 
-                  className={`block w-full border ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400`} 
+                  className={`block w-full border ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400 `} 
                   placeholder="***********"
                   value={formik.values.confirmPassword}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                 />
-                <div className="cursor-pointer absolute inset-y-0 right-0 flex items-center px-8 text-gray-600 border-l border-gray-300">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    strokeWidth="1.5"
-                    stroke="currentColor" 
-                    className="w-5 h-5"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                      d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                    />
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </div>
+                
               </div>
               {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
                 <div className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</div>
@@ -222,12 +191,13 @@ function Signup() {
             </button>
           </div>
         </form>
-        <p className="mt-4 text-gray-600 text-center">
-          Already have an account? 
-          <Link to="/doctor/login"  className="text-blue-300  ml-2">Login Now</Link>
-        </p>
-      </div>
-    </div>
+    <p className="mt-4 text-gray-600 text-center">
+      Already have an account? 
+      <Link to="/doctor/login" className="text-blue-300 ml-2">Login Now</Link>
+    </p>
+  </div>
+</div>
+
   );
 }
 

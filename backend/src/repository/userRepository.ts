@@ -779,4 +779,6 @@ export class userRepository implements IUserRepository {
       throw new Error(error.message);
     }
   }
+  
+
 }

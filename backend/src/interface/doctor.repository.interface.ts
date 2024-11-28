@@ -22,6 +22,7 @@ export interface IDoctorRepository {
     getAllStatistics(doctorId: string): Promise<IDashboardStats>;
     uploadProfileImage(doctorID: string, imageData: doctorImage): Promise<DoctorResult>;
     getMedicalRecords(userId: string): Promise<IMedicalReport[]>;
+    doctorData(doctorId: string): Promise<any>
 
     
 

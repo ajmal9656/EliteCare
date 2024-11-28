@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import DetailsUpload from '../../components/doctorComponents/DetailsUpload';
@@ -6,6 +6,7 @@ import axiosUrl from '../../utils/axios';
 import { Specializations } from '../../interfaces/doctorinterface';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import VerificationProcessingPage from '../../pages/doctorPages/VerificationProcessingPage';
 
 // Validation schema for the form
 const validationSchema = Yup.object({
@@ -38,6 +39,7 @@ const validationSchema = Yup.object({
 
 function DoctorVerifivationForm() {
   const navigate = useNavigate()
+  const [isProcessing, setIsProcessing] = useState(false);
   const [specializations, setSpecializations] = React.useState<Specializations[]>([]);
   const [imagePreviews, setImagePreviews] = React.useState({
     image: null,
@@ -63,21 +65,37 @@ function DoctorVerifivationForm() {
     }
   };
 
+  console.log("sdvhscvdsjvhsdjvhnskjldvhnsdajfvhasjkdchna.,jkcvhnajvn");
   
   
 
-  React.useEffect(() => {
+  
     const fetchSpecializations = async () => {
       try {
+        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        
         const response = await axiosUrl.get('/admin/getSpecializations');
-        setSpecializations(response.data.response);
-      } catch (error) {
-        console.error('Failed to fetch specializations:', error);
+        console.log("speceeeeeeee",response.data);
+        
+        setSpecializations(response.data.response.specializations);
+      } catch (error:any) {
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login page.");
+          navigate("/doctor/login"); // Navigate to the login page if unauthorized
+        } else {
+          console.error("Error fetching user details:", error);
+        }
       }
     };
+
+    useEffect(()=>{
+      console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+      
+      fetchSpecializations()
+
+    },[])
     
-    fetchSpecializations();
-  }, []);
+    
   
   const formik = useFormik({
     initialValues: {
@@ -140,7 +158,12 @@ function DoctorVerifivationForm() {
         });
 
         console.log('Form submitted successfully', response.data);
-        navigate("/doctor/verificationProcessing")
+        if(response.data.status){
+          setIsProcessing(true);
+          
+
+        }
+        
         
       } catch (error:any) {
         console.error('Failed to submit the form', error);
@@ -150,7 +173,9 @@ function DoctorVerifivationForm() {
       }
     },
   });
-  
+  if (isProcessing) {
+    return <VerificationProcessingPage />;
+  }
 
   return (
     <div className="flex flex-col md:flex-row">

@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import adminRoute from './src/routes/adminRoutes'
 import { createServer } from 'http';
 import { configSocketIO } from './src/config/socket.ioConfig';
+import "./src/helper/nodeCron"
 
 
 

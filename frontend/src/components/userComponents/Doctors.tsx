@@ -83,8 +83,7 @@ const Doctors: React.FC = () => {
         Our Doctors
       </h1>
       <p className=" mt-2 text-center lg:text-start">
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Natus,
-        quidem.
+        Our Doctors are here to take care for you...
       </p>
     </div>
     <div className="flex gap-5 mt-4 lg:mt-0">

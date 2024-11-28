@@ -1,14 +1,13 @@
 import React from "react";
 import Button from "../common/userCommon/Button";
-import axiosUrl from "../../utils/axios";
+
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
+  const navigate = useNavigate()
   const handleClick = async () => {
     try {
-      // Replace this with your actual backend endpoint
-      const response = await axiosUrl.get("/getSpecializations");
-      console.log("Backend response:", response.data);
-      // Handle the response data as needed
+      navigate("/doctor/login")
     } catch (error) {
       console.error("Error fetching services:", error);
     }
@@ -21,13 +20,11 @@ const Home: React.FC = () => {
           Empowering Health Choices for a Vibrant Life Your Trusted..
         </h1>
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam magnam
-          omnis natus accusantium quos. Reprehenderit incidunt expedita
-          molestiae impedit at sequi dolorem iste sit culpa, optio voluptates
-          fugiat vero consequatur?
+        EliteCare is here to support your health needs. From trusted information to booking appointments and managing records, we provide personalized care to make your healthcare experience simple and accessible.
         </p>
 
-        <Button title="See Services" onClick={handleClick} />
+        <Button title="Are you a Doctor?" onClick={handleClick} />
+        
       </div>
     </div>
   );

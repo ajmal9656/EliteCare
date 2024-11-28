@@ -165,7 +165,14 @@ function AppointmentDetails() {
         console.log("medfical", response.data.response);
 
         setMedicalRecords(response.data.response);
-      } catch (error) {}
+      } catch (error:any) {
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login page.");
+          navigate("/doctor/login"); // Navigate to the login page if unauthorized
+        } else {
+          console.error("Error fetching user details:", error);
+        }
+      }
     };
 
     fetchMedicalRecords();
@@ -241,64 +248,97 @@ function AppointmentDetails() {
     }
   };
 
-  // Helper function to render buttons based on appointment status
-  const renderButtons = () => {
-    switch (appointmentStatus) {
-      case "pending":
-        return (
-          <>
+  // Helper function to check if the chat button should be displayed
+const shouldShowChatButton = (appointmentDate: string) => {
+  if (!appointmentDate) return false;
+
+  const today = moment().startOf("day"); // Current date (start of the day)
+  const appointmentMoment = moment(appointmentDate).startOf("day"); // Appointment date
+  const daysDiff = today.diff(appointmentMoment, "days"); // Difference in days
+
+  return daysDiff >= 0 && daysDiff <= 2; // Show button if today or within 2 days after
+};
+
+// Helper function to check if the cancel button should be displayed
+const shouldShowCancelButton = (appointmentDate: string) => {
+  if (!appointmentDate) return false;
+
+  const now = moment(); // Current date and time
+  const appointmentMoment = moment(appointmentDate); // Appointment date and time
+
+  return now.isBefore(appointmentMoment); // Show button if the current time is before the appointment time
+};
+
+// Updated renderButtons function
+const renderButtons = () => {
+  const isChatButtonVisible =
+    appointment?.date && shouldShowChatButton(appointment.date);
+
+  const isCancelButtonVisible =
+    appointment?.date && shouldShowCancelButton(appointment.date);
+
+  switch (appointmentStatus) {
+    case "pending":
+      return (
+        <>
+          {isChatButtonVisible && (
             <button
               className="bg-blue-500 w-[30%] h-[70%] rounded-md text-white font-medium hover:bg-blue-600 transition duration-200 ease-in-out"
               onClick={navigateChat}
             >
               Chat
             </button>
+          )}
+          {isCancelButtonVisible && (
             <button
               className="bg-red-500 w-[30%] h-[70%] rounded-md text-white font-medium hover:bg-red-600 transition duration-200 ease-in-out"
               onClick={openModal}
             >
               Cancel
             </button>
-          </>
-        );
-      case "prescription pending":
-        return (
-          <>
+          )}
+        </>
+      );
+    case "prescription pending":
+      return (
+        <>
+          {isChatButtonVisible && (
             <button
               className="bg-blue-500 w-[30%] h-[70%] rounded-md text-white font-medium hover:bg-blue-600 transition duration-200 ease-in-out"
               onClick={navigateChat}
             >
               Chat
             </button>
-            <button
-              className="bg-green-500 w-[60%] h-[70%] rounded-md text-white font-medium hover:bg-green-600 transition duration-200 ease-in-out"
-              onClick={openPrescriptionModal}
-            >
-              Add Prescription
-            </button>
-          </>
-        );
-      case "cancelled":
-        return (
-          <p className="text-red-600 text-lg font-medium">
-            Cancelled By Patient
-          </p>
-        );
-      case "cancelled by Dr":
-        return (
+          )}
           <button
-            className="bg-red-500 w-[60%] h-[70%] rounded-md text-white font-medium hover:bg-red-600 transition duration-200 ease-in-out"
-            onClick={showCancellationReasonModal}
+            className="bg-green-500 w-[60%] h-[70%] rounded-md text-white font-medium hover:bg-green-600 transition duration-200 ease-in-out"
+            onClick={openPrescriptionModal}
           >
-            Cancelled by You
+            Add Prescription
           </button>
-        );
-      case "completed":
-        return <p className="text-green-600 text-lg font-medium">Completed</p>;
-      default:
-        return null;
-    }
-  };
+        </>
+      );
+    case "cancelled":
+      return (
+        <p className="text-red-600 text-lg font-medium">
+          Cancelled By Patient
+        </p>
+      );
+    case "cancelled by Dr":
+      return (
+        <button
+          className="bg-red-500 w-[60%] h-[70%] rounded-md text-white font-medium hover:bg-red-600 transition duration-200 ease-in-out"
+          onClick={showCancellationReasonModal}
+        >
+          Cancelled by You
+        </button>
+      );
+    case "completed":
+      return <p className="text-green-600 text-lg font-medium">Completed</p>;
+    default:
+      return null;
+  }
+};
 
   return (
     <>

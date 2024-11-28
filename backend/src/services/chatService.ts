@@ -1,7 +1,7 @@
 
 import { UpdateWriteOpResult } from "mongoose";
 import { S3Service } from "../config/s3client";
-import { chatData, GetChatResult, NotificationData } from "../interface/chatInterface/chatInterface";
+import { Appointment, chatData, GetChatResult, NotificationData } from "../interface/chatInterface/chatInterface";
 import { chatRepository } from "../repository/chatRepository";
 import { IChatRepository } from "../interface/chat.repository.interface";
 
@@ -20,7 +20,7 @@ export class chatService{
     async createChat(messageDetails: any):Promise<chatData> {
         try {
             // Call the repository to save the chat
-            const savedChat = await chatRepositoryInstance.createChat(messageDetails);
+            const savedChat = await this.chatRepository.createChat(messageDetails);
             return savedChat;
         } catch (error: any) {
             console.error("Error in chatService:", error);
@@ -30,7 +30,7 @@ export class chatService{
     async createNotification(messageDetails: any):Promise<void> {
         try {
             // Call the repository to save the chat
-            const savedNotification = await chatRepositoryInstance.createNotification(messageDetails);
+            const savedNotification = await this.chatRepository.createNotification(messageDetails);
             
             
             return savedNotification;
@@ -44,7 +44,7 @@ export class chatService{
             
             
             // Call the repository to save the chat
-            const savedNotification = await chatRepositoryInstance.createVideocallNotification(notificationDetails);
+            const savedNotification = await this.chatRepository.createVideocallNotification(notificationDetails);
             return savedNotification;
         } catch (error: any) {
             console.error("Error in chatService:", error);
@@ -54,7 +54,7 @@ export class chatService{
     async deleteMessage(messageDetails: any):Promise<chatData> {
         try {
             // Call the repository to save the chat
-            const savedChat = await chatRepositoryInstance.deleteMessage(messageDetails);
+            const savedChat = await this.chatRepository.deleteMessage(messageDetails);
             return savedChat;
         } catch (error: any) {
             console.error("Error in chatService:", error);
@@ -95,7 +95,7 @@ export class chatService{
       };
       async getNotificationCount (receiverId: string): Promise<{notificationCount:{notificationCount:number}}>  {
         try {
-            const notificationCount = await chatRepositoryInstance.getNotificationCount(receiverId)
+            const notificationCount = await this.chatRepository.getNotificationCount(receiverId)
             
     
             return {
@@ -108,7 +108,7 @@ export class chatService{
     async getAllNotifications (receiverId: string): Promise<NotificationData[]>  {
         try {
 
-            const notifications = await chatRepositoryInstance.getAllNotifications(receiverId)
+            const notifications = await this.chatRepository.getAllNotifications(receiverId)
             
     
             return notifications;
@@ -119,7 +119,7 @@ export class chatService{
      async readAllNotifications (receiverId: string): Promise<UpdateWriteOpResult>  {
         try {
 
-            const notifications = await chatRepositoryInstance.readAllNotifications(receiverId)
+            const notifications = await this.chatRepository.readAllNotifications(receiverId)
             
     
             return notifications;
@@ -127,12 +127,15 @@ export class chatService{
             throw error;
         }
     };
-     async updateAppointment (appointmentId: string): Promise<any>  {
+     async updateAppointment (appointmentId: string): Promise<Appointment>  {
         try {
 
             
 
-            const response = await chatRepositoryInstance.updateAppointment(appointmentId)
+            const response = await this.chatRepository.updateAppointment(appointmentId)
+
+            console.log("reesponseeeee",response);
+            
             
     
             return response;

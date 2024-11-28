@@ -120,11 +120,11 @@ export class doctorController {
   async logoutDoctor(req: Request, res: Response): Promise<void> {
     try {
       // Clear the access token and refresh token cookies
-      res.cookie("doctorAccessToken", "", {
+      res.cookie("AccessToken", "", {
         httpOnly: true,
         expires: new Date(0),
       });
-      res.cookie("doctorRefreshToken", "", {
+      res.cookie("RefreshToken", "", {
         httpOnly: true,
         expires: new Date(0),
       });
@@ -623,6 +623,37 @@ export class doctorController {
       const userId = req.params.userId;
 
       const response = await this.doctorService.getMedicalRecords(userId);
+
+      res.status(200).json({ message: "successfully", response });
+    } catch (error: any) {
+      if (
+        error.message ===
+        "Something went wrong while creating the specialization."
+      ) {
+        res
+          .status(400)
+          .json({
+            message: "Something went wrong while creating the specialization.",
+          });
+      } else {
+        res
+          .status(500)
+          .json({
+            message: "An unexpected error occurred",
+            error: error.message,
+          });
+      }
+    }
+  }
+
+  async getDoctorData(req: Request, res: Response): Promise<void> {
+    try {
+      const email = req.params.email;
+      
+      const response = await this.doctorService.doctorDetails(
+        email);
+        console.log("redd",response);
+        
 
       res.status(200).json({ message: "successfully", response });
     } catch (error: any) {

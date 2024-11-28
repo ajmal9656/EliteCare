@@ -113,11 +113,11 @@ export class userController {
   async logoutUser(req: Request, res: Response): Promise<void> {
     try {
       // Clear the access token and refresh token cookies
-      res.cookie("userAccessToken", "", {
+      res.cookie("AccessToken", "", {
         httpOnly: true,
         expires: new Date(0),
       });
-      res.cookie("userRefreshToken", "", {
+      res.cookie("RefreshToken", "", {
         httpOnly: true,
         expires: new Date(0),
       });

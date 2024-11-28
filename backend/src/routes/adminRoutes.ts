@@ -21,18 +21,18 @@ route.post('/addSpecialization',adminControllerInstance.addSpecialization.bind(a
 route.get('/getSpecializations',adminControllerInstance.getSpecialization.bind(adminControllerInstance));
 route.put('/updateSpecialization',adminControllerInstance.editSpecialization.bind(adminControllerInstance));
 route.put('/listUnlistSpecialization',adminControllerInstance.listUnlistSpecialization.bind(adminControllerInstance));
-route.get('/getApplications',adminControllerInstance.getApplication.bind(adminControllerInstance));
+route.get('/getApplications',verifyAdminToken,adminControllerInstance.getApplication.bind(adminControllerInstance));
 route.get('/getDoctorApplication/:applicationId',adminControllerInstance.getDoctorApplication.bind(adminControllerInstance));
 route.post('/approveApplication/:doctorId',adminControllerInstance.approveApplication.bind(adminControllerInstance));
 route.delete('/rejectApplication/:doctorId',adminControllerInstance.rejectApplication.bind(adminControllerInstance));
-route.get('/getUsers',adminControllerInstance.getUsers.bind(adminControllerInstance));
+route.get('/getUsers',verifyAdminToken,adminControllerInstance.getUsers.bind(adminControllerInstance));
 route.put('/listUnlistUser/:userId',adminControllerInstance.listUnlistUser.bind(adminControllerInstance));
-route.get('/getDoctors',adminControllerInstance.getDoctors.bind(adminControllerInstance));
+route.get('/getDoctors',verifyAdminToken,adminControllerInstance.getDoctors.bind(adminControllerInstance));
 route.put('/listUnlistDoctor/:doctorId',adminControllerInstance.listUnlistDoctor.bind(adminControllerInstance));
-route.get('/dashboardData',adminControllerInstance.getDashboardData.bind(adminControllerInstance));
+route.get('/dashboardData',verifyAdminToken,adminControllerInstance.getDashboardData.bind(adminControllerInstance));
 route.post('/logout', adminControllerInstance.logoutAdmin.bind(adminControllerInstance));
-route.get('/getAppointments', adminControllerInstance.getAllAppointments.bind(adminControllerInstance));
-route.get('/getTransactionsDetails', adminControllerInstance.getAllTransactions.bind(adminControllerInstance));
+route.get('/getAppointments',verifyAdminToken, adminControllerInstance.getAllAppointments.bind(adminControllerInstance));
+route.get('/getTransactionsDetails',verifyAdminToken, adminControllerInstance.getAllTransactions.bind(adminControllerInstance));
 
 
 

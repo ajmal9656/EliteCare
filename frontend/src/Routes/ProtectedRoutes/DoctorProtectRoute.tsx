@@ -3,30 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../Redux/store';
 import { useEffect } from 'react';
 
-interface UserProtectRouteProps {
+interface DoctorProtectRouteProps {
   children: React.ReactNode;
 }
 
-function UserProtectRoute({ children }: UserProtectRouteProps) {
+function DoctorProtectRoute({ children }: DoctorProtectRouteProps) {
   const navigate = useNavigate();
-  const userToken = useSelector((state: RootState) => state.user.userInfo);
+  const doctorToken = useSelector((state: RootState) => state.doctor.doctorInfo);
 
-  console.log("eeeeeeeeeeeeeee",userToken);
+  console.log("eeeeeeeeeeeeeee",doctorToken);
   
 
  
   useEffect(() => {
-    if (userToken==null) {
-      navigate('/login', {
+    if (doctorToken==null) {
+      navigate('/doctor/login', {
         state: { message: 'Authorization failed' },
         replace: true,
       });
     }
-  }, [navigate, userToken]);
+  }, [navigate, doctorToken]);
 
 
   
   return <>{children}</>;
 }
 
-export default UserProtectRoute;
+export default DoctorProtectRoute;

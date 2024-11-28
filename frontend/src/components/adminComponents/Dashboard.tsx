@@ -4,8 +4,10 @@ import { FaUsers, FaUserDoctor } from "react-icons/fa6";
 import axiosUrl from "../../utils/axios";
 import RevenueChart from "./RevenueChart";
 import UserDoctorChart from "./UserDoctorChart";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+  const navigate = useNavigate()
   const [dashboardData, setDashboardData] = useState({
     totalRevenue: 0,
     totalUsers: 0,
@@ -33,8 +35,13 @@ function Dashboard() {
           adminRevenue:response.data.response.adminRevenue,
           doctorRevenue:response.data.response.doctorRevenue,
         });
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
+      } catch (error:any) {
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login page.");
+          navigate("/admin/login"); // Navigate to the login page if unauthorized
+        } else {
+          console.error("Error fetching user details:", error);
+        }
       }
     };
 

@@ -879,4 +879,52 @@ async withdrawMoney(doctorId: string, withdrawalAmount: number): Promise<IWallet
       );
     }
   }
+
+  async doctorData(email: string): Promise<any> {
+    try {
+      console.log("Fetching doctor data for email:", email);
+  
+      const response: any = await doctorModel.findOne({ email: email }, { password: 0 });
+  
+      if (response) {
+        console.log("Doctor data fetched:", response);
+  
+        let result: any = response.toObject(); // Convert Mongoose document to plain object if necessary
+  
+        if (response.kycStatus === "rejected") {
+          console.log("Doctor's KYC status is rejected.");
+          
+          const rejectedData = await RejectDoctorModel.findOne({
+            doctorId: response._id,
+          });
+  
+          console.log("Rejected data fetched:", rejectedData);
+  
+          if (rejectedData) {
+            console.log("Rejected reason found:", rejectedData.reason);
+            result.rejectedReason = rejectedData.reason;
+          } else {
+            console.log("No rejected data found for doctor ID:", response._id);
+          }
+        }
+        if(response.kycStatus === "approved"&&response.kycDetails==null){
+          console.log("Approveeee");
+          
+          result.approved = true;
+
+        }
+  
+        console.log("Final result before return:", result);
+        return result;
+      }
+  
+      console.warn(`No doctor found with email: ${email}`);
+      throw new Error("No doctor found");
+    } catch (error: any) {
+      console.error("Error fetching doctor data:", error.message);
+      throw new Error(`Failed to fetch doctor data: ${error.message}`);
+    }
+  }
+  
+  
 }

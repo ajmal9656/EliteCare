@@ -44,6 +44,7 @@ export interface DoctorResult {
   gender: string;
   image: ImageDetails;
   rejectedReason?: string; // Optional, in case `kycStatus` is "rejected"
+  justApproved?:boolean
 }
 
 export interface IDoctorInformation {
@@ -109,7 +110,7 @@ export interface DoctorState {
   }
   
   export interface DoctorFiles {
-    image?: FileData[];
+    image?: FileData[]|any;
     aadhaarFrontImage?: FileData[];
     aadhaarBackImage?: FileData[];
     certificateImage?: FileData[];
@@ -119,6 +120,7 @@ export interface DoctorState {
     profileUrl: {
       type:string,
       url:string
+      
     };
     aadhaarFrontImageUrl: {
       type:string,

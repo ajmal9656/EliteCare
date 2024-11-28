@@ -1,6 +1,4 @@
 import { Request, Response } from "express";
-import { adminService } from "../services/adminServices";
-import { log } from "util";
 import { IAdminService } from "../interface/admin.service.interface";
 
 
@@ -67,8 +65,8 @@ export class adminController {
       async logoutAdmin(req: Request, res: Response): Promise<void> {
         try {
           // Clear the access token and refresh token cookies
-          res.cookie('adminAccessToken', '', { httpOnly: true, expires: new Date(0) });
-          res.cookie('adminRefreshToken', '', { httpOnly: true, expires: new Date(0) });
+          res.cookie('AccessToken', '', { httpOnly: true, expires: new Date(0) });
+          res.cookie('RefreshToken', '', { httpOnly: true, expires: new Date(0) });
       
           // Send success response
           res.status(200).json({ message: "Logout successful" });

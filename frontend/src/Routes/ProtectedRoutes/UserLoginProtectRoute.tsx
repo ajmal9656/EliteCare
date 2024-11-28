@@ -3,22 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../Redux/store';
 import { useEffect } from 'react';
 
-interface UserProtectRouteProps {
+interface LoginProtectRouteProps {
   children: React.ReactNode;
 }
 
-function UserProtectRoute({ children }: UserProtectRouteProps) {
+function UserLoginProtectRoute({ children }: LoginProtectRouteProps) {
   const navigate = useNavigate();
-  const userToken = useSelector((state: RootState) => state.user.userInfo);
+  const userToken = useSelector((state: RootState) => state.user);
 
   console.log("eeeeeeeeeeeeeee",userToken);
   
 
  
   useEffect(() => {
-    if (userToken==null) {
-      navigate('/login', {
-        state: { message: 'Authorization failed' },
+    if (userToken.userInfo!=null) {
+      navigate('/', {
+        state: { message: 'logged in' },
         replace: true,
       });
     }
@@ -29,4 +29,4 @@ function UserProtectRoute({ children }: UserProtectRouteProps) {
   return <>{children}</>;
 }
 
-export default UserProtectRoute;
+export default UserLoginProtectRoute;

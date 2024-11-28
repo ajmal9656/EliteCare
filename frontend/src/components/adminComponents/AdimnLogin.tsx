@@ -30,7 +30,7 @@ function AdminLogin() {
               console.log("logggg success",loginData);
               
                 toast.success("admin login successful");
-                navigate("/admin/home")
+                navigate("/admin/dashboard")
               
               
     

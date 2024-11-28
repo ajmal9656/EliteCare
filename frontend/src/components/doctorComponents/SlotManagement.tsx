@@ -14,9 +14,12 @@ import { MdDelete } from "react-icons/md";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { TiTick } from "react-icons/ti";
+import { useNavigate } from 'react-router-dom';
 
 
 function SlotManagement() {
+
+  const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); 
   const [availableSlots, setAvailableSlots] = useState<{ start: string, end: string, availability: boolean, _id: string,date:Date,doctorId:string }[]>([]);
@@ -282,9 +285,20 @@ function SlotManagement() {
 
  
   useEffect(() => {
-    const date = new Date()
+    try{
+      const date = new Date()
     var selectedDateUTC = moment(date).utc().startOf('day').toISOString();
     fetchSlotsForDate(selectedDateUTC);
+
+    }catch(error:any){
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized: Redirecting to login page.");
+        navigate("/doctor/login"); // Navigate to the login page if unauthorized
+      } else {
+        console.error("Error fetching user details:", error);
+      }
+    }
+    
   }, []); 
 
   return (

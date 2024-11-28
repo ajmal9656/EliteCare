@@ -283,9 +283,25 @@ function AppointmentDetails() {
       )}
 
       {appointment?.status === "prescription pending" && (
+        <div>
+          {moment(appointment.date).isSame(moment(), 'day') && moment(appointment.date).isBetween(
+      moment().startOf('day'),
+      moment().add(2, 'days').endOf('day'),
+      undefined,
+      '[]' // Includes boundary dates
+    ) && (
+      <button
+        className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
+        onClick={navigateChat}
+      >
+        Chat
+      </button>
+    )}
+          
         <p className="text-lg italic text-yellow-600">
           Prescription will be added soon...
         </p>
+        </div>
       )}
 
 {appointment?.status === "pending" && (

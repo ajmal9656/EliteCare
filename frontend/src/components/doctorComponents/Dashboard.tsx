@@ -6,8 +6,11 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
 import axiosUrl from '../../utils/axios';
 import RevenueChart from './RevenueChart';
+import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
+
+  const navigate = useNavigate()
   
   const DoctorData = useSelector((state: RootState) => state.doctor);
   const [dashboardData, setDashboardData] = useState({
@@ -30,8 +33,13 @@ function Dashboard() {
         // Update state with the received data
         setDashboardData(response.data.response);
         
-      } catch (error) {
-        console.error("Error fetching data", error);
+      } catch (error:any) {
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login page.");
+          navigate("/doctor/login"); // Navigate to the login page if unauthorized
+        } else {
+          console.error("Error fetching user details:", error);
+        }
       }
     };
 

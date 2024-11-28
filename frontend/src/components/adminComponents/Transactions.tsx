@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import axiosUrl from "../../utils/axios";
 import DatePicker from "react-datepicker";
+import { useNavigate } from "react-router-dom";
 
 const Transactions = () => {
+  const navigate = useNavigate()
   const [status, setStatus] = useState("Credit");
   const [transactions, setTransactions] = useState<any>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -32,8 +34,13 @@ const Transactions = () => {
       
       setTransactions(response.data.data);
       setTotalPages(response.data.totalPages)
-    } catch (err) {
-      console.error("Error fetching transactions:", err);
+    } catch (error:any) {
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized: Redirecting to login page.");
+        navigate("/admin/login"); // Navigate to the login page if unauthorized
+      } else {
+        console.error("Error fetching user details:", error);
+      }
     }
   };
 

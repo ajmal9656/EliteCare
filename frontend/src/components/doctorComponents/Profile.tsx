@@ -8,11 +8,14 @@ import { updateDoctorProfile, updateDoctorProfileImage } from "../../Redux/Actio
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
 
 
 
 
 function Profile() {
+
+  const navigate = useNavigate()
 
 const dispatch:any = useDispatch()
   const DoctorData = useSelector((state: RootState) => state.doctor);
@@ -66,8 +69,13 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
             fees: profile.fees || "",
             phone: profile.phone || "",
           }); // Prefill edit fields with profile data
-        } catch (error) {
-          console.error("Error fetching profile details:", error);
+        } catch (error:any) {
+          if (error.response && error.response.status === 401) {
+            console.error("Unauthorized: Redirecting to login page.");
+            navigate("/doctor/login"); // Navigate to the login page if unauthorized
+          } else {
+            console.error("Error fetching user details:", error);
+          }
         }
       };
   

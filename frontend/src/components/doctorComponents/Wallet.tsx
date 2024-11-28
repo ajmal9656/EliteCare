@@ -6,6 +6,7 @@ import CustomTable from '../common/doctorCommon/Table';
 import { RootState } from '../../Redux/store';
 import axiosUrl from '../../utils/axios';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 interface Transaction {
   transactionId: string;
@@ -15,6 +16,8 @@ interface Transaction {
 }
 
 function Wallet() {
+
+  const navigate = useNavigate()
   const DoctorData = useSelector((state: RootState) => state.doctor);
   const [status, setStatus] = useState('All');
   const [allTransactions, setTransactions] = useState<Transaction[]>([]);
@@ -168,7 +171,18 @@ function Wallet() {
   }
 
   useEffect(()=>{
-    fetchWalletData(status,currentPage);
+    try{
+      fetchWalletData(status,currentPage);
+
+    }catch(error:any){
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized: Redirecting to login page.");
+        navigate("/doctor/login"); // Navigate to the login page if unauthorized
+      } else {
+        console.error("Error fetching user details:", error);
+      }
+    }
+    
 
   },[balance])
   

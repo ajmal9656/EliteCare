@@ -34,8 +34,13 @@ const Specialization: React.FC = () => {
       
       setCategories(response.data.response.specializations);
       setTotalPages(response.data.response.totalPages)
-    } catch (error) {
-      toast.error('Failed to fetch specializations');
+    } catch (error:any) {
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized: Redirecting to login page.");
+        navigate("/admin/login"); // Navigate to the login page if unauthorized
+      } else {
+        console.error("Error fetching user details:", error);
+      }
     }
   };
 

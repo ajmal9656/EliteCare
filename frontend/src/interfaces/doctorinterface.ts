@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 export interface Doctor {
+  justApproved: boolean;
   _id:string;
     doctorId: string;
     name: string;

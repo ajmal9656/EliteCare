@@ -44,8 +44,7 @@ const Services = () => {
             Our Services
           </h1>
           <p className="mt-2 text-center lg:text-start">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Natus,
-            quidem.
+            Choose the right specialization here...
           </p>
         </div>
         <div className="mt-4 lg:mt-0">

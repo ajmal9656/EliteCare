@@ -23,4 +23,5 @@ export interface IUserRepository {
     getAppointment(appointmentId: string): Promise<BookAppointment>;
     
     
+    
  };

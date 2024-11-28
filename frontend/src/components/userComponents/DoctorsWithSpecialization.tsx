@@ -57,7 +57,7 @@ function DoctorsWithSpecialization({ specializationId }: DoctorsWithSpecializati
             <h1 className="text-5xl font-bold leading-tight">
               Find the right doctor for you
             </h1>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam magnam omnis natus accusantium quos. Reprehenderit incidunt expedita moles</p>
+            <p>Choosing the right doctor is an important decision for your health and well-being. It’s essential to find a healthcare professional who understands your needs, communicates effectively, and has the expertise in the area of care you require. Whether you’re looking for a general physician or a specialist, consider factors like experience, bedside manner, and reviews from other patients. Taking the time to choose the right doctor ensures that you receive the best care possible and feel confident in your healthcare journey.</p>
           </div>
         </div>
       </div>

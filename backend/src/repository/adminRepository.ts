@@ -7,12 +7,14 @@ import RejectDoctorModel from "../model/RejectDoctorSchema";
 import userModel from "../model/userModel";
 import appointmentModel from "../model/AppoinmentModel";
 import { AdminDetails, Application, Doctor, GetApplication, getAppointments, GetDoctor, getSpecialization, getTransaction, GetUser, MonthlyDashboardStats, MonthlyStats, Specialization, User} from "../interface/adminInterface/adminInterface";
+import { refund } from "../config/stripeConfig";
 
 
 
 
 
 export class adminRepository {
+   
     
 
     async adminCheck(email:string):Promise<AdminDetails>{
@@ -594,6 +596,53 @@ export class adminRepository {
           throw new Error(error.message);
         }
       }
+
+      static async getPendingAppointments(yesterday: any, now: any): Promise<any> {
+        try {
+          // Fetch appointments from yesterday
+          const appointments = await appointmentModel.find({
+            date: { $gte: yesterday, $lt: now }, // Match yesterday's date                              
+          });
+      
+          console.log("Appointments from yesterday:", appointments);
+      
+          
+          for (const appointment of appointments) {
+            if (appointment.paymentId) { // Ensure the appointment has a paymentId
+              try {
+                if(appointment.paymentStatus!=="refunded"){
+                     // Process the refund
+                const refundResponse = await refund(appointment.paymentId, "appointment not completed");
+                
+                // Update the appointment's payment status to "refunded"
+                await appointmentModel.updateOne(
+                  { _id: appointment._id },
+                  { $set: { paymentStatus: "refunded" } }
+                );
+
+                }
+               
+      
+                
+              } catch (error: any) {
+                console.error(
+                  `Error processing refund for appointment ID ${appointment._id}:`,
+                  error.message
+                );
+                
+              }
+            } else {
+              console.warn(`No paymentId found for appointment ID ${appointment._id}`);
+            }
+          }
+      
+          
+        } catch (error: any) {
+          console.error("Error getting appointments:", error.message);
+          throw new Error(error.message);
+        }
+      }
+      
       
     
     

@@ -1,6 +1,6 @@
 import { Routes,Route } from 'react-router-dom';
 import AdminLoginPage from '../pages/adminPages/AdminLoginPage';
-import AdminHomePage from '../pages/adminPages/AdminHome';
+import AdminLoginProtectRoute from './ProtectedRoutes/AdminLoginProtectRoute';
 import SpecializationPage from '../pages/adminPages/SpecializationPage';
 import AdminLayout from '../pages/adminPages/AdminLayout';
 import DashboardPage from '../pages/adminPages/DashboardPage';
@@ -10,13 +10,14 @@ import UsersListPage from '../pages/adminPages/UsersListPage';
 import DoctorListingPage from '../pages/adminPages/DoctorListingPage';
 import AppointmentPage from '../pages/adminPages/AppointmentPage';
 import TransactionsPage from '../pages/adminPages/TransactionsPage';
+import AdminProtectRoute from './ProtectedRoutes/AdminProtectRoute';
 
 function adminRoutes() {
   return (
     <Routes>
-    <Route path="/login" element={<AdminLoginPage/>} />
-    <Route path="/home" element={<AdminHomePage/>} />
-            <Route path='/' element={<AdminLayout/>}>
+    <Route path="/login" element={<AdminLoginProtectRoute><AdminLoginPage/></AdminLoginProtectRoute>} />
+    
+            <Route path='/' element={<AdminProtectRoute><AdminLayout/></AdminProtectRoute>}>
                    <Route index path="dashboard" element={<DashboardPage/>} />
                    <Route path="specializations" element={<SpecializationPage/>} />
                    <Route path="applications" element={<ApplicationsPage/>} />

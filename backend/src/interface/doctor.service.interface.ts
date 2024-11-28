@@ -23,6 +23,7 @@ export interface IDoctorService {
     getDashboardData(doctorId: string): Promise<IDashboardStats>;
     updateImage(userID: string, file: FileData): Promise<{doctorInfo:IDoctorImageInfo}>;
     getMedicalRecords(userId: string): Promise<IMedicalReport[]>
+    doctorDetails(doctorId: string): Promise<any>
 
 
 

@@ -277,8 +277,38 @@ export class doctorService {
           url: "",
         },
       };
-
       if (files.image) {
+        console.log("imageeeeeeeeee",files.image);
+        
+        
+
+        // Load the image buffer into sharp and get metadata
+        const image = await sharp(files.image[0].buffer);
+        const metadata = await image.metadata();
+
+        const width = metadata.width;
+        const height = metadata.height;
+
+        // Check if width and height are defined
+        if (width === undefined || height === undefined) {
+          throw new Error("Image metadata could not be retrieved.");
+        }
+
+        // Calculate the size and position for cropping
+        const squareSize = Math.min(width, height); // Ensuring the crop is square
+        const x = (width - squareSize) / 2; // X position for cropping (centered)
+        const y = (height - squareSize) / 2; // Y position for cropping (centered)
+
+        // Crop the image into a square
+        const croppedBuffer = await cropAndSave(
+          x,
+          y,
+          squareSize,
+          squareSize,
+          files.image[0].buffer
+        );
+
+        files.image[0].buffer = croppedBuffer;
         const profileUrl = await this.S3Service.uploadFile(
           "eliteCare/doctorProfileImages/",
           files.image[0]
@@ -286,6 +316,15 @@ export class doctorService {
         docDetails.profileUrl.url = profileUrl;
         docDetails.profileUrl.type = "profile image";
       }
+
+      // if (files.image) {
+      //   const profileUrl = await this.S3Service.uploadFile(
+      //     "eliteCare/doctorProfileImages/",
+      //     files.image[0]
+      //   );
+      //   docDetails.profileUrl.url = profileUrl;
+      //   docDetails.profileUrl.type = "profile image";
+      // }
       if (files.aadhaarFrontImage) {
         const aadhaarFrontImageUrl = await this.S3Service.uploadFile(
           "eliteCare/doctorDocuments/",
@@ -722,6 +761,19 @@ export class doctorService {
       const response = await this.doctorRepository.getMedicalRecords(userId);
 
       return response;
+    } catch (error: any) {
+      console.error("Error in getDoctor:", error.message);
+      throw new Error(`Failed to get specialization: ${error.message}`);
+    }
+  }
+
+  async doctorDetails(email: string): Promise<any> {
+    try {
+      const response = await this.doctorRepository.doctorData(
+        email
+      );
+
+      return response
     } catch (error: any) {
       console.error("Error in getDoctor:", error.message);
       throw new Error(`Failed to get specialization: ${error.message}`);

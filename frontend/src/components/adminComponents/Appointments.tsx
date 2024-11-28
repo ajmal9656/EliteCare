@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import axiosUrl from '../../utils/axios';
 import DatePicker from 'react-datepicker';
+import { useNavigate } from 'react-router-dom';
 
 function Appointments() {
+
+  const navigate = useNavigate()
   // State to store fetched appointments
   const [appointments, setAppointments] = useState([]);
   const [status, setStatus] = useState<string>('All'); 
@@ -25,8 +28,13 @@ function Appointments() {
       console.log('tt', response.data.data);
       setAppointments(response.data.data.appointments);
       setTotalPages(response.data.data.totalPages)
-    } catch (err) {
-      console.error(err); // It's good practice to log errors for debugging
+    } catch (error:any) {
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized: Redirecting to login page.");
+        navigate("/admin/login"); // Navigate to the login page if unauthorized
+      } else {
+        console.error("Error fetching user details:", error);
+      }
     }
   };
 

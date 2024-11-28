@@ -1,4 +1,5 @@
-import { chatData, GetChatResult, messageDetails, NotificationData } from "../interface/chatInterface/chatInterface";
+import { IChatRepository } from "../interface/chat.repository.interface";
+import { Appointment, chatData, GetChatResult, messageDetails, NotificationData } from "../interface/chatInterface/chatInterface";
 import appointmentModel from "../model/AppoinmentModel";
 import ChatModel from "../model/chatModel";
 import doctorModel from "../model/doctorModel";
@@ -6,7 +7,7 @@ import NotificationModel from "../model/notificationModel";
 import userModel from "../model/userModel";
 import mongoose, { UpdateWriteOpResult } from 'mongoose';
 
-export class chatRepository{
+export class chatRepository implements IChatRepository{
 
     async createChat(messageDetails: messageDetails):Promise<chatData> {
         try {
@@ -282,7 +283,7 @@ export class chatRepository{
             throw error;
         }
     };
-    async updateAppointment (appointmentId: string): Promise<any>  {
+    async updateAppointment (appointmentId: string): Promise<Appointment>  {
         try {
             
             
@@ -294,9 +295,16 @@ export class chatRepository{
 
             console.log("resulttttt",result);
 
+            if(result){
+                return result;
+
+            }else{
+                throw new Error("Appointment not found")
+            }
+
             
     
-            return result;
+            
         } catch (error) {
             throw error;
         }

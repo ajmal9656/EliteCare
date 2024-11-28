@@ -48,8 +48,13 @@ function Appointments() {
       }));
       setRows(convertedData);
       setTotalPages(response.data.data.totalPages);
-    } catch (error) {
-      console.error('Error fetching appointments:', error);
+    } catch (error:any) {
+      if (error.response && error.response.status === 401) {
+        console.error("Unauthorized: Redirecting to login page.");
+        navigate("/doctor/login"); // Navigate to the login page if unauthorized
+      } else {
+        console.error("Error fetching user details:", error);
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BsSendFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,6 +18,7 @@ function Chat() {
   const [chatHistory, setChatHistory] = useState<any>(null);
   const [chatDetails, setChatDetails] = useState<any>(null);
   const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number; messageId: string } | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   let {socket} = useSocket()
 
 
@@ -56,6 +57,12 @@ function Chat() {
 
     }    
   },[socket])
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatHistory]);
 
   const sendMessage = (newMsg:string) => {
     if (newMsg.trim()) {
@@ -159,7 +166,7 @@ function Chat() {
 
 
   return (
-    <div className="w-[75%]  pr-10 pb-5">
+    <div className="w-[75%] pr-10 pb-5">
   <div className="bg-white h-[730px] rounded-lg border flex flex-col justify-around p-5">
     <div className="flex-1 sm:p-6 justify-between flex flex-col h-full">
       {/* Chat header */}
@@ -181,116 +188,135 @@ function Chat() {
             <div className="text-2xl mt-1 flex items-center">
               <span className="text-gray-700 mr-3">Dr.{chatDetails?.doctor?.name}</span>
             </div>
-            <span className="text-lg text-gray-600">Junior Developer</span>
+            <span className="text-lg text-gray-600">online</span>
           </div>
-        </div>
-        <div className="flex items-center space-x-2">
-          {/* Buttons (if needed) */}
         </div>
       </div>
 
       {/* Chat messages */}
       <div id="messages" className="flex flex-col space-y-4 p-3 overflow-y-auto">
-          {chatHistory?.length > 0 ? (
-            chatHistory.map((chat: any, index: any) => (
-              <div key={index} className="chat-message">
+        {chatHistory?.length > 0 ? (
+          chatHistory.map((chat: any, index: any) => {
+            // Format the timestamp to show only the time (HH:mm)
+            const time = new Date(chat.createdAt).toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+
+            return (
+              <div key={index} className="chat-message relative">
                 {chat.sender === "user" ? (
                   <div className="flex items-end justify-end">
-                  <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-end">
-                      <div onContextMenu={(e) => handleRightClick(e, chat._id)}>
-                          {chat.delete ? (
-                              <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
-                                  This message was deleted
-                              </span>
-                          ) : (
-                              <span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white">
-                                  {chat.message}
-                              </span>
-                          )}
+                    <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-end">
+                      <div
+                        onContextMenu={(e) => handleRightClick(e, chat._id)}
+                        className="relative"
+                      >
+                        {chat.delete ? (
+                          <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
+                            This message was deleted
+                          </span>
+                        ) : (
+                          <span className="px-4 py-2 rounded-lg inline-block bg-blue-600 text-white">
+                            {chat.message}
+                          </span>
+                        )}
+                        {/* Delete button (positioned just above the message) */}
+                        {contextMenu?.messageId === chat._id && (
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '-30px',
+                              left: '0',
+                              backgroundColor: 'white',
+                              border: '1px solid #ccc',
+                              borderRadius: '4px',
+                              padding: '4px',
+                              zIndex: 1000,
+                            }}
+                            onClick={() => onDeleteMessage(chat._id)}
+                          >
+                            <button
+                              style={{
+                                fontSize: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                            >
+                              <MdDeleteOutline /> Delete
+                            </button>
+                          </div>
+                        )}
                       </div>
+                      {/* Display time below the message */}
+                      <span className="text-xs text-gray-500">{time}</span>
+                    </div>
+                    <img
+                      src={chatDetails?.signedUserImageUrl}
+                      alt="User profile"
+                      className="w-6 h-6 rounded-full"
+                    />
                   </div>
-                  <img src={chatDetails?.signedUserImageUrl} alt="Doctor profile" className="w-6 h-6 rounded-full" />
-              </div>
-              
                 ) : (
                   <div className="flex items-end">
-                  <img src={chatDetails.signedDoctorImageUrl} alt="User profile" className="w-6 h-6 rounded-full" />
-                  <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-start">
+                    <img
+                      src={chatDetails.signedDoctorImageUrl}
+                      alt="User profile"
+                      className="w-6 h-6 rounded-full"
+                    />
+                    <div className="flex flex-col space-y-2 text-xs max-w-xs mx-2 items-start">
                       <div>
-                          {chat.delete ? (
-                              <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
-                                  This message was deleted
-                              </span>
-                          ) : (
-                              <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
-                                  {chat.message}
-                              </span>
-                          )}
+                        {chat.delete ? (
+                          <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-500 italic">
+                            This message was deleted
+                          </span>
+                        ) : (
+                          <span className="px-4 py-2 rounded-lg inline-block bg-gray-300 text-gray-600">
+                            {chat.message}
+                          </span>
+                        )}
                       </div>
+                      {/* Display time below the message */}
+                      <span className="text-xs text-gray-500">{time}</span>
+                    </div>
                   </div>
-              </div>
-              
                 )}
               </div>
-            ))
-          ) : (
-            <p>No messages yet...</p>
-          )}
-        </div>
-
-        {/* Context Menu for Deleting a Message */}
-        {contextMenu && (
-          <>
-           <div
-  style={{
-    position: "absolute",
-    top: contextMenu.mouseY,
-    left: contextMenu.mouseX,
-    backgroundColor: "white",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-    padding: "4px",
-    zIndex: 1000,
-  }}
-  onClick={() => onDeleteMessage(contextMenu.messageId)}
->
-  <button style={{ fontSize: "12px", display: "flex", alignItems: "center", gap: "4px" }}>
-    <MdDeleteOutline /> Delete Message
-  </button>
-</div>
-            <div onClick={handleCloseContextMenu} className="fixed inset-0" />
-          </>
+            );
+          })
+        ) : (
+          <p>No messages yet...</p>
         )}
-
-      {/* Chat input */}
-      <div className="border-t-2 border-gray-200 px-4 pt-4">
-        <div className="relative flex">
-          <span className="absolute inset-y-0 flex items-center">
-            <button
-              type="button"
-              className="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300"
-            >
-              {/* Icon if needed */}
-            </button>
-          </span>
-          <input
-            type="text"
-            placeholder="Write your message!"
-            value={newMsg}
-            onChange={(e) => setNewMsg(e.target.value)}
-            className="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3"
-          />
-          <button
-            onClick={() => sendMessage(newMsg)}
-            className="absolute right-0 inset-y-0 flex items-center justify-center h-full w-12 text-gray-500"
-          >
-            <BsSendFill className="text-xl" />
-          </button>
-        </div>
+        <div ref={messagesEndRef} />
       </div>
+      <div className="border-t-2 border-gray-200 px-4 pt-4">
+          <div className="relative flex">
+            <input
+              type="text"
+              className="w-full py-2 pl-12 pr-10 bg-gray-200 rounded-full"
+              placeholder="Type a message..."
+              value={newMsg}
+              onChange={(e) => setNewMsg(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage(newMsg)}
+            />
+            <button onClick={() => sendMessage(newMsg)} className="text-blue-500 px-4">
+              <BsSendFill />
+            </button>
+          </div>
+        </div>
+
+      {/* Context Menu for Deleting a Message */}
+      {contextMenu && (
+        <div
+          onClick={handleCloseContextMenu}
+          className="fixed inset-0"
+        />
+      )}
     </div>
   </div>
 </div>
+
 
   )
 }
