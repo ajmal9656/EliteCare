@@ -30,12 +30,15 @@ configSocketIO(server);
 app.use(cookieParser());
 
 app.use(express.json());
-// const corsOptions = {
-//   origin: 'http://localhost:5173', // Allow this origin
-//   optionsSuccessStatus: 200, // Response status for successful OPTIONS request
-//   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
-// };
+const corsOptions = {
+  origin: 'http://localhost:5173', // Frontend origin
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+  allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'], // Allowed headers
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  optionsSuccessStatus: 204, // For OPTIONS preflight requests
+};
+
+app.use(cors(corsOptions));
 
 
 
@@ -43,7 +46,7 @@ app.use(express.json());
 
 
 
-app.use(cors);
+
 
 app.use('/', userRoute);
 app.use('/doctor', doctorRoute);
