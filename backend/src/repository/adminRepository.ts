@@ -133,7 +133,7 @@ export class adminRepository {
             const skip = (page - 1) * limit;
             
             // Fetch applications with pagination
-            const applications = await doctorApplicationModel.find()
+            const applications = await doctorApplicationModel.find().populate("department")
                 .skip(skip)
                 .limit(limit);
     
@@ -154,6 +154,10 @@ export class adminRepository {
         try {
             
             const application = await doctorApplicationModel.findById(doctorId).populate("department")
+
+
+            
+            
     
           
     

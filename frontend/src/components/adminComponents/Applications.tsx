@@ -64,10 +64,10 @@ function Applications() {
           </tr>
         </thead>
         <tbody >
-          {applications.map((application) => (
+          {applications.map((application:any) => (
             <tr key={application._id} className="hover:bg-gray-100 transition duration-200 text-center">
               <td className="py-2 px-4 border-b border-gray-300">{`Dr. ${application.name}`}</td>
-              <td className="py-2 px-4 border-b border-gray-300">{application.department}</td>
+              <td className="py-2 px-4 border-b border-gray-300">{application.department.name}</td>
               <td className="py-2 px-4 border-b border-gray-300 text-center">
                 <button
                   className='bg-blue-500 text-white px-3 py-1 rounded transition duration-200 hover:bg-blue-600'
