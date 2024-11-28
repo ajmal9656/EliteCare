@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosUrl =  axios.create({
-    baseURL:'http://localhost:5001',
+    baseURL:import.meta.env.VITE_AXIOS_BASE_URL,
     withCredentials:true
 });
 

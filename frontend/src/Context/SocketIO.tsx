@@ -42,7 +42,7 @@ export const SocketProvider: React.FC<any> = ({ children }) => {
     if (loggedUser) {
       console.log("wwww",loggedUser);
       
-      const newSocket = io("http://localhost:5001", {
+      const newSocket = io(import.meta.env.VITE_AXIOS_BASE_URL, {
         query: {
           userId: loggedUser
         }

@@ -25,6 +25,7 @@ export class adminRepository {
             if(adminData){
                 
                 
+                
                 return adminData
             }
             throw new Error("Doctor Doesn't exist")

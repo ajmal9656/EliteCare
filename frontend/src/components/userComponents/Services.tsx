@@ -22,7 +22,7 @@ const Services = () => {
       console.log("enter");
       
       const response = await axiosUrl.get("/getSpecializations");
-      console.log("spec", response.data);
+      console.log("spec", response);
       setSpecializations(response.data.response); // Store the fetched data in state
     } catch (error) {
       console.error("Error fetching specializations:", error);
