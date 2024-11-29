@@ -114,17 +114,17 @@ function DoctorProfile() {
         </div>
       </div>
       <div className='w-full flex justify-center mt-5 items-center'>
-        <h1 className='text-3xl font-bold font-serif text-backgroundColor'>
+        <h1 className='text-3xl sm:text-2xl font-bold font-serif text-backgroundColor'>
           Dr. {doctor.name}
         </h1>
       </div>
       <div className='w-full flex justify-center items-center my-2'>
-        <h1 className='text-xl font-semibold font-serif text-gray-600'>
+        <h1 className='text-xl sm:text-lg font-semibold font-serif text-gray-600'>
           {doctor.department.name}
         </h1>
       </div>
       <div className='w-full flex justify-center items-center my-2'>
-        <h1 className='text-xl font-medium font-serif text-gray-600'>
+        <h1 className='text-xl sm:text-lg font-medium font-serif text-gray-600'>
           <span className='text-indigo-600'>{doctor.email}</span>
         </h1>
       </div>
@@ -175,6 +175,7 @@ function DoctorProfile() {
     </div>
   </div>
 </div>
+
 
   );
 }
