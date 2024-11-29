@@ -362,6 +362,7 @@ export class doctorService {
         data,
         docDetails
       );
+      console.log("upload data service",response);
       if (response) {
         return response;
       }

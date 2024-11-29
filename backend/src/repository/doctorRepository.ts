@@ -123,6 +123,8 @@ export class doctorRepository {
           details
         );
 
+        console.log("upload data controller",newDoctorApplication);
+
         return true;
       }else{
         return false

@@ -174,6 +174,8 @@ export class doctorController {
         req.body,
         req.files as DoctorFiles
       );
+      console.log("upload data controller",response);
+      
       if (response) {
         res
           .status(200)
