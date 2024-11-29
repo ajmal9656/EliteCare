@@ -135,7 +135,7 @@ export class doctorService {
 
           return { valid: true };
         } else {
-          console.log("error");
+        
           throw new Error("Invalid OTP");
         }
       } else {
@@ -255,6 +255,7 @@ export class doctorService {
   }
   async uploadData(data: DoctorData, files: DoctorFiles): Promise<boolean|undefined> {
     try {
+      console.log("entered upload service");
       const docDetails: docDetails = {
         profileUrl: {
           type: "",
@@ -278,7 +279,7 @@ export class doctorService {
         },
       };
       if (files.image) {
-        console.log("imageeeeeeeeee",files.image);
+        
         
         
 
@@ -744,7 +745,7 @@ export class doctorService {
           image: signedUrl,
         };
 
-        console.log("docccccccccccccc",doctorInfo);
+       
         
 
         return { doctorInfo };

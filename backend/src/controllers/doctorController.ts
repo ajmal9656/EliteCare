@@ -170,6 +170,8 @@ export class doctorController {
   }
   async uploadDoctorData(req: Request, res: Response): Promise<void> {
     try {
+      console.log("entered upload controller");
+      
       const response = await this.doctorService.uploadData(
         req.body,
         req.files as DoctorFiles
@@ -342,15 +344,14 @@ export class doctorController {
     try {
       const { appointmentId, reason } = req.body;
 
-      console.log("Received appointmentId:", appointmentId);
-      console.log("Received Reason:", reason);
+     
 
       const response = await this.doctorService.cancelAppointment(
         appointmentId,
         reason
       );
 
-      console.log("Cancel Appointment Response:", response);
+    
 
       res
         .status(200)
@@ -376,15 +377,14 @@ export class doctorController {
     try {
       const { appointmentId, prescription } = req.body;
 
-      console.log("Received appointmentId:", appointmentId);
-      console.log("Received prescription:", prescription);
+     
 
       const response = await this.doctorService.addPrescription(
         appointmentId,
         prescription
       );
 
-      console.log("Add Prescription Response:", response);
+      
 
       res
         .status(200)
@@ -448,9 +448,7 @@ export class doctorController {
     try {
       const doctorId = req.params.doctorId;
       const withdrawalAmount = req.body.withdrawAmount;
-      console.log(req.body);
-      console.log(withdrawalAmount);
-      console.log(typeof withdrawalAmount);
+     
 
       if (!doctorId) {
         res
@@ -498,7 +496,7 @@ export class doctorController {
     try {
       const doctorId = req.params.doctorId;
       const reviewData = req.query.reviewData;
-      console.log("revi", doctorId);
+      
 
       const response = await this.doctorService.getDoctorData(
         doctorId,
@@ -599,7 +597,7 @@ export class doctorController {
       }
 
       const response = await this.doctorService.updateImage(doctorId, req.file);
-      console.log("image res", response);
+      
 
       res
         .status(200)
@@ -654,7 +652,7 @@ export class doctorController {
       
       const response = await this.doctorService.doctorDetails(
         email);
-        console.log("redd",response);
+       
         
 
       res.status(200).json({ message: "successfully", response });

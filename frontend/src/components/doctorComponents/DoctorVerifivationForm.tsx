@@ -68,17 +68,17 @@ function DoctorVerifivationForm() {
     }
   };
 
-  console.log("sdvhscvdsjvhsdjvhnskjldvhnsdajfvhasjkdchna.,jkcvhnajvn");
+ 
   
   
 
   
     const fetchSpecializations = async () => {
       try {
-        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+       
         
         const response = await axiosUrl.get('/admin/getSpecializations');
-        console.log("speceeeeeeee",response.data);
+       
         
         setSpecializations(response.data.response.specializations);
       } catch (error:any) {
@@ -94,7 +94,7 @@ function DoctorVerifivationForm() {
     };
 
     useEffect(()=>{
-      console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+      
       
       fetchSpecializations()
 
@@ -155,6 +155,8 @@ function DoctorVerifivationForm() {
       }
   
       try {
+        console.log("form enter");
+        
         
         const response = await axiosUrl.post('/doctor/uploadDoctorData', formData, {
           headers: {
