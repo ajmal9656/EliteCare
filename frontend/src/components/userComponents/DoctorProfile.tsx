@@ -99,100 +99,85 @@ function DoctorProfile() {
 
 
   return (
-    <div className="w-full flex justify-center">
-  <div className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] h-auto flex flex-col justify-center items-center">
-    
-    {/* Doctor details section */}
-    <div className="w-full sm:w-[95%] h-auto bg-white my-5 shadow-lg rounded-lg border border-gray-200">
-      
-      {/* Rating and Review Details */}
-      <div className="w-full flex justify-between items-center mt-5 px-5">
-        <div className="flex items-center gap-3">
-          <Typography variant="h6" className="font-bold text-blue-gray-500">{averageRating}</Typography>
-          <Rating value={averageRating} readOnly />
+    <div className='w-full flex justify-center'>
+      <div className='w-[70%] h-auto flex flex-col justify-center items-center'>
+        {/* Doctor details section */}
+        <div className='w-[95%] h-auto bg-white my-5 shadow-lg rounded-lg border border-gray-200'>
+          <div className='w-full flex justify-end mt-5 items-center'>
+            <div className="flex items-center gap-2 font-bold text-blue-gray-500 mr-16">
+              {averageRating}
+              <Rating value={averageRating} readOnly />
+              <Typography color="blue-gray" className="font-medium text-blue-gray-500">
+                Out of {reviews.length} Reviews
+              </Typography>
+            </div>
+          </div>
+          <div className='w-full flex justify-center mt-5 items-center'>
+            <h1 className='text-3xl font-bold font-serif text-backgroundColor'>
+              Dr. {doctor.name}
+            </h1>
+          </div>
+          <div className='w-full flex justify-center items-center my-2'>
+            <h1 className='text-xl font-semibold font-serif text-gray-600'>
+              {doctor.department.name}
+            </h1>
+          </div>
+          <div className='w-full flex justify-center items-center my-2'>
+            <h1 className='text-xl font-medium font-serif text-gray-600'>
+              <span className='text-indigo-600'>{doctor.email}</span>
+            </h1>
+          </div>
+          <div className='w-[95%] px-10 py-4 text-center'>
+            <h2 className='text-lg font-medium text-gray-700'>
+              Specialty & Experience
+            </h2>
+            <p className='text-gray-500 mt-2'>
+              Dr. {doctor.name} has over 10 years of experience in {doctor.department.name}, specializing in treating complex medical conditions. 
+              With a patient-centered approach, they are dedicated to providing the highest quality of care and ensuring each patient feels comfortable and informed.
+            </p>
+          </div>
+          <div className='w-full h-20 flex justify-center items-center'>
+            <Button title="Book Slot" onClick={handleClick} />
+          </div>
         </div>
-        <div className="flex items-center gap-2 font-bold text-blue-gray-500">
-          <Typography color="blue-gray" className="font-medium text-blue-gray-500">
-            {reviews.length} Reviews
-          </Typography>
-        </div>
-      </div>
-      
-      {/* Doctor Name */}
-      <div className="w-full flex justify-center mt-5 items-center">
-        <h1 className="text-3xl sm:text-2xl font-bold font-serif text-backgroundColor">
-          Dr. {doctor.name}
-        </h1>
-      </div>
 
-      {/* Doctor Department */}
-      <div className="w-full flex justify-center items-center my-2">
-        <h1 className="text-xl sm:text-lg font-semibold font-serif text-gray-600">
-          {doctor.department.name}
-        </h1>
-      </div>
-
-      {/* Doctor Email */}
-      <div className="w-full flex justify-center items-center my-2">
-        <h1 className="text-xl sm:text-lg font-medium font-serif text-gray-600">
-          <span className="text-indigo-600">{doctor.email}</span>
-        </h1>
-      </div>
-
-      {/* Specialty & Experience */}
-      <div className="w-full sm:w-[95%] px-10 py-4 text-center">
-        <h2 className="text-lg font-medium text-gray-700">
-          Specialty & Experience
-        </h2>
-        <p className="text-gray-500 mt-2">
-          Dr. {doctor.name} has over 10 years of experience in {doctor.department.name}, specializing in treating complex medical conditions. 
-          With a patient-centered approach, they are dedicated to providing the highest quality of care and ensuring each patient feels comfortable and informed.
-        </p>
-      </div>
-
-      {/* Book Slot Button */}
-      <div className="w-full h-20 flex justify-center items-center">
-        <Button title="Book Slot" onClick={handleClick} />
-      </div>
-    </div>
-
-    {/* Carousel for Reviews */}
-    <div className="w-full mt-4 relative pb-8">
-      {reviews.length > 0 && (
-        <>
-          <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
-            Patient Reviews
-          </h2>
-          <Slider {...carouselSettings}>
-            {reviews.map((review, index) => (
-              <div key={index} className="carousel-slide">
-                <div className="bg-white shadow-lg rounded-lg p-6 h-full flex flex-col justify-between border border-gray-200 transition-all duration-300 hover:shadow-xl transform hover:scale-105">
-                  <div className="flex items-center space-x-3">
-                    <Typography variant="h6" className="font-semibold text-gray-900">
-                      {review.patientName}
-                    </Typography>
-                  </div>
-                  <div className="mt-3">
-                    <Rating value={review.review.rating} readOnly precision={0.5} />
-                  </div>
-                  <div className="mt-4 text-gray-700">
-                    <Typography variant="body2" className="line-clamp-3">
-                      {review.review.description}
-                    </Typography>
-                  </div>
-                </div>
+        {/* Carousel for Reviews */}
+        <div className="w-full mt-4 relative pb-8">
+  {/* Check if the reviews array is not empty */}
+  {reviews.length > 0 && (
+    <>
+      <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
+        Patient Reviews
+      </h2>
+      <Slider {...carouselSettings}>
+        {reviews.map((review, index) => (
+          <div key={index} className="carousel-slide">
+            <div className="bg-white shadow-lg rounded-lg p-6 h-full flex flex-col justify-between border border-gray-200 transition-all duration-300 hover:shadow-xl transform hover:scale-105">
+              <div className="flex items-center space-x-3">
+                <Typography variant="h6" className="font-semibold text-gray-900">
+                  {review.patientName}
+                </Typography>
               </div>
-            ))}
-          </Slider>
-        </>
-      )}
-    </div>
-  </div>
+              <div className="mt-3">
+                <Rating value={review.review.rating} readOnly precision={0.5} />
+              </div>
+              <div className="mt-4 text-gray-700">
+                <Typography variant="body2" className="line-clamp-3">
+                  {review.review.description}
+                </Typography>
+              </div>
+            </div>
+          </div>
+        ))}
+      </Slider>
+    </>
+  ) }
 </div>
 
 
 
-
+      </div>
+    </div>
   );
 }
 
