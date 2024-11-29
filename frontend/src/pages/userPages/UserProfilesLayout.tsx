@@ -39,7 +39,9 @@ function UserProfilesLayout() {
 
   const fetchUser = async () => {
     try {
-      const response = await axiosUrl.get(`/getUserDetails/${userData?._id}`); // Replace with your backend endpoint
+      const response = await axiosUrl.get(`/getUserDetails/${userData?._id}`,{
+        withCredentials: true, // Ensure cookies are included
+      }); // Replace with your backend endpoint
       console.log("userrrrr",response.data.response);
       
       setUserImage(response.data.response); // Assuming response data has the list of doctors
