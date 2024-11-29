@@ -48,7 +48,7 @@ const Chat = () => {
     (async () => {
       try {
         const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,sender:"DOCTOR" } });
-        console.log("aaaaaa.data",response.data );
+        console.log("whole chat front",response.data);
         
         if(response.data.chatResult!=null){
           setChatHistory(response.data.chatResult.messages);
@@ -56,10 +56,13 @@ const Chat = () => {
         }else{
           setChatHistory([])
         }
+
+        console.log("chat errr");
         
-        console.log("ccc",response.data);
+        
         
         setChatDetails(response.data)
+        console.log("chat errr222");
         
       } catch (error:any) {
         if (error.response?.status === 401) {

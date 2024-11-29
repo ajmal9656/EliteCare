@@ -28,7 +28,7 @@ function Chat() {
 
         
         const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.docId._id, userID: appointment?.userId , sender:"USER" } });
-        console.log("aaaaaa.data",response.data);
+        console.log("whole chat front",response.data);
         
         
         if(response.data.chatResult!=null){
@@ -37,7 +37,13 @@ function Chat() {
         }else{
           setChatHistory([])
         }
+
+        console.log("chat errrrrr");
+        
+
+        
         setChatDetails(response.data)
+        console.log("chat errr222");
         
       } catch (error:any) {
         if (error.response.status === 401) {

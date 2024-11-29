@@ -34,7 +34,7 @@ function VideoChat() {
 
     //@ts-ignore
     const roomIdStr = roomIdDoctor.toString()
-    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appId, serverSecret, roomIdStr, Date.now().toString(), "naveen");
+    const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(appId, serverSecret, roomIdStr, Date.now().toString(), "Doctor");
     const zp = ZegoUIKitPrebuilt.create(kitToken);
 
     zp.joinRoom({

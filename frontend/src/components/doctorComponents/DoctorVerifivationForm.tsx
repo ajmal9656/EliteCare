@@ -27,7 +27,7 @@ const validationSchema = Yup.object({
       return isBirthdayPassedThisYear ? age >= 18 : age - 1 >= 18;
     }),
   department: Yup.string().required('Department is required'),
-  fees: Yup.number().required('Fees are required').positive('Fees must be positive'),
+  fees: Yup.number().required('Fees are required').positive('Fees must be positive').max(5000, 'Fees must be less than 5000'),
   aadhaarNumber: Yup.string()
     .matches(/^\d{12}$/, 'Aadhaar Number must be exactly 12 digits')
     .required('Aadhaar Number is required'),

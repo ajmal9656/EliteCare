@@ -142,14 +142,19 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
           hasError = true;
       }
   }
-    if (!editFields.fees) {
-      newErrors.fees = "Fees are required.";
-      hasError = true;
-    } else if (isNaN(Number(editFields.fees)) || Number(editFields.fees) <= 0) {
-      // Check if fees are a valid number and greater than 0
-      newErrors.fees = "Fees must be a positive number.";
-      hasError = true;
-    }
+  if (!editFields.fees) {
+    newErrors.fees = "Fees are required.";
+    hasError = true;
+  } else if (isNaN(Number(editFields.fees)) || Number(editFields.fees) <= 0) {
+    // Check if fees are a valid number and greater than 0
+    newErrors.fees = "Fees must be a positive number.";
+    hasError = true;
+  } else if (Number(editFields.fees) >= 5000) {
+    // Check if fees are less than 5000
+    newErrors.fees = "Fees must be less than 5000.";
+    hasError = true;
+  }
+  
     if (!editFields.phone) {
       newErrors.phone = "Phone number is required.";
       hasError = true;
