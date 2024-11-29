@@ -31,7 +31,7 @@ app.use(cookieParser());
 
 app.use(express.json());
 const corsOptions = {
-  origin: 'http://localhost:5173', // Frontend origin
+  origin: 'https://ajmals.site', // Frontend origin
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
   allowedHeaders: ['Origin', 'Content-Type', 'Accept', 'Authorization'], // Allowed headers
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
