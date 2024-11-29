@@ -94,38 +94,111 @@ function Signup() {
     <h2 className="text-2xl uppercase font-medium mb-1">Register</h2>
     <p className="text-gray-600 mb-6 text-sm">Welcome! So good to have you here!</p>
     <form onSubmit={formik.handleSubmit} autoComplete="off">
-      <div className="space-y-2">
-        <div>
-          <label htmlFor="name" className="text-gray-600 mb-2 block">Name</label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            className={`block w-full border ${
-              formik.touched.name && formik.errors.name
-                ? 'border-red-500'
-                : 'border-gray-300'
-            } px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400`}
-            placeholder="Enter your name"
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.name && formik.errors.name ? (
-            <div className="text-red-500 text-sm mt-1">{formik.errors.name}</div>
-          ) : null}
-        </div>
-      </div>
-      {/* Other form fields remain unchanged */}
-      <div className="mt-4">
-        <button
-          type="submit"
-          className="w-full block py-2 text-center text-white bg-gradient-to-l from-cyan-500 to-blue-500 border rounded hover:bg-blue-400 transition uppercase font-roboto font-medium"
-        >
-          Register
-        </button>
-      </div>
-    </form>
+          <div className="space-y-2">
+            <div>
+              <label htmlFor="name" className="text-gray-600 mb-2 block">Name</label>
+              <input 
+                type="text" 
+                name="name" 
+                id="name" 
+                className={`block w-full border ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-gray-300'} px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400`} 
+                placeholder="Enter your name"
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.name && formik.errors.name ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.name}</div>
+              ) : null}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div>
+              <label htmlFor="email" className="text-gray-600 mt-3 mb-2 block">Email address</label>
+              <input 
+                type="email" 
+                name="email" 
+                id="email" 
+                className={`block w-full border ${formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'} px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400`} 
+                placeholder="youremail.@domain.com"
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.email && formik.errors.email ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.email}</div>
+              ) : null}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div>
+              <label htmlFor="phone" className="text-gray-600 mt-3 mb-2 block">Phone</label>
+              <input 
+                type="text" 
+                name="phone" 
+                id="phone" 
+                className={`block w-full border ${formik.touched.phone && formik.errors.phone ? 'border-red-500' : 'border-gray-300'} px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400`} 
+                placeholder="Enter your phone"
+                value={formik.values.phone}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              />
+              {formik.touched.phone && formik.errors.phone ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.phone}</div>
+              ) : null}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div>
+              <label htmlFor="password" className="text-gray-600 mt-3 mb-2 block">Password</label>
+              <div className="relative">
+                <input 
+                  type="password" 
+                  name="password" 
+                  id="password" 
+                  className={`block w-full border ${formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-300'} px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400`} 
+                  placeholder="***********"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                
+              </div>
+              {formik.touched.password && formik.errors.password ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
+              ) : null}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div>
+              <label htmlFor="confirmPassword" className="text-gray-600 mt-3 mb-2 block">Confirm Password</label>
+              <div className="relative">
+                <input 
+                  type="password" 
+                  name="confirmPassword" 
+                  id="confirmPassword" 
+                  className={`block w-full border ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} px-4 py-3 text-gray-600 text-sm rounded focus:ring-0 focus:border-teal-500 placeholder-gray-400 `} 
+                  placeholder="***********"
+                  value={formik.values.confirmPassword}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                
+              </div>
+              {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+                <div className="text-red-500 text-sm mt-1">{formik.errors.confirmPassword}</div>
+              ) : null}
+            </div>
+          </div>
+          <div className="mt-4">
+            <button 
+              type="submit" 
+              className="w-full block py-2 text-center text-white bg-gradient-to-l from-cyan-500 to-blue-500 border  rounded hover:bg-blue-400  transition uppercase font-roboto font-medium"
+            >
+              Register
+            </button>
+          </div>
+        </form>
     <p className="mt-4 text-gray-600 text-center">
       Already have an account?
       <Link to="/doctor/login" className="text-blue-300 ml-2">
