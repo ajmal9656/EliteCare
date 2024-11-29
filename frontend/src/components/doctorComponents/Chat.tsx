@@ -124,7 +124,7 @@ const Chat = () => {
     };
   
     fetchChatHistory();
-  }, [appointment]); // Add dependencies if needed, e.g., [appointment]
+  }, []); // Add dependencies if needed, e.g., [appointment]
   
 
   // useEffect(() => {
