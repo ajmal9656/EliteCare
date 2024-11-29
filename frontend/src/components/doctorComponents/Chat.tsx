@@ -22,7 +22,7 @@ const Chat = () => {
   
 
   const { appointment } = location.state || {};
-  console.log("eeeeeeee",appointment);
+  
   
   const [newMsg, setNewMsg] = useState(""); // State for new message input
   const navigate = useNavigate();
@@ -44,39 +44,10 @@ const Chat = () => {
   
 
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,sender:"DOCTOR" } });
-        console.log("whole chat front",response.data);
-        
-        if(response.data.chatResult!=null){
-          setChatHistory(response.data.chatResult.messages);
-
-        }else{
-          setChatHistory([])
-        }
-
-        console.log("chat errr");
-        
-        
-        
-        setChatDetails(response.data)
-        console.log("chat errr222");
-        
-      } catch (error:any) {
-        if (error.response?.status === 401) {
-          
-          navigate("/login", { state: { message: "Authorization failed, please login" } });
-        } else {
-          toast.error("Ssssomething wrong, Can't fetch chat history. Please try again later");
-        }
-      }
-    })();
-  }, []);
+  
 
   useEffect(()=>{
-    console.log("SOCKKK",socket)
+    
     if(socket){
       socket?.emit("joinChatRoom", { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,online:"DOCTOR" });
     }    
@@ -113,6 +84,38 @@ const Chat = () => {
       }
     }
   };
+  useEffect(() => {
+    (async () => {
+      try {
+        console.log("a,ppointment?.viewDetails?.docId",appointment?.viewDetails?.docId,appointment?.viewDetails?.userId?._id);
+        
+        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,sender:"DOCTOR" } });
+        console.log("whole chat front",response.data);
+        
+        if(response.data.chatResult!=null){
+          setChatHistory(response.data.chatResult.messages);
+
+        }else{
+          setChatHistory([])
+        }
+
+        console.log("chat errr");
+        
+        
+        
+        setChatDetails(response.data)
+        console.log("chat errr222");
+        
+      } catch (error:any) {
+        if (error.response?.status === 401) {
+          
+          navigate("/login", { state: { message: "Authorization failed, please login" } });
+        } else {
+          toast.error("Ssssomething wrong, Can't fetch chat history. Please try again later");
+        }
+      }
+    })();
+  }, []);
 
   // useEffect(() => {
   //   // Example of receiving messages
