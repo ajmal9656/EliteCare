@@ -77,7 +77,7 @@ function AppointmentDetails() {
               appointmentId: appointment.viewDetails._id,
               reason: values.cancelReason,
             })
-            .then((response:any) => {
+            .then(() => {
               setAppointmentStatus("cancelled by Dr");
               Swal.fire(
                 "Cancelled!",
@@ -86,7 +86,7 @@ function AppointmentDetails() {
               );
               closeModal();
             })
-            .catch((error:any) => {
+            .catch(() => {
               Swal.fire(
                 "Error!",
                 "There was an error cancelling your appointment.",
@@ -134,7 +134,7 @@ function AppointmentDetails() {
                 appointmentId: appointment.viewDetails._id, // Passing appointment ID
                 prescription: values.prescription, // Passing prescription details
               })
-              .then((response) => {
+              .then(() => {
                 setAppointmentStatus("completed"); // Update the local status
                 Swal.fire(
                   "Submitted!",
@@ -143,7 +143,7 @@ function AppointmentDetails() {
                 );
                 closePrescriptionModal(); // Close the modal after submission
               })
-              .catch((error) => {
+              .catch(() => {
                 Swal.fire(
                   "Error!",
                   "There was an error adding the prescription.",

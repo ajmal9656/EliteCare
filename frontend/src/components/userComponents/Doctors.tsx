@@ -103,7 +103,7 @@ const Doctors: React.FC = () => {
   </div>
   <div className=" mt-5">
   <Slider ref={slider} {...settings}>
-    {Array.isArray(doctors) && doctors.map((doctor, index) => (
+    {Array.isArray(doctors) && doctors.map((doctor) => (
       <Link
       key={doctor._id}
               to={{

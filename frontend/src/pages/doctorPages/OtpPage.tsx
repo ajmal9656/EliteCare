@@ -1,4 +1,4 @@
-import React from 'react';
+
 import OTPForm from '../../components/doctorComponents/OTPForm';
 
 

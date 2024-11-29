@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setRoomId, setShowVideoCall, setVideoCall } from '../../Redux/Slice/doctorSlice';
 import { RootState } from '../../Redux/store';
 import { useSocket } from '../../Context/SocketIO';
-import { useNavigate } from 'react-router-dom';
+
 import axiosUrl from '../../utils/axios';
 
 

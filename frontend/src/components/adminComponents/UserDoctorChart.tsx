@@ -32,7 +32,7 @@ const UserDoctorChart: React.FC<UserDoctorChartProps> = ({ data }) => {
     // Filter and format data for the last 12 months
     const last12MonthsData = data
         .filter(item => {
-            const itemDate = new Date(item.year, item.month - 1); // Create a date object for the item
+            // const itemDate = new Date(item.year, item.month - 1); // Create a date object for the item
             const monthsDiff = (currentYear - item.year) * 12 + (currentMonth - item.month); // Calculate the difference in months
             return monthsDiff >= 0 && monthsDiff < 12; // Only keep items within the last 12 months
         })

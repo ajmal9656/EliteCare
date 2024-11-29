@@ -119,7 +119,7 @@ function Chat() {
     
   },[chatHistory])
 
-  const onDeleteMessage = async (messageId: string) => {
+  const onDeleteMessage = async () => {
     try {
 
       const messageDetails = {
@@ -234,7 +234,7 @@ function Chat() {
                               padding: '4px',
                               zIndex: 1000,
                             }}
-                            onClick={() => onDeleteMessage(chat._id)}
+                            onClick={() => onDeleteMessage()}
                           >
                             <button
                               style={{

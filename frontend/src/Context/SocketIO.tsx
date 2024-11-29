@@ -7,10 +7,7 @@ import { endCallDoctor, setRoomId, setShowVideoCall } from '../Redux/Slice/docto
 import { toast } from 'sonner';
 
 
-interface SocketContextType {
-  socket: Socket | null;
-  onlineUsers: string[] | undefined;
-}
+
 
 const SocketContext = createContext<any>({ socket: null});
 

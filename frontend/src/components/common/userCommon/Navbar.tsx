@@ -22,9 +22,9 @@ const Navbar = () => {
     setMenu(!menu);
   };
 
-  const closeMenu = () => {
-    setMenu(false);
-  };
+  // const closeMenu = () => {
+  //   setMenu(false);
+  // };
 
   const fetchUnreadNotifications = async () => {
     

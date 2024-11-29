@@ -175,7 +175,7 @@ const navigateVideoChat=()=>{
 
 }
 
-const onDeleteMessage = async (messageId: string) => {
+const onDeleteMessage = async () => {
   try {
 
     const messageDetails = {
@@ -288,7 +288,7 @@ const handleCloseContextMenu = () => {
                         padding: '4px',
                         zIndex: 1000,
                       }}
-                      onClick={() => onDeleteMessage(chat._id)}
+                      onClick={() => onDeleteMessage()}
                     >
                       <button
                         style={{
@@ -346,7 +346,7 @@ const handleCloseContextMenu = () => {
                         padding: '4px',
                         zIndex: 1000,
                       }}
-                      onClick={() => onDeleteMessage(chat._id)}
+                      onClick={() => onDeleteMessage()}
                     >
                       <button
                         style={{

@@ -1,7 +1,7 @@
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     import { createSlice,PayloadAction } from "@reduxjs/toolkit";
 import { login, logoutUser, updateUserProfile,updateUserProfileImage } from "../Action/userActions";
 import { User,UserState } from "../../interfaces/userInterface";
-import { boolean } from "yup";
+
 
 
 

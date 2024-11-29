@@ -358,7 +358,7 @@ function AppointmentDetails() {
                   <Rating
                     {...field}
                     value={field.value}
-                    onChange={(event, newValue) => {
+                    onChange={( newValue) => {
                       setFieldValue("rating", newValue);
                     }}
                     precision={0.5}

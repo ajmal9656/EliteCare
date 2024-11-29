@@ -89,7 +89,7 @@ const Specialization: React.FC = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await dispatch(updateSpecialization({
+        await dispatch(updateSpecialization({
           id: editCategory?._id!,
           name: values.name,
           description: values.description
@@ -110,7 +110,7 @@ const Specialization: React.FC = () => {
   });
 
   const toggleListState = async (id: number) => {
-    const response = await dispatch(listUnlistSpecialization({
+    await dispatch(listUnlistSpecialization({
       id: id,
     }));
     setCategories((prevCategories) =>

@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../Redux/store';
-import { useEffect, useState } from 'react';
-import axiosUrl from '../../utils/axios';
+import { useEffect} from 'react';
+
 
 interface LoginProtectRouteProps {
   children: React.ReactNode;
