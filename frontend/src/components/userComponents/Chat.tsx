@@ -57,7 +57,7 @@ function Chat() {
   }, []);
 
   useEffect(()=>{
-    console.log("SOCKKK",socket)
+   
     if(socket){
       socket?.emit("joinChatRoom", { doctorID: appointment?.docId._id, userID: appointment?.userId ,online:"USER"});
 
@@ -108,7 +108,7 @@ function Chat() {
   // }, [socket]);
   useEffect(() => {
     socket?.on("receiveMessage", (messageDetails:any) => {
-      console.log("user recieved",messageDetails.messages);
+      
        
       setChatHistory(messageDetails.messages);
     });
@@ -117,13 +117,7 @@ function Chat() {
     };
   }, []);
 
-  useEffect(()=>{
-   
-   
-    console.log("chatt",chatHistory);
-    
-    
-  },[chatHistory])
+ 
 
   const onDeleteMessage = async () => {
     try {
@@ -135,7 +129,7 @@ function Chat() {
         sender:"user"
       };
 
-      console.log("sssssssssssssssssssssssssss",messageDetails);
+ 
       
   
       socket?.emit("deleteMessage", { messageDetails});
