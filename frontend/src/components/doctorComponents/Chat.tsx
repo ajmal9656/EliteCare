@@ -85,37 +85,47 @@ const Chat = () => {
     }
   };
   useEffect(() => {
-    (async () => {
+    const fetchChatHistory = async () => {
       try {
-        console.log("a,ppointment?.viewDetails?.docId",appointment?.viewDetails?.docId,appointment?.viewDetails?.userId?._id);
-        
-        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.viewDetails?.docId, userID: appointment?.viewDetails?.userId?._id,sender:"DOCTOR" } });
-        console.log("whole chat front",response.data);
-        
-        if(response.data.chatResult!=null){
+        console.log(
+          "appointment?.viewDetails?.docId",
+          appointment?.viewDetails?.docId,
+          appointment?.viewDetails?.userId?._id
+        );
+  
+        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, {
+          params: {
+            doctorID: appointment?.viewDetails?.docId,
+            userID: appointment?.viewDetails?.userId?._id,
+            sender: "DOCTOR",
+          },
+        });
+        console.log("whole chat front", response.data);
+  
+        if (response.data.chatResult != null) {
           setChatHistory(response.data.chatResult.messages);
-
-        }else{
-          setChatHistory([])
-        }
-
-        console.log("chat errr");
-        
-        
-        
-        setChatDetails(response.data)
-        console.log("chat errr222");
-        
-      } catch (error:any) {
-        if (error.response?.status === 401) {
-          
-          navigate("/login", { state: { message: "Authorization failed, please login" } });
         } else {
-          toast.error("Ssssomething wrong, Can't fetch chat history. Please try again later");
+          setChatHistory([]);
+        }
+  
+        console.log("chat errr");
+  
+        setChatDetails(response.data);
+        console.log("chat errr222");
+      } catch (error: any) {
+        if (error.response?.status === 401) {
+          navigate("/login", {
+            state: { message: "Authorization failed, please login" },
+          });
+        } else {
+          toast.error("Something went wrong, Can't fetch chat history. Please try again later");
         }
       }
-    })();
-  }, []);
+    };
+  
+    fetchChatHistory();
+  }, []); // Add dependencies if needed, e.g., [appointment]
+  
 
   // useEffect(() => {
   //   // Example of receiving messages

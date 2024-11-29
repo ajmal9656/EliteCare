@@ -14,6 +14,8 @@ export class chatController {
 
     async getChat (req: Request, res: Response)  {
         try {
+          console.log("rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+          
           const doctorID = req.query.doctorID as string;
           const userID = req.query.userID as string;
           const sender = req.query.sender as string;
