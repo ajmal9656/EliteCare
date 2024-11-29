@@ -100,6 +100,7 @@ const Chat = () => {
             sender: "DOCTOR",
           },
         });
+        
         console.log("whole chat front", response.data);
   
         if (response.data.chatResult != null) {

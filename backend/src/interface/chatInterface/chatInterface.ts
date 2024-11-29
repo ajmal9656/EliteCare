@@ -62,7 +62,7 @@ export interface messageDetails {
   export interface GetChatResult{
     doctor:Doctor;
     user:User;
-    chatResult:chatData
+    chatResult:chatData|null
     signedDoctorImageUrl?: string, 
     signedUserImageUrl?: string 
 

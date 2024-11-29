@@ -64,7 +64,10 @@ export class chatService{
 
      async getChat (doctorID: string, userID: string,sender:string): Promise<GetChatResult> {
         try {
+            console.log("getchat service");
+            
           const response = await this.chatRepository.getChat(doctorID, userID,sender);
+          
          
 
           let signedDoctorUrl: string | undefined;

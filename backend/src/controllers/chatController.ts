@@ -19,7 +19,9 @@ export class chatController {
           const doctorID = req.query.doctorID as string;
           const userID = req.query.userID as string;
           const sender = req.query.sender as string;
+          console.log("rrrrrrrrrr",doctorID,userID,sender);
           const chatHistory = await this.chatService.getChat(doctorID, userID,sender);
+          
 
           console.log("whole chat res",chatHistory);
           

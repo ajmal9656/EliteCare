@@ -201,10 +201,9 @@ export class chatRepository implements IChatRepository{
 
     async getChat (doctorID: string, userID: string,sender:string): Promise<GetChatResult>  {
         try {
-          const chatResult = await ChatModel.findOne({doctorId:doctorID,userId:userID})
-          if (!chatResult) {
-            throw new Error(`chat not found.`);
-          }
+            
+          let chatResult = await ChatModel.findOne({doctorId:doctorID,userId:userID})
+          
           
 
             const user = await userModel.findById(userID,{name:1,image:1})
@@ -223,11 +222,13 @@ export class chatRepository implements IChatRepository{
             console.log("doctor",doctor);
             console.log("user",user);
             console.log("chatResult",chatResult);
+
+            
             
             return {
                 doctor:doctor,
                 user:user,
-                chatResult
+                chatResult:chatResult?chatResult:null
             };
 
           
