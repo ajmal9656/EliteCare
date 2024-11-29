@@ -99,45 +99,59 @@ function DoctorProfile() {
 
 
   return (
-    <div className='w-full flex justify-center'>
-  <div className='w-full sm:w-[90%] md:w-[80%] lg:w-[70%] h-auto flex flex-col justify-center items-center'>
+    <div className="w-full flex justify-center">
+  <div className="w-full sm:w-[90%] md:w-[80%] lg:w-[70%] h-auto flex flex-col justify-center items-center">
     
     {/* Doctor details section */}
-    <div className='w-full sm:w-[95%] h-auto bg-white my-5 shadow-lg rounded-lg border border-gray-200'>
-      <div className='w-full flex justify-end mt-5 items-center'>
-        <div className="flex items-center gap-2 font-bold text-blue-gray-500 mr-16">
-          {averageRating}
+    <div className="w-full sm:w-[95%] h-auto bg-white my-5 shadow-lg rounded-lg border border-gray-200">
+      
+      {/* Rating and Review Details */}
+      <div className="w-full flex justify-between items-center mt-5 px-5">
+        <div className="flex items-center gap-3">
+          <Typography variant="h6" className="font-bold text-blue-gray-500">{averageRating}</Typography>
           <Rating value={averageRating} readOnly />
+        </div>
+        <div className="flex items-center gap-2 font-bold text-blue-gray-500">
           <Typography color="blue-gray" className="font-medium text-blue-gray-500">
-            Out of {reviews.length} Reviews
+            {reviews.length} Reviews
           </Typography>
         </div>
       </div>
-      <div className='w-full flex justify-center mt-5 items-center'>
-        <h1 className='text-3xl sm:text-2xl font-bold font-serif text-backgroundColor'>
+      
+      {/* Doctor Name */}
+      <div className="w-full flex justify-center mt-5 items-center">
+        <h1 className="text-3xl sm:text-2xl font-bold font-serif text-backgroundColor">
           Dr. {doctor.name}
         </h1>
       </div>
-      <div className='w-full flex justify-center items-center my-2'>
-        <h1 className='text-xl sm:text-lg font-semibold font-serif text-gray-600'>
+
+      {/* Doctor Department */}
+      <div className="w-full flex justify-center items-center my-2">
+        <h1 className="text-xl sm:text-lg font-semibold font-serif text-gray-600">
           {doctor.department.name}
         </h1>
       </div>
-      <div className='w-full flex justify-center items-center my-2'>
-        <h1 className='text-xl sm:text-lg font-medium font-serif text-gray-600'>
-          <span className='text-indigo-600'>{doctor.email}</span>
+
+      {/* Doctor Email */}
+      <div className="w-full flex justify-center items-center my-2">
+        <h1 className="text-xl sm:text-lg font-medium font-serif text-gray-600">
+          <span className="text-indigo-600">{doctor.email}</span>
         </h1>
       </div>
-      <div className='w-full sm:w-[95%] px-10 py-4 text-center'>
-        <h2 className='text-lg font-medium text-gray-700'>
+
+      {/* Specialty & Experience */}
+      <div className="w-full sm:w-[95%] px-10 py-4 text-center">
+        <h2 className="text-lg font-medium text-gray-700">
           Specialty & Experience
         </h2>
-        <p className='text-gray-500 mt-2'>
+        <p className="text-gray-500 mt-2">
           Dr. {doctor.name} has over 10 years of experience in {doctor.department.name}, specializing in treating complex medical conditions. 
           With a patient-centered approach, they are dedicated to providing the highest quality of care and ensuring each patient feels comfortable and informed.
         </p>
       </div>
-      <div className='w-full h-20 flex justify-center items-center'>
+
+      {/* Book Slot Button */}
+      <div className="w-full h-20 flex justify-center items-center">
         <Button title="Book Slot" onClick={handleClick} />
       </div>
     </div>
@@ -175,6 +189,8 @@ function DoctorProfile() {
     </div>
   </div>
 </div>
+
+
 
 
   );

@@ -16,19 +16,20 @@ function DoctorProfileLayout() {
   return (
     <div className='w-full flex flex-col bg-gray-100'>
   {/* Doctor's Profile Image */}
-  <div className='w-full h-[300px] bg-gradient-to-r from-[#D2EFEA] to-[#ADE9DC] flex justify-center'>
-    <div className='w-[20%] h-[200px] mt-16 relative sm:w-[30%] md:w-[20%] lg:w-[15%]'>
-      {doctor ? (
-        <img
-          src={doctor.signedImageUrl}
-          alt={doctor.name}
-          className='w-full h-full object-cover rounded-md'
-        />
-      ) : (
-        <p>No doctor data available</p>
-      )}
-    </div>
+  <div className="w-full h-[300px] bg-gradient-to-r from-[#D2EFEA] to-[#ADE9DC] flex justify-center">
+  <div className="w-[20%] h-[200px] mt-16 relative sm:w-[30%] md:w-[20%] lg:w-[15%] mx-auto">
+    {doctor ? (
+      <img
+        src={doctor.signedImageUrl}
+        alt={doctor.name}
+        className="w-full h-full object-cover rounded-md"
+      />
+    ) : (
+      <p>No doctor data available</p>
+    )}
   </div>
+</div>
+
 
   {/* Passing data to Outlet */}
   {appointmentData ? (
