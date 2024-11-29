@@ -13,7 +13,7 @@ import "./src/helper/nodeCron"
 
 
 
-
+ 
 
 
 dotenv.config();
@@ -29,7 +29,8 @@ configSocketIO(server);
 
 app.use(cookieParser());
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' })); // For JSON payloads
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 const corsOptions = {
   origin: 'https://ajmals.site', // Frontend origin
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
