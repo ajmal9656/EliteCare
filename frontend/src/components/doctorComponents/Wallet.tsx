@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import CustomTable from '../common/doctorCommon/Table';
@@ -7,6 +7,7 @@ import { RootState } from '../../Redux/store';
 import axiosUrl from '../../utils/axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { logoutDoctor } from '../../Redux/Action/doctorActions';
 
 interface Transaction {
   transactionId: string;
@@ -18,6 +19,7 @@ interface Transaction {
 function Wallet() {
 
   const navigate = useNavigate()
+  const dispatch:any = useDispatch()
   const DoctorData = useSelector((state: RootState) => state.doctor);
   const [status, setStatus] = useState('All');
   const [allTransactions, setTransactions] = useState<Transaction[]>([]);
@@ -170,21 +172,24 @@ function Wallet() {
     }
   }
 
-  useEffect(()=>{
-    try{
-      fetchWalletData(status,currentPage);
-
-    }catch(error:any){
-      if (error.response && error.response.status === 401) {
-        console.error("Unauthorized: Redirecting to login page.");
-        navigate("/doctor/login"); // Navigate to the login page if unauthorized
-      } else {
-        console.error("Error fetching user details:", error);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchWalletData(status, currentPage);
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login page.");
+          await dispatch(logoutDoctor());
+          navigate("/doctor/login"); // Navigate to the login page if unauthorized
+        } else {
+          console.error("Error fetching user details:", error);
+        }
       }
-    }
-    
-
-  },[balance])
+    };
+  
+    fetchData(); // Call the async function
+  }, [balance]);
+  
   
 
   return (

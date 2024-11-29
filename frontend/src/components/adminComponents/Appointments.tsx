@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import axiosUrl from '../../utils/axios';
 import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
+import { logoutAdmin } from '../../Redux/Action/adminActions';
+import { useDispatch } from 'react-redux';
 
 function Appointments() {
 
   const navigate = useNavigate()
+  const dispatch:any =useDispatch()
   // State to store fetched appointments
   const [appointments, setAppointments] = useState([]);
   const [status, setStatus] = useState<string>('All'); 
@@ -31,7 +34,8 @@ function Appointments() {
     } catch (error:any) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized: Redirecting to login page.");
-        navigate("/admin/login"); // Navigate to the login page if unauthorized
+        await dispatch(logoutAdmin());
+          navigate("/admin/login"); // Navigate to the login page if unauthorized
       } else {
         console.error("Error fetching user details:", error);
       }

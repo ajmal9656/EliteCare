@@ -8,18 +8,20 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'sonner';
 import axiosUrl from '../../utils/axios';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
 import { MdDelete } from "react-icons/md";
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { TiTick } from "react-icons/ti";
 import { useNavigate } from 'react-router-dom';
+import { logoutDoctor } from '../../Redux/Action/doctorActions';
 
 
 function SlotManagement() {
 
   const navigate = useNavigate()
+  const dispatch:any = useDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date()); 
   const [availableSlots, setAvailableSlots] = useState<{ start: string, end: string, availability: boolean, _id: string,date:Date,doctorId:string }[]>([]);
@@ -284,22 +286,28 @@ function SlotManagement() {
   
 
  
+  
   useEffect(() => {
-    try{
-      const date = new Date()
-    var selectedDateUTC = moment(date).utc().startOf('day').toISOString();
-    fetchSlotsForDate(selectedDateUTC);
-
-    }catch(error:any){
-      if (error.response && error.response.status === 401) {
-        console.error("Unauthorized: Redirecting to login page.");
-        navigate("/doctor/login"); // Navigate to the login page if unauthorized
-      } else {
-        console.error("Error fetching user details:", error);
+    const fetchData = async () => {
+      try {
+        const date = new Date();
+        const selectedDateUTC = moment(date).utc().startOf("day").toISOString();
+        await fetchSlotsForDate(selectedDateUTC); // Assuming fetchSlotsForDate is async
+  
+      } catch (error: any) {
+        if (error.response && error.response.status === 401) {
+          console.error("Unauthorized: Redirecting to login page.");
+          await dispatch(logoutDoctor());
+          navigate("/doctor/login"); // Navigate to the login page if unauthorized
+        } else {
+          console.error("Error fetching user details:", error);
+        }
       }
-    }
-    
-  }, []); 
+    };
+  
+    fetchData();
+  }, [dispatch, navigate]); // Add dependencies where necessary
+  
 
   return (
     <div className="flex flex-col w-full mx-auto pl-64 p-4 mt-14">

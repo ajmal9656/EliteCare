@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../Redux/store';
-import { addSpecialization, updateSpecialization, listUnlistSpecialization } from '../../Redux/Action/adminActions';
+import { addSpecialization, updateSpecialization, listUnlistSpecialization, logoutAdmin } from '../../Redux/Action/adminActions';
 import { Specializations } from '../../interfaces/doctorinterface';
 import axiosUrl from '../../utils/axios';
 
@@ -37,7 +37,8 @@ const Specialization: React.FC = () => {
     } catch (error:any) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized: Redirecting to login page.");
-        navigate("/admin/login"); // Navigate to the login page if unauthorized
+        await dispatch(logoutAdmin());
+          navigate("/admin/login"); // Navigate to the login page if unauthorized
       } else {
         console.error("Error fetching user details:", error);
       }

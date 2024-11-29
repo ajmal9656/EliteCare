@@ -1,4 +1,4 @@
-import React from "react";
+
 
 import img1 from '../../assets/blog1.jpg'
 import img2 from '../../assets/blog2.jpg'
@@ -6,7 +6,7 @@ import img3 from '../../assets/blog3.jpg'
 import img4 from '../../assets/blog4.jpg'
 import img5 from '../../assets/blog5.jpg'
 import img6 from '../../assets/blog6.jpg'
-import Button from "../common/userCommon/Button";
+
 import BlogCard from "../common/userCommon/BlogCard";
 
 const Blogs = () => {

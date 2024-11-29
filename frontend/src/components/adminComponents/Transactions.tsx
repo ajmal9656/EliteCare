@@ -2,9 +2,12 @@ import { useState, useEffect } from "react";
 import axiosUrl from "../../utils/axios";
 import DatePicker from "react-datepicker";
 import { useNavigate } from "react-router-dom";
+import { logoutAdmin } from "../../Redux/Action/adminActions";
+import { useDispatch } from "react-redux";
 
 const Transactions = () => {
   const navigate = useNavigate()
+  const dispatch:any = useDispatch()
   const [status, setStatus] = useState("Credit");
   const [transactions, setTransactions] = useState<any>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -37,7 +40,8 @@ const Transactions = () => {
     } catch (error:any) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized: Redirecting to login page.");
-        navigate("/admin/login"); // Navigate to the login page if unauthorized
+        await dispatch(logoutAdmin());
+          navigate("/admin/login"); // Navigate to the login page if unauthorized
       } else {
         console.error("Error fetching user details:", error);
       }

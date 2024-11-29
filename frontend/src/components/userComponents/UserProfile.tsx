@@ -4,7 +4,7 @@ import { RootState } from "../../Redux/store";
 import { FaCamera, FaEdit } from "react-icons/fa";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { updateUserProfile,updateUserProfileImage } from "../../Redux/Action/userActions";
+import { logoutUser, updateUserProfile,updateUserProfileImage } from "../../Redux/Action/userActions";
 import { useNavigate } from "react-router-dom";
 import axiosUrl from "../../utils/axios";
 
@@ -131,7 +131,8 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
       } catch (error:any) {
         if (error.response && error.response.status === 401) {
           console.error("Unauthorized: Redirecting to login page.");
-          navigate("/login"); // Navigate to the login page if unauthorized
+          await dispatch(logoutUser());
+        navigate("/login"); // Navigate to the login page if unauthorized
         } else {
           console.error("Error fetching user details:", error);
         }

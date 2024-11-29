@@ -7,6 +7,8 @@ import { Specializations } from '../../interfaces/doctorinterface';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import VerificationProcessingPage from '../../pages/doctorPages/VerificationProcessingPage';
+import { useDispatch } from 'react-redux';
+import { logoutDoctor } from '../../Redux/Action/doctorActions';
 
 // Validation schema for the form
 const validationSchema = Yup.object({
@@ -39,6 +41,7 @@ const validationSchema = Yup.object({
 
 function DoctorVerifivationForm() {
   const navigate = useNavigate()
+  const dispatch:any = useDispatch()
   const [isProcessing, setIsProcessing] = useState(false);
   const [specializations, setSpecializations] = React.useState<Specializations[]>([]);
   const [imagePreviews, setImagePreviews] = React.useState({
@@ -81,6 +84,8 @@ function DoctorVerifivationForm() {
       } catch (error:any) {
         if (error.response && error.response.status === 401) {
           console.error("Unauthorized: Redirecting to login page.");
+          await dispatch(logoutDoctor());
+   
           navigate("/doctor/login"); // Navigate to the login page if unauthorized
         } else {
           console.error("Error fetching user details:", error);

@@ -5,9 +5,12 @@ import axiosUrl from "../../utils/axios";
 import RevenueChart from "./RevenueChart";
 import UserDoctorChart from "./UserDoctorChart";
 import { useNavigate } from "react-router-dom";
+import { logoutAdmin } from "../../Redux/Action/adminActions";
+import { useDispatch } from "react-redux";
 
 function Dashboard() {
   const navigate = useNavigate()
+  const dispatch:any = useDispatch()
   const [dashboardData, setDashboardData] = useState({
     totalRevenue: 0,
     totalUsers: 0,
@@ -38,6 +41,7 @@ function Dashboard() {
       } catch (error:any) {
         if (error.response && error.response.status === 401) {
           console.error("Unauthorized: Redirecting to login page.");
+          await dispatch(logoutAdmin());
           navigate("/admin/login"); // Navigate to the login page if unauthorized
         } else {
           console.error("Error fetching user details:", error);

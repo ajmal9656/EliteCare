@@ -14,7 +14,7 @@ function VideoChat() {
   const videoCallRef = useRef(null)
   const { roomIdDoctor,videoCall} = useSelector((state: RootState) => state.doctor)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
+  
 
 
   console.log("vid",videoCall);

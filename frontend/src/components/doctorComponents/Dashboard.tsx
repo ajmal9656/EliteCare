@@ -2,15 +2,17 @@ import { FaUsers } from 'react-icons/fa';
 import { FaUserDoctor } from 'react-icons/fa6';
 import { GrMoney } from 'react-icons/gr';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
 import axiosUrl from '../../utils/axios';
 import RevenueChart from './RevenueChart';
 import { useNavigate } from 'react-router-dom';
+import { logoutDoctor } from '../../Redux/Action/doctorActions';
 
 function Dashboard() {
 
   const navigate = useNavigate()
+  const dispatch:any = useDispatch()
   
   const DoctorData = useSelector((state: RootState) => state.doctor);
   const [dashboardData, setDashboardData] = useState({
@@ -36,6 +38,8 @@ function Dashboard() {
       } catch (error:any) {
         if (error.response && error.response.status === 401) {
           console.error("Unauthorized: Redirecting to login page.");
+          await dispatch(logoutDoctor());
+   
           navigate("/doctor/login"); // Navigate to the login page if unauthorized
         } else {
           console.error("Error fetching user details:", error);

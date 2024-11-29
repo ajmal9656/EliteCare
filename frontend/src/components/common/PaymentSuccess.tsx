@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect} from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axiosUrl from "../../utils/axios";
 import { toast } from "sonner";

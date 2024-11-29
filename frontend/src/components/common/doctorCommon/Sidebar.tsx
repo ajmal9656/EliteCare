@@ -1,4 +1,4 @@
-import { Link,NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutDoctor } from "../../../Redux/Action/doctorActions";

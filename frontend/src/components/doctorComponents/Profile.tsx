@@ -4,7 +4,7 @@ import { RootState } from "../../Redux/store";
 import axiosUrl from "../../utils/axios";
 import { Rating, Typography, Modal, Box, TextField, Button } from "@mui/material"; // Import Modal, TextField, Button
 import { FaEdit ,FaCamera} from "react-icons/fa";
-import { updateDoctorProfile, updateDoctorProfileImage } from "../../Redux/Action/doctorActions";
+import { logoutDoctor, updateDoctorProfile, updateDoctorProfileImage } from "../../Redux/Action/doctorActions";
 import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -72,7 +72,9 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
         } catch (error:any) {
           if (error.response && error.response.status === 401) {
             console.error("Unauthorized: Redirecting to login page.");
-            navigate("/doctor/login"); // Navigate to the login page if unauthorized
+            await dispatch(logoutDoctor());
+   
+          navigate("/doctor/login"); // Navigate to the login page if unauthorized
           } else {
             console.error("Error fetching user details:", error);
           }

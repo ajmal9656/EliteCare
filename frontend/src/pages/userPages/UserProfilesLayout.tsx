@@ -46,6 +46,7 @@ function UserProfilesLayout() {
     } catch (error:any) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized: Redirecting to login page.");
+        await dispatch(logoutUser());
         navigate("/login"); // Navigate to the login page if unauthorized
       } else {
         console.error("Error fetching user details:", error);

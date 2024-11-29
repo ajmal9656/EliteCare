@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+
 import axiosUrl from '../../utils/axios';
 import { UserDetails } from '../../interfaces/userInterface';
 import { useNavigate } from 'react-router-dom';
+import { logoutAdmin } from '../../Redux/Action/adminActions';
+import { useDispatch } from 'react-redux';
 
 function UserListing() {
     const navigate = useNavigate();
+    const dispatch:any = useDispatch()
     const [users, setUsers] = useState<UserDetails[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -24,7 +27,8 @@ function UserListing() {
         } catch (error:any) {
           if (error.response && error.response.status === 401) {
             console.error("Unauthorized: Redirecting to login page.");
-            navigate("/admin/login"); // Navigate to the login page if unauthorized
+            await dispatch(logoutAdmin());
+          navigate("/admin/login"); // Navigate to the login page if unauthorized
           } else {
             console.error("Error fetching user details:", error);
           }

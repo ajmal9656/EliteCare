@@ -3,9 +3,12 @@ import { toast } from 'sonner';
 import axiosUrl from '../../utils/axios';
 import { DoctorApplication } from '../../interfaces/doctorinterface';
 import { useNavigate } from 'react-router-dom';
+import { logoutAdmin } from '../../Redux/Action/adminActions';
+import { useDispatch } from 'react-redux';
 
 function Applications() {
   const navigate = useNavigate();
+  const dispatch:any = useDispatch()
   const [applications, setApplications] = useState<DoctorApplication[]>([]);
    const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -20,7 +23,8 @@ function Applications() {
     } catch (error:any) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized: Redirecting to login page.");
-        navigate("/admin/login"); // Navigate to the login page if unauthorized
+        await dispatch(logoutAdmin());
+          navigate("/admin/login"); // Navigate to the login page if unauthorized
       } else {
         console.error("Error fetching user details:", error);
       }

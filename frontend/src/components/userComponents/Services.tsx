@@ -1,10 +1,10 @@
 import axiosUrl from "../../utils/axios"; // Import Axios
-import Button from "../common/userCommon/Button";
+
 import { RiMicroscopeLine } from "react-icons/ri";
 import ServicesCard from "../common/userCommon/ServiceCard";
 import { MdHealthAndSafety } from "react-icons/md";
 import { FaHeartbeat } from "react-icons/fa";
-import { useNavigate, Link } from "react-router-dom";
+import {  Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 interface Specialization {

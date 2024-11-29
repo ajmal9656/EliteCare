@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { setVideoCall } from '../../Redux/Slice/doctorSlice';
 import { RootState } from '../../Redux/store';
-import { io } from 'socket.io-client';
+
 import { useSocket } from '../../Context/SocketIO';
 
-import { MdYard } from 'react-icons/md';
+
 import { setRoomId, setShowIncomingVideoCall, setShowVideoCall } from '../../Redux/Slice/userSlice';
-import { useNavigate } from 'react-router-dom';
+
 import axiosUrl from '../../utils/axios';
 
 
@@ -25,7 +25,7 @@ function VideoChat() {
   const videoCallRef = useRef(null)
   const { showIncomingVideoCall,roomIdUser} = useSelector((state: RootState) => state.user)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
+
 
   console.log("show",showIncomingVideoCall);
   

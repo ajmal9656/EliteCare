@@ -6,10 +6,13 @@ import Swal from "sweetalert2";
 import axiosUrl from "../../utils/axios";
 import jsPDF from "jspdf";
 import moment from "moment";
+import { useDispatch } from "react-redux";
+import { logoutDoctor } from "../../Redux/Action/doctorActions";
 
 function AppointmentDetails() {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch:any = useDispatch()
   const { appointment } = location.state || {};
   console.log("idddd", appointment);
   // Retrieve appointment data from location state
@@ -74,7 +77,7 @@ function AppointmentDetails() {
               appointmentId: appointment.viewDetails._id,
               reason: values.cancelReason,
             })
-            .then((response) => {
+            .then((response:any) => {
               setAppointmentStatus("cancelled by Dr");
               Swal.fire(
                 "Cancelled!",
@@ -83,7 +86,7 @@ function AppointmentDetails() {
               );
               closeModal();
             })
-            .catch((error) => {
+            .catch((error:any) => {
               Swal.fire(
                 "Error!",
                 "There was an error cancelling your appointment.",
@@ -168,6 +171,8 @@ function AppointmentDetails() {
       } catch (error:any) {
         if (error.response && error.response.status === 401) {
           console.error("Unauthorized: Redirecting to login page.");
+          await dispatch(logoutDoctor());
+   
           navigate("/doctor/login"); // Navigate to the login page if unauthorized
         } else {
           console.error("Error fetching user details:", error);

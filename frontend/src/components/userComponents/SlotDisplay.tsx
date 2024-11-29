@@ -1,11 +1,9 @@
-import Button from "../common/userCommon/Button";
+
 
 
 function SlotDisplay() {
 
-    const handleClick = () =>{
-
-    }
+    
 
 
   return (

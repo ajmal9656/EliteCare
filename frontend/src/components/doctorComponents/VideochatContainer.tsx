@@ -7,7 +7,7 @@ import { useSocket } from '../../Context/SocketIO';
 const VideochatContainer = ({ data }: { data: any }) => {
   const { socket } = useSocket()
   // const [callAccepted,setCallAccepted]=useState<boolean>(false)
-  const dispatch = useDispatch()
+  
 
   const handleEndCall = () => {
     socket?.emit('reject-call', ({ to: data._id }))

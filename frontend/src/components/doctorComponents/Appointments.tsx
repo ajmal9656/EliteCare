@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import CustomTable from "../common/doctorCommon/Table";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
 import axiosUrl from '../../utils/axios';
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { logoutDoctor } from '../../Redux/Action/doctorActions';
 
 function Appointments() {
   const DoctorData = useSelector((state: RootState) => state.doctor);
   const navigate = useNavigate();
+  const dispatch:any = useDispatch()
   const [rows, setRows] = useState<Array<{ [key: string]: any }>>([]);
   const [status, setStatus] = useState<string>('All');
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -51,7 +53,9 @@ function Appointments() {
     } catch (error:any) {
       if (error.response && error.response.status === 401) {
         console.error("Unauthorized: Redirecting to login page.");
-        navigate("/doctor/login"); // Navigate to the login page if unauthorized
+        await dispatch(logoutDoctor());
+   
+          navigate("/doctor/login"); // Navigate to the login page if unauthorized
       } else {
         console.error("Error fetching user details:", error);
       }
