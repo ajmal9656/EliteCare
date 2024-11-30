@@ -86,6 +86,7 @@ function AppointmentDetails() {
 
   const handleSubmitReview = async (values: ReviewFormValues, { resetForm }: { resetForm: () => void }) => {
     try {
+      
       const response = await axiosUrl.post('/addReview', {
         appointmentId: appointment?._id, // Ensure appointment is not null
         rating: values.rating,
@@ -177,6 +178,8 @@ function AppointmentDetails() {
 
 
   }
+
+ 
   
   
   
@@ -359,6 +362,8 @@ function AppointmentDetails() {
                     {...field}
                     value={field.value}
                     onChange={( newValue) => {
+                      console.log("new value",newValue);
+                      
                       setFieldValue("rating", newValue);
                     }}
                     precision={0.5}
