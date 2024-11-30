@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation ,useNavigate} from "react-router-dom";
 import moment from "moment";
 import { Rating } from "@mui/material";
-import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik";
+import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik"; 
 import * as Yup from "yup";
 import axiosUrl from "../../utils/axios";
 import { toast } from "sonner";
-import jsPDF from "jspdf";
+import jsPDF from 'jspdf';
+
 
 interface ReviewFormValues {
-  rating: number|any;
+  rating: number | null;
   reviewText: string;
 }
 
@@ -19,26 +20,26 @@ interface Appointment {
   age: number;
   date: string;
   start: string;
-  docId: any;
-  paymentMethod: string;
-  paymentStatus: string;
-  paymentId: any;
+  docId:any;
+  paymentMethod:string;
+  paymentStatus:string;
+  paymentId:any
   end: string;
   description: string;
   status: string;
   reason?: string; // Optional field for cancellation reason
-  review?: {
-    // Optional review field
+  review?: { // Optional review field
     rating: number; // Ensure rating is a number
     reviewText?: string; // Optional field for review text
+    
   };
-  prescription: string;
-  fees: string;
+  prescription:string;
+    fees:string
 }
 
 function AppointmentDetails() {
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const appointmentId = location.state?.appointmentId; // Only the ID
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,6 +51,9 @@ function AppointmentDetails() {
       try {
         const response = await axiosUrl.get(`/getAppointment/${appointmentId}`);
         console.log("Fetched appointment data:", response.data.data);
+        console.log("appoin",response.data.data);
+        
+        
         setAppointment(response.data.data); // Assuming response.data contains appointment details
       } catch (error) {
         console.error("Error fetching appointment details:", error);
@@ -76,21 +80,15 @@ function AppointmentDetails() {
   };
 
   const validationSchema = Yup.object().shape({
-    rating: Yup.number()
-      .required("Rating is required")
-      .min(1, "Rating must be at least 1")
-      .max(5, "Rating cannot be more than 5"),
+    rating: Yup.number().required("Rating is required").min(1, "Rating must be at least 1").max(5, "Rating cannot be more than 5"),
     reviewText: Yup.string().required("Review is required"),
   });
 
-  const handleSubmitReview = async (
-    values: ReviewFormValues,
-    { resetForm }: { resetForm: () => void }
-  ) => {
+  const handleSubmitReview = async (values: ReviewFormValues, { resetForm }: { resetForm: () => void }) => {
     try {
-      const response = await axiosUrl.post("/addReview", {
+      const response = await axiosUrl.post('/addReview', {
         appointmentId: appointment?._id, // Ensure appointment is not null
-        rating: values.rating || 0, // Default rating to 0 if null
+        rating: values.rating,
         reviewText: values.reviewText,
       });
       setAppointment(response.data.data);
@@ -106,84 +104,87 @@ function AppointmentDetails() {
   const downloadPrescription = async () => {
     if (appointment?.prescription) {
       const doc = new jsPDF();
-
+  
       // Set fonts
       doc.setFont("Helvetica", "normal");
       doc.setFontSize(12);
-
+  
       // Define Colors
       const darkBlue = "rgb(0, 51, 102)";
       const lightBlue = "rgb(0, 102, 204)";
       const darkGrey = "rgb(50, 50, 50)";
       const lightGrey = "rgb(150, 150, 150)";
-
+  
       // Website Name
       doc.setFontSize(18);
       doc.setTextColor(darkBlue);
       doc.text("EliteCare", 10, 15); // Position it at the top
-
+  
       // Header
       doc.setFontSize(22);
       doc.setTextColor(lightBlue);
       doc.text("Prescription", 10, 30); // Adjusted Y position to make room for website name
-
+  
       // Draw a line under the header
       doc.setDrawColor(0, 102, 204);
       doc.setLineWidth(1);
       doc.line(10, 35, 200, 35); // Adjusted line position
-
+  
       // Patient Information
       doc.setFontSize(14);
       doc.setTextColor(darkGrey);
       doc.text(`Patient Name: ${appointment.patientNAme}`, 10, 45);
       doc.text(`Age: ${appointment.age.toString()}`, 10, 55);
-      doc.text(
-        `Date: ${moment(appointment.date).format("MMMM Do YYYY")}`,
-        10,
-        65
-      );
+      doc.text(`Date: ${moment(appointment.date).format("MMMM Do YYYY")}`, 10, 65);
       doc.text(`Time: ${appointment.start} - ${appointment.end}`, 10, 75);
-
+  
       // Add some space
       doc.setLineWidth(0.5);
       doc.line(10, 80, 200, 80); // Separator line
-
+  
       // Prescription Section
       doc.setFontSize(16);
       doc.setTextColor(darkBlue);
       doc.text("Prescription Details:", 10, 90);
-
+  
       // Increase spacing before prescription content
       const prescriptionSpacing = 10; // Adjust this value to increase or decrease spacing
       let yPosition = 90 + prescriptionSpacing; // Starting position for the content
-
+  
       // Prescription Details in a structured format
-      const prescriptionLines = appointment.prescription.split("\n");
+      const prescriptionLines = appointment.prescription.split('\n');
       prescriptionLines.forEach((line) => {
         doc.setTextColor(darkGrey);
         doc.text(line, 10, yPosition);
         yPosition += 8; // Move down for each line
       });
-
+  
       // Footer
       doc.setFontSize(10);
       doc.setTextColor(lightGrey);
       doc.text("Thank you for choosing our service!", 10, 280);
       doc.text("For any questions, please contact us.", 10, 285);
       doc.text("EliteCare | elitecare@gmail.com", 10, 290); // Optional company details
-
+  
       // Save the PDF
       doc.save(`Prescription_${appointment.patientNAme}.pdf`);
     }
   };
+  
+  const navigateChat = () =>{
 
-  const navigateChat = () => {
-    navigate("/userProfile/chat", { state: { appointment: appointment } });
-  };
+    navigate("/userProfile/chat",{ state: { appointment: appointment } })
+
+
+  }
+  
+  
+  
+  
 
   return (
     <div className="w-[75%] pr-10 pb-5">
-     <div className="bg-white w-[100%] object-cover rounded-lg border flex flex-col justify-around p-5 space-y-6">
+  <div className="bg-white w-[100%] object-cover rounded-lg border flex flex-col justify-around p-5 space-y-6">
     <h2 className="text-2xl font-bold text-gray-700 border-b pb-4">Appointment Details</h2>
 
     {/* Patient Information */}
@@ -358,8 +359,6 @@ function AppointmentDetails() {
                     {...field}
                     value={field.value}
                     onChange={( newValue) => {
-                      console.log("new value",newValue);
-                      
                       setFieldValue("rating", newValue);
                     }}
                     precision={0.5}
@@ -414,7 +413,8 @@ function AppointmentDetails() {
    </div>
         </div>
   )}
-    </div>
+</div>
+
   );
 }
 
