@@ -88,7 +88,7 @@ function AppointmentDetails() {
     try {
       const response = await axiosUrl.post('/addReview', {
         appointmentId: appointment?._id, // Ensure appointment is not null
-        rating: values.rating,
+        rating: 4,
         reviewText: values.reviewText,
       });
       setAppointment(response.data.data);
@@ -345,7 +345,7 @@ function AppointmentDetails() {
     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[80%] overflow-y-auto overflow-x-hidden">
       <h3 className="text-lg font-semibold mb-4">Submit Your Review</h3>
       <Formik
-        initialValues={{ rating: null, reviewText: "" }}
+        initialValues={{ rating: 4, reviewText: "" }}
         validationSchema={validationSchema}
         onSubmit={handleSubmitReview}
       >
