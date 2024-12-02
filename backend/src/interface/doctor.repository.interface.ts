@@ -8,9 +8,12 @@ export interface IDoctorRepository {
     createDoctor(doctorData: doctorType): Promise<Document>;
     doctorCheck(email: string): Promise<DoctorResult>;
     uploadDoctorData(data: DoctorData, docDetails: docDetails): Promise<boolean>;
-    createSlot(data: TimeSlot): Promise<DoctorSchedule>;
+    createSlot(data: any): Promise<any>;
     getSlots(date: string, doctorId: string): Promise<Slot[]>;
-    checkSlots(date: string, doctorId: string, start: string, end: string): Promise<boolean>;
+    checkSlots( startDate: string,
+        endDate: string,
+        doctorId: string,
+        timeSlots: Array<{ start: string; end: string }>): Promise<boolean>;
     deleteTimeSlot(date: Date, doctorId: string, slotId: string): Promise<boolean>;
     getAllAppointments(doctorId: string,status: string,page: number, limit: number,startDate: Date | null,endDate: Date | null) : Promise<GetAppointmentData>
     cancelAppointment(appointmentId: string, reason: string): Promise<AppointmentData>;

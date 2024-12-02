@@ -3,7 +3,7 @@ import { userController } from "../controllers/userController";
 import { userService } from "../services/userService";
 import { userRepository } from "../repository/userRepository";
 import multer from 'multer';
-import { verifyUserToken } from "../config/jwtConfig";
+import { verifyToken } from "../config/jwtConfig";
 
 
 
@@ -28,17 +28,17 @@ route.get('/getSpecializations', userControllerInstance.getSpecializations.bind(
 route.get('/getDoctors', userControllerInstance.getDoctors.bind(userControllerInstance));
 route.get('/getDoctorsWithSpecialization/:specializationId', userControllerInstance.getDoctorsWithSpecialization.bind(userControllerInstance));
 route.get('/getSlots', userControllerInstance.getDoctorSlots.bind(userControllerInstance));
-route.get('/getUserDetails/:userId', verifyUserToken,userControllerInstance.getUserDetails.bind(userControllerInstance));
-route.put('/updateUser',verifyUserToken, userControllerInstance.updateUserProfile.bind(userControllerInstance));
-route.put('/updateProfileImage',verifyUserToken, uploadUserFiles, userControllerInstance.updateProfileImage.bind(userControllerInstance));
-route.post('/checkSlotStatus',verifyUserToken, userControllerInstance.checkSlotStatus.bind(userControllerInstance));
-route.post('/create-checkout-session',verifyUserToken, userControllerInstance.createCheckoutSession.bind(userControllerInstance));
-route.post('/checkSessionStatus',verifyUserToken, userControllerInstance.confirmPayment.bind(userControllerInstance));
+route.get('/getUserDetails/:userId', verifyToken('user'),userControllerInstance.getUserDetails.bind(userControllerInstance));
+route.put('/updateUser',verifyToken('user'), userControllerInstance.updateUserProfile.bind(userControllerInstance));
+route.put('/updateProfileImage',verifyToken('user'), uploadUserFiles, userControllerInstance.updateProfileImage.bind(userControllerInstance));
+route.post('/checkSlotStatus',verifyToken('user'), userControllerInstance.checkSlotStatus.bind(userControllerInstance));
+route.post('/create-checkout-session',verifyToken('user'), userControllerInstance.createCheckoutSession.bind(userControllerInstance));
+route.post('/checkSessionStatus',verifyToken('user'), userControllerInstance.confirmPayment.bind(userControllerInstance));
 route.get('/doctordetails/:doctorId', userControllerInstance.getDoctorDetails.bind(userControllerInstance));
-route.get('/getAppointments/:userId',verifyUserToken, userControllerInstance.getAllAppointments.bind(userControllerInstance));
-route.put('/cancelAppointment/:appointmentId',verifyUserToken, userControllerInstance.cancelAppointment.bind(userControllerInstance));
-route.post('/addReview',verifyUserToken, userControllerInstance.addReview.bind(userControllerInstance));
-route.get('/getAppointment/:appointmentId',verifyUserToken, userControllerInstance.getAppointment.bind(userControllerInstance));
+route.get('/getAppointments/:userId',verifyToken('user'), userControllerInstance.getAllAppointments.bind(userControllerInstance));
+route.put('/cancelAppointment/:appointmentId',verifyToken('user'), userControllerInstance.cancelAppointment.bind(userControllerInstance));
+route.post('/addReview',verifyToken('user'), userControllerInstance.addReview.bind(userControllerInstance));
+route.get('/getAppointment/:appointmentId',verifyToken('user'), userControllerInstance.getAppointment.bind(userControllerInstance));
 route.post('/logout', userControllerInstance.logoutUser.bind(userControllerInstance));
 
 export default route;

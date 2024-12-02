@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import axiosUrl from "../../utils/axios";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
+import Swal from "sweetalert2";
 
 
 interface ReviewFormValues {
@@ -44,13 +45,16 @@ function AppointmentDetails() {
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [appointmentStatus, setAppointmentStatus] = useState(
+    appointment?.status
+  );
 
   // Fetch appointment details using appointmentId
   useEffect(() => {
     const fetchAppointmentDetails = async () => {
       try {
         const response = await axiosUrl.get(`/getAppointment/${appointmentId}`);
-        console.log("Fetched appointment data:", response.data.data);
+        
         console.log("appoin",response.data.data);
         
         
@@ -176,7 +180,45 @@ function AppointmentDetails() {
     navigate("/userProfile/chat",{ state: { appointment: appointment } })
 
 
+
+    
   }
+
+  const handleCancelAppointment = (appointmentId: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to cancel this appointment?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, cancel it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosUrl
+          .put(`/cancelAppointment/${appointmentId}`)
+          .then((result) => {
+            setAppointmentStatus("cancelled")
+            toast.success("Appointment cancelled");
+            Swal.fire(
+              "Cancelled!",
+              "The appointment has been cancelled. Your money will be refunded to your bank account.",
+              "success"
+            );
+            console.log("appointment",appointment);
+            
+
+            console.log("cancalled appointment" ,result);
+            
+            
+          })
+          .catch((error) => {
+            console.error("Error canceling appointment:", error);
+            Swal.fire("Failed!", "Failed to cancel the appointment. Please try again.", "error");
+          });
+      }
+    });
+  };
   
   
   
@@ -322,13 +364,21 @@ function AppointmentDetails() {
     )}
 
     {/* Cancel Button: Hide if appointment date is today */}
-    {!moment(appointment.date).isBefore(moment(), 'day') && !moment(appointment.date).isSame(moment(), 'day') && (
-  <button
-    className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
-  >
-    Cancel
-  </button>
-)}
+    {!moment(appointment.date).isBefore(moment(), 'day') && 
+ !moment(appointment.date).isSame(moment(), 'day') &&
+ (
+   appointmentStatus !== "cancelled" ? (
+     <button
+       className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+       onClick={() => handleCancelAppointment(appointment._id)}
+     >
+       Cancel
+     </button>
+   ) : (
+    <p className="px-4 py-2 text-red-600 rounded-lg">Cancelled</p>
+   )
+ )}
+
 
   </div>
 )}

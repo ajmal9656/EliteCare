@@ -15,82 +15,33 @@ const createToken = (id: string,email:string ,role: string): string => {
 
 
 
-const verifyUserToken = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        console.log("hiii",req.cookies);
-        
+const verifyToken = (requiredRole: string) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      try {
         const accessToken: string = req.cookies.AccessToken;
-        console.log("acc",accessToken);
-        
+  
         if (accessToken) {
-            console.log("access user",accessToken);
-            
-            jwt.verify(accessToken, secret_key, async (err, decoded) => {
-                if (err) {
-                    await handleRefreshToken(req, res, next);
-                } else {
-                    const { role } = decoded as jwt.JwtPayload;
-                    if (role !== "user") { 
-                        return res.status(401).json({ message: 'Access denied. Insufficient role.' });
-                    }
-                    next();
-                };
-            });
+          jwt.verify(accessToken, secret_key, async (err, decoded) => {
+            if (err) {
+              await handleRefreshToken(req, res, next);
+            } else {
+              const { role } = decoded as jwt.JwtPayload;
+  
+              if (role !== requiredRole) {
+                return res.status(401).json({ message: `Access denied. Insufficient role. Expected ${requiredRole}.` });
+              }
+  
+              next();
+            }
+          });
         } else {
-            console.log("not access");
-            
-            await handleRefreshToken(req, res, next);
-        };
-    } catch (error) {
-        res.status(401).json({ message: 'Access denied. Access token not valid.' });
-    };
-};
-const verifyDoctorToken = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const accessToken: string = req.cookies.AccessToken;
-        if (accessToken) {
-            jwt.verify(accessToken, secret_key, async (err, decoded) => {
-                if (err) {
-                    await handleRefreshToken(req, res, next);
-                } else {
-                    const { role } = decoded as jwt.JwtPayload;
-                    if (role !== "doctor") { 
-                        return res.status(401).json({ message: 'Access denied. Insufficient role.' });
-                    }
-                    next();
-                };
-            });
-        } else {
-            await handleRefreshToken(req, res, next);
-        };
-    } catch (error) {
-        res.status(401).json({ message: 'Access denied. Access token not valid.' });
-    };
-};
-
-
-const verifyAdminToken = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const adminToken: string = req.cookies.AccessToken;
-        if (adminToken) {
-            jwt.verify(adminToken, secret_key, async (err, decoded) => {
-                if (err) {
-                    return res.status(401).json({ message: 'Access denied. Admin token expired or invalid.' });
-                } else {
-                    const { role } = decoded as jwt.JwtPayload;
-                    if (role !== "admin") {
-                        return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
-                    }
-                    next();
-                };
-            });
-        } else {
-            return res.status(401).json({ message: 'Access denied. Admin token not provided.' });
+          await handleRefreshToken(req, res, next);
         }
-    } catch (error) {
-        res.status(401).json({ message: 'Access denied. Admin token not valid.' });
+      } catch (error) {
+        res.status(401).json({ message: 'Access denied. Access token not valid.' });
+      }
     };
-};
+  };
 
 const handleRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken: string = req.cookies.RefreshToken;
@@ -118,4 +69,4 @@ const handleRefreshToken = async (req: Request, res: Response, next: NextFunctio
     };
 };
 
-export { createToken, verifyUserToken,verifyDoctorToken, verifyAdminToken};
+export { createToken, verifyToken};

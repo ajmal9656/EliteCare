@@ -130,15 +130,14 @@ function LoginComp() {
       
     )}
   </div>
-  {formik.touched.password && formik.errors.password ? (
-    <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
-  ) : null}
+  
 </div>
 
-          {formik.touched.password && formik.errors.password ? (
+          
+        </div>
+        {formik.touched.password && formik.errors.password ? (
             <div className="text-red-500 text-sm mt-1">{formik.errors.password}</div>
           ) : null}
-        </div>
       </div>
       
       <div className="mt-4">

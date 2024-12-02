@@ -246,21 +246,15 @@ export class doctorController {
   }
   async checkSlotAvailability(req: Request, res: Response): Promise<void> {
     try {
-      const { date, doctorId, start, end } = req.body;
+      const { startDate,endDate, doctorId, timeSlots } = req.body;
 
-      if (!date || !doctorId) {
-        res
-          .status(400)
-          .json({
-            message: "Missing required query parameters: date or doctorId",
-          });
-      }
+      
 
       const response = await this.doctorService.checkAvailability(
-        date as string,
+        startDate as string,
+        endDate as string,
         doctorId as string,
-        start as string,
-        end as string
+        timeSlots
       );
 
       res.status(200).json({ status: true, data: response });

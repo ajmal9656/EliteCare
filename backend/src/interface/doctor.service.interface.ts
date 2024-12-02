@@ -9,9 +9,12 @@ export interface IDoctorService {
     resendOtpCheck(doctorToken: string): Promise<{token:string}>;
     verifyDoctor(email: string, password: string): Promise<{doctorInfo:IDoctorInfo,accessToken:string,refreshToken:string,}>;
     uploadData(data: DoctorData, files: DoctorFiles): Promise<boolean|undefined>;
-    createSlot(data: TimeSlot): Promise<DoctorSchedule>;
+    createSlot(data: TimeSlot): Promise<any>;
     getSlots(date: string, doctorId: string): Promise<Slot[]>;
-    checkAvailability(date: string,doctorId: string,start: string,end: string): Promise<boolean>;
+    checkAvailability(startDate: string,
+        endDate:string,
+        doctorId: string,
+        timeSlots: Array<{ start: string; end: string }>,): Promise<boolean>;
     deleteSlot(date: Date, doctorId: string, slotId: string): Promise<boolean>;
     getAppointments(doctorId: string,status: string,page: number, limit: number ,startDate: Date | null ,endDate: Date | null ): Promise<GetAppointmentData>;
     cancelAppointment(appointmentId: string, reason: string): Promise<AppointmentData>;

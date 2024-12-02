@@ -38,8 +38,8 @@ async function makeThePayment(data: any, appointmentId: any) {
 
   try {
     const session = await stripe.checkout.sessions.create({
-      success_url: `https://ajmals.site/confirmPayment/${appointmentId}/${doctorId}`,
-      cancel_url: `https://ajmals.site/paymentFailed`,
+      success_url: `http://localhost:5173/confirmPayment/${appointmentId}/${doctorId}`,
+      cancel_url: `http://localhost:5173/paymentFailed`,
       line_items: line_items,
       mode: "payment",
     });
@@ -53,44 +53,51 @@ async function makeThePayment(data: any, appointmentId: any) {
 
 export async function refund(paymentId: string, status: string): Promise<any> {
   try {
-    // Retrieve the checkout session
     const session = await stripe.checkout.sessions.retrieve(paymentId);
     console.log("session", session);
     console.log("payID", paymentId);
 
-    // Ensure the paymentIntentId exists and is of the correct type
     const paymentIntentId = session.payment_intent as string | null;
     if (!paymentIntentId) {
       throw new Error("No payment intent found in the session.");
     }
 
-    // Retrieve the payment intent
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
     const chargeId = paymentIntent.latest_charge as string | null;
     if (!chargeId) {
       throw new Error("No charge found in the payment intent.");
     }
-    let refundAmount;
-    if (status == "cancelled by user") {
+
+    const charge = await stripe.charges.retrieve(chargeId);
+    const remainingRefundableAmount = charge.amount_captured - (charge.amount_refunded || 0);
+
+    let refundAmount = 0;
+    if (status === "cancelled by user") {
       refundAmount = Math.round(paymentIntent.amount * 0.95);
-    }
-    if (status == "cancelled by doctor") {
+    } else if (status === "cancelled by doctor") {
       refundAmount = paymentIntent.amount;
+    } else {
+      throw new Error("Invalid cancellation status provided.");
     }
 
-    // Create the refund
+    if (refundAmount > remainingRefundableAmount) {
+      throw new Error(
+        `Refund amount (${refundAmount}) exceeds the remaining refundable amount (${remainingRefundableAmount}).`
+      );
+    }
+
     const refund = await stripe.refunds.create({
       charge: chargeId,
-      amount: refundAmount, // Amount should be in cents
+      amount: refundAmount,
     });
 
-    console.log("refund", refund);
-
-    return refund; // Return the refund details
+    console.log("Refund created successfully:", refund);
+    return refund;
   } catch (error: any) {
     console.error("Error in processing refund:", error.message);
     throw new Error(`Failed to process refund: ${error.message}`);
   }
 }
+
 
 export default makeThePayment;

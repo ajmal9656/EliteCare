@@ -730,7 +730,7 @@ export class userRepository implements IUserRepository {
 
       return appointment;
     } catch (error: any) {
-      console.error("Error canceling appointment:", error.message);
+      console.error("Error canceling appointmentsss:", error.message);
       throw new Error(error.message);
     }
   }

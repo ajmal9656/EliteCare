@@ -76,6 +76,10 @@ function AppointmentsList() {
               "The appointment has been cancelled. Your money will be refunded to your bank account.",
               "success"
             );
+            
+            
+
+            console.log("cancalled appointment" ,result);
             fetchAppointments(status, currentPage); // Refresh the appointments list
           })
           .catch((error) => {
@@ -179,17 +183,14 @@ function AppointmentsList() {
                 >
                   View Details
                 </button>
-                {appointment.status === "cancelled" || appointment.status === "cancelled by Dr" ? (
-                  <span className="px-4 py-2 text-sm font-medium text-red-500">Cancelled</span>
-                ) : appointment.status === "completed" ? (
-                  <span className="px-4 py-2 text-sm font-medium text-green-500">Completed</span>
+                {appointment.status === "cancelled" || appointment.status === "cancelled by Dr"  ? (
+                  <span className="px-4 py-2 text-sm font-medium text-red-500">cancelled</span>
+                ) : appointment.status === "completed" || appointment.status === "prescription pending" ? (
+                  <span className="px-4 py-2 text-sm font-medium text-green-500">{appointment.status}</span>
                 ) : (
-                  <button
-                    className="px-7 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-500"
-                    onClick={() => handleCancelAppointment(appointment._id)}
-                  >
-                    Cancel
-                  </button>
+
+                  <span className="px-4 py-2 text-sm font-medium text-green-500">pending</span>
+                  
                 )}
               </div>
             </div>

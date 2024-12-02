@@ -40,6 +40,7 @@ function SlotManagement() {
     { start: '15:15', end: '16:00' },
     { start: '16:15', end: '17:00' },
     { start: '17:15', end: '18:00' },
+    
   ];
 
   const timeSlots = rawTimeSlots.map((slot) => {
@@ -57,63 +58,87 @@ function SlotManagement() {
 
   const formik = useFormik({
     initialValues: {
-      selectedDate: null,
+      startDate: null,
+      endDate: null,
       selectedSlots: [] as string[],
     },
     validationSchema: Yup.object({
-      selectedDate: Yup.date().required('Date is required'),
+      startDate: Yup.date().required('Start date is required'),
+      endDate: Yup.date()
+        .required('End date is required')
+        .min(Yup.ref('startDate'), 'End date cannot be earlier than the start date'),
       selectedSlots: Yup.array().min(1, 'At least one slot is required'),
     }),
     onSubmit: async (values) => {
       try {
-        console.log("before utc",values.selectedDate);
-        
-        const selectedDateUTC = moment(values.selectedDate)
-          .utc()
-          .startOf('day').add(1,'days')
-          .toISOString();
-          
-          console.log("after utc",selectedDateUTC);
+        console.log("Start Date:", values.startDate);
+        console.log("End Date:", values.endDate);
+    
+        // Parse start and end dates without converting to UTC initially
+        const startDate = moment(values.startDate).startOf('day');
+        const endDate = moment(values.endDate).endOf('day');
+    
+        console.log("Start Date (Local):", startDate.toISOString());
+        console.log("End Date (Local):", endDate.toISOString());
+    
+       // Generate all dates between startDate and endDate
+    const dateRange: moment.Moment[] = [];
+    let currentDate = startDate.clone(); // Use .clone() for moment objects
+    while (currentDate.isSameOrBefore(endDate, 'day')) {
+      dateRange.push(currentDate.clone()); // Clone to preserve original moment object
+      currentDate.add(1, 'day'); // Increment the date
+    }
 
-        const slotsWithDates = values.selectedSlots.map((slot) => {
-          const [startTime, endTime] = slot.split(' to ');
+    // Create slots array where each object represents a date with selected times
+    const slotsWithDates = dateRange.map((date) => {
+      const slots = values.selectedSlots.map((slot) => {
+        const [startTime, endTime] = slot.split(' to ');
 
-          const startDate = moment.tz(selectedDateUTC, 'UTC')
-            .set({
-              hour: moment(startTime, 'h:mm A').hour(),
-              minute: moment(startTime, 'h:mm A').minute(),
-            })
-            .toISOString();
+        // Adjust start and end times for each slot in the local time zone
+        const slotStartTime = date
+          .clone()
+          .set({
+            hour: moment(startTime, 'h:mm A').hour(),
+            minute: moment(startTime, 'h:mm A').minute(),
+          })
+          .format('YYYY-MM-DDTHH:mm:ss'); // Format without .toISOString()
 
-          const endDate = moment.tz(selectedDateUTC, 'UTC')
-            .set({
-              hour: moment(endTime, 'h:mm A').hour(),
-              minute: moment(endTime, 'h:mm A').minute(),
-            })
-            .toISOString();
+        const slotEndTime = date
+          .clone()
+          .set({
+            hour: moment(endTime, 'h:mm A').hour(),
+            minute: moment(endTime, 'h:mm A').minute(),
+          })
+          .format('YYYY-MM-DDTHH:mm:ss'); // Format without .toISOString()
 
-          return { start: startDate, end: endDate };
-        });
+        return { start: slotStartTime, end: slotEndTime };
+      });
 
+      return { slots };
+    });
+    
         const formData = {
-          selectedDate: selectedDateUTC,
+          startDate:moment(values.startDate).startOf('day').utcOffset(0, true).toISOString(),
+          endDate: moment(values.endDate).startOf('day').utcOffset(0, true).toISOString(),
           selectedSlots: slotsWithDates,
           doctorId: DoctorData?.doctorInfo?.doctorId,
         };
-
+    
+        console.log("Slot Form Data:", formData);
+    
         await axiosUrl.post('/doctor/createSlot', formData);
-        
-    fetchSlotsForDate(selectedDateUTC);
+    
         toggleAddSlotModal();
       } catch (error) {
         console.error('Error submitting form:', error);
       }
     },
   });
+  
 
   const checkSlotInPast = (slot: string) => {
-    if (formik.values.selectedDate) {
-      const selectedDate = moment(formik.values.selectedDate).startOf('day');
+    if (formik.values.startDate) {
+      const selectedDate = moment(formik.values.startDate).startOf('day');
       const currentDate = moment();
 
       const [slotStart] = slot.split(' to ');
@@ -128,14 +153,14 @@ function SlotManagement() {
   };
 
   const handleSlotChange = async (slot: string) => {
-    if (!formik.values.selectedDate) {
+    if (!formik.values.startDate||!formik.values.endDate) {
       formik.setFieldError('selectedDate', 'Date is required');
       toast.error('Please select a date first');
       return;
     }
   
     if (checkSlotInPast(slot)) {
-      toast.error('The time has already passed');
+      toast.error('The time has already passed fot today');
       return;
     }
   
@@ -155,35 +180,76 @@ function SlotManagement() {
         : [...selectedSlots, slot]
     );
   };
+
+  const generateTimeSlots = (
+    startDate: string, 
+    endDate: string, 
+    startTime: string, 
+    endTime: string
+  ) => {
+    const slots = [];
+    const startMoment = moment(startDate).startOf('day');
+    const endMoment = moment(endDate).startOf('day');
+    
+    while (startMoment.isSameOrBefore(endMoment)) {
+      // Create time range for the current date
+      const start = startMoment.clone()
+        .set({
+          hour: moment(startTime, 'h:mm A').hour(),
+          minute: moment(startTime, 'h:mm A').minute(),
+        })
+        .format('YYYY-MM-DDTHH:mm:ss');
+
+        
+  
+      const end = startMoment.clone()
+        .set({
+          hour: moment(endTime, 'h:mm A').hour(),
+          minute: moment(endTime, 'h:mm A').minute(),
+        })
+        .format('YYYY-MM-DDTHH:mm:ss');
+  
+      slots.push({ start, end });
+      startMoment.add(1, 'days'); // Move to the next day
+    }
+  
+    return slots;
+  };
   
  
   const checkSlotAvailability = async (slot: string) => {
+    console.log("slotttt",slot);
+    
     const [startTime, endTime] = slot.split(' to ');
-  
-    const selectedDateUTC = moment(formik.values.selectedDate)
-    .utc()
-    .startOf('day').add(1,'days')
-    .toISOString(); 
-    const start = moment.tz(selectedDateUTC, 'UTC')
-            .set({
-              hour: moment(startTime, 'h:mm A').hour(),
-              minute: moment(startTime, 'h:mm A').minute(),
-            })
-            .toISOString();
+    const startDate = moment(formik.values.startDate).startOf('day').utcOffset(0, true).toISOString() 
+    const endDate = moment(formik.values.endDate).startOf('day').utcOffset(0, true).toISOString() 
 
-          const end = moment.tz(selectedDateUTC, 'UTC')
-            .set({
-              hour: moment(endTime, 'h:mm A').hour(),
-              minute: moment(endTime, 'h:mm A').minute(),
-            })
-            .toISOString();
+
+    const timeSlots = generateTimeSlots(startDate, endDate, startTime, endTime);
+  
+   
+    // const start = moment.tz(startDate, 'UTC')
+    //         .set({
+    //           hour: moment(startTime, 'h:mm A').hour(),
+    //           minute: moment(startTime, 'h:mm A').minute(),
+    //         })
+    //         .toISOString();
+
+    //       const end = moment.tz(startDate, 'UTC')
+    //         .set({
+    //           hour: moment(endTime, 'h:mm A').hour(),
+    //           minute: moment(endTime, 'h:mm A').minute(),
+    //         })
+    //         .toISOString();
+    console.log("time slots",timeSlots);
+    
             
   
     try {
       const response = await axiosUrl.post('/doctor/checkSlotAvailability', {
-        start: start,
-        end: end,
-        date: selectedDateUTC,
+        timeSlots:timeSlots,
+        startDate: startDate,
+        endDate: endDate,
         doctorId: DoctorData?.doctorInfo?.doctorId,
       });
       console.log("mmm",response.data.data);
@@ -369,56 +435,81 @@ function SlotManagement() {
 
   {/* Modal for Adding Slots */}
   {isModalOpen && (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-4 md:mx-auto">
-        <h2 className="text-xl font-bold mb-4">Add Slot</h2>
-        <form onSubmit={formik.handleSubmit}>
-          <div className="mb-4">
-            <label className="block mb-2">Select Date:</label>
-            <DatePicker
-              selected={formik.values.selectedDate}
-              onChange={(date) => formik.setFieldValue('selectedDate', date)}
-              dateFormat="MM/dd/yyyy"
-              className="border border-gray-300 p-2 rounded w-full"
-              placeholderText="Select a date"
-              minDate={new Date()}
-              maxDate={new Date(new Date().setDate(new Date().getDate() + 10))}
-            />
-            {formik.errors.selectedDate && <div className="text-red-500">{formik.errors.selectedDate}</div>}
-          </div>
+  <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-4 md:mx-auto">
+      <h2 className="text-xl font-bold mb-4">Add Slots</h2>
+      <form onSubmit={formik.handleSubmit}>
+      <div className="mb-4">
+  <label className="block mb-2">Select Start Date:</label>
+  <DatePicker
+    selected={formik.values.startDate}
+    onChange={(date:any) => {
+      // Check if the end date is already selected and if start date is greater than end date
+      if (formik.values.endDate && date > formik.values.endDate) {
+        formik.setFieldValue('startDate', formik.values.endDate); // Set start date to the end date
+      } else {
+        formik.setFieldValue('startDate', date);
+      }
+    }}
+    dateFormat="MM/dd/yyyy"
+    className="border border-gray-300 p-2 rounded w-full"
+    placeholderText="Select start date"
+    minDate={new Date()}
+  />
+  {formik.errors.startDate && <div className="text-red-500">{formik.errors.startDate}</div>}
+</div>
 
-          <div className="mb-4">
-            <label className="block mb-2">Select Slots:</label>
-            <div className="grid grid-cols-2 gap-2">
-              {timeSlots.map((slot) => (
-                <div key={slot}>
-                  <label className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={formik.values.selectedSlots.includes(slot)}
-                      onChange={() => handleSlotChange(slot)}
-                      className="mr-2"
-                    />
-                    {slot}
-                  </label>
-                </div>
-              ))}
-            </div>
-            {formik.errors.selectedSlots && <div className="text-red-500">{formik.errors.selectedSlots}</div>}
-          </div>
 
-          <div className="flex justify-end">
-            <button type="button" className="bg-gray-300 text-black px-4 py-2 rounded mr-2" onClick={toggleAddSlotModal}>
-              Cancel
-            </button>
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-              Add Slots
-            </button>
+        <div className="mb-4">
+          <label className="block mb-2">Select End Date:</label>
+          <DatePicker
+            selected={formik.values.endDate}
+            onChange={(date) => formik.setFieldValue('endDate', date)}
+            dateFormat="MM/dd/yyyy"
+            className="border border-gray-300 p-2 rounded w-full"
+            placeholderText="Select end date"
+            minDate={formik.values.startDate || new Date()} // Ensure end date is after or equal to start date
+          />
+          {formik.errors.endDate && <div className="text-red-500">{formik.errors.endDate}</div>}
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Select Slots:</label>
+          <div className="grid grid-cols-2 gap-2">
+            {timeSlots.map((slot) => (
+              <div key={slot}>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={formik.values.selectedSlots.includes(slot)}
+                    onChange={() => handleSlotChange(slot)}
+                    className="mr-2"
+                  />
+                  {slot}
+                </label>
+              </div>
+            ))}
           </div>
-        </form>
-      </div>
+          {formik.errors.selectedSlots && <div className="text-red-500">{formik.errors.selectedSlots}</div>}
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="bg-gray-300 text-black px-4 py-2 rounded mr-2"
+            onClick={toggleAddSlotModal}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+            Add Slots
+          </button>
+        </div>
+      </form>
     </div>
-  )}
+  </div>
+)}
+
 </div>
 
   );

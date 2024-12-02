@@ -372,7 +372,7 @@ export class doctorService {
       throw new Error(error.message);
     }
   }
-  async createSlot(data: TimeSlot): Promise<DoctorSchedule> {
+  async createSlot(data: TimeSlot): Promise<any> {
     try {
       const response = await this.doctorRepository.createSlot(data);
 
@@ -401,17 +401,18 @@ export class doctorService {
     }
   }
   async checkAvailability(
-    date: string,
+    startDate: string,
+    endDate:string,
     doctorId: string,
-    start: string,
-    end: string
+    timeSlots: Array<{ start: string; end: string }>,
+    
   ): Promise<boolean> {
     try {
       const response = await this.doctorRepository.checkSlots(
-        date,
+        startDate,
+        endDate,
         doctorId,
-        start,
-        end
+        timeSlots
       );
 
       if (response) {
