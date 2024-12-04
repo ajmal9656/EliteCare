@@ -1,10 +1,10 @@
 import cron from 'node-cron'
-import appointmentModel from "../model/AppoinmentModel";
-
-import { adminRepository } from '../repository/adminRepository';
 
 
-const adminRepositoryInstance = new adminRepository()
+import { AdminRepository } from '../repository/admin/Admin';
+
+
+const AdminRepositoryInstance = new AdminRepository()
 
 // Schedule a cron job to run every day at midnight
 cron.schedule("0 0 * * *", async () => {
@@ -15,7 +15,7 @@ cron.schedule("0 0 * * *", async () => {
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
 
-    const response = await adminRepository.getPendingAppointments(yesterday,now)
+    const response = await AdminRepository.getPendingAppointments(yesterday,now)
 
     
 

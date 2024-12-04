@@ -1,38 +1,51 @@
 import { Router } from "express";
-import { adminController } from "../controllers/adminController";
-import { adminRepository } from "../repository/adminRepository";
-import { adminService } from "../services/adminServices";
 import { S3Service } from "../config/s3client";
 import { verifyToken } from "../config/jwtConfig";
+import { AuthRepository } from "../repository/admin/Auth";
+import { AuthService } from "../services/admin/Auth";
+import { AuthController } from "../controllers/admin/Auth";
+import { AdminRepository } from "../repository/admin/Admin";
+import { AdminService } from "../services/admin/Admin";
+import { AdminController } from "../controllers/admin/Admin";
 
 
 
 
 const route = Router()
-const adminRepositoryInstance = new adminRepository;
+const AdminRepositoryInstance = new AdminRepository;
 const S3ServiceInstance = new S3Service();
-const adminServiceInstance = new adminService(adminRepositoryInstance,S3ServiceInstance)
-const adminControllerInstance = new adminController(adminServiceInstance);
+const AdminServiceInstance = new AdminService(AdminRepositoryInstance,S3ServiceInstance)
+const AdminControllerInstance = new AdminController(AdminServiceInstance);
+
+
+const AuthRepositoryInstance = new AuthRepository;
+const AuthServiceInstance = new AuthService(AuthRepositoryInstance)
+const AuthControllerInstance = new AuthController(AuthServiceInstance);
 
 
 
-route.post('/login',adminControllerInstance.loginAdmin.bind(adminControllerInstance));
-route.post('/addSpecialization',adminControllerInstance.addSpecialization.bind(adminControllerInstance));
-route.get('/getSpecializations',adminControllerInstance.getSpecialization.bind(adminControllerInstance));
-route.put('/updateSpecialization',adminControllerInstance.editSpecialization.bind(adminControllerInstance));
-route.put('/listUnlistSpecialization',adminControllerInstance.listUnlistSpecialization.bind(adminControllerInstance));
-route.get('/getApplications',verifyToken('admin'),adminControllerInstance.getApplication.bind(adminControllerInstance));
-route.get('/getDoctorApplication/:applicationId',adminControllerInstance.getDoctorApplication.bind(adminControllerInstance));
-route.post('/approveApplication/:doctorId',adminControllerInstance.approveApplication.bind(adminControllerInstance));
-route.delete('/rejectApplication/:doctorId',adminControllerInstance.rejectApplication.bind(adminControllerInstance));
-route.get('/getUsers',verifyToken('admin'),adminControllerInstance.getUsers.bind(adminControllerInstance));
-route.put('/listUnlistUser/:userId',adminControllerInstance.listUnlistUser.bind(adminControllerInstance));
-route.get('/getDoctors',verifyToken('admin'),adminControllerInstance.getDoctors.bind(adminControllerInstance));
-route.put('/listUnlistDoctor/:doctorId',adminControllerInstance.listUnlistDoctor.bind(adminControllerInstance));
-route.get('/dashboardData',verifyToken('admin'),adminControllerInstance.getDashboardData.bind(adminControllerInstance));
-route.post('/logout', adminControllerInstance.logoutAdmin.bind(adminControllerInstance));
-route.get('/getAppointments',verifyToken('admin'), adminControllerInstance.getAllAppointments.bind(adminControllerInstance));
-route.get('/getTransactionsDetails',verifyToken('admin'), adminControllerInstance.getAllTransactions.bind(adminControllerInstance));
+route.post('/login',AuthControllerInstance.loginAdmin.bind(AuthControllerInstance));
+route.post('/logout', AuthControllerInstance.logoutAdmin.bind(AuthControllerInstance));
+
+route.post('/addSpecialization',AdminControllerInstance.addSpecialization.bind(AdminControllerInstance));
+route.get('/getSpecializations',AdminControllerInstance.getSpecialization.bind(AdminControllerInstance));
+route.put('/updateSpecialization',AdminControllerInstance.editSpecialization.bind(AdminControllerInstance));
+route.put('/listUnlistSpecialization',AdminControllerInstance.listUnlistSpecialization.bind(AdminControllerInstance));
+
+route.get('/getApplications',verifyToken('admin'),AdminControllerInstance.getApplication.bind(AdminControllerInstance));
+route.get('/getDoctorApplication/:applicationId',AdminControllerInstance.getDoctorApplication.bind(AdminControllerInstance));
+route.post('/approveApplication/:doctorId',AdminControllerInstance.approveApplication.bind(AdminControllerInstance));
+route.delete('/rejectApplication/:doctorId',AdminControllerInstance.rejectApplication.bind(AdminControllerInstance));
+
+route.get('/getUsers',verifyToken('admin'),AdminControllerInstance.getUsers.bind(AdminControllerInstance));
+route.put('/listUnlistUser/:userId',AdminControllerInstance.listUnlistUser.bind(AdminControllerInstance));
+
+route.get('/getDoctors',verifyToken('admin'),AdminControllerInstance.getDoctors.bind(AdminControllerInstance));
+route.put('/listUnlistDoctor/:doctorId',AdminControllerInstance.listUnlistDoctor.bind(AdminControllerInstance));
+
+route.get('/dashboardData',verifyToken('admin'),AdminControllerInstance.getDashboardData.bind(AdminControllerInstance));
+route.get('/getAppointments',verifyToken('admin'), AdminControllerInstance.getAllAppointments.bind(AdminControllerInstance));
+route.get('/getTransactionsDetails',verifyToken('admin'), AdminControllerInstance.getAllTransactions.bind(AdminControllerInstance));
 
 
 

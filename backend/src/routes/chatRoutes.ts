@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { chatService } from "../services/chatService";
-import { chatRepository } from "../repository/chatRepository";
-import { chatController } from "../controllers/chatController";
+import { chatService } from "../services/chat/chat";
+import { chatRepository } from "../repository/chat/chat";
+import { chatController } from "../controllers/chat/chat";
 
 
 

@@ -1,8 +1,8 @@
 import { Server as SocketServer } from "socket.io";
 import { Server as HttpServer } from "http";
-import { chatService } from "../services/chatService";
+import { chatService } from "../services/chat/chat";
 
-import { chatRepository } from "../repository/chatRepository";
+import { chatRepository } from "../repository/chat/chat";
 
 const chatRepositoryInstance = new chatRepository()
 const chatServices = new chatService(chatRepositoryInstance)
