@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { IAdminService } from "../interface/admin.service.interface";
+import HTTP_statusCode from "../enums/HttpStatusCode";
 
 
 export class adminController {
@@ -43,20 +44,20 @@ export class adminController {
             maxAge: 1 * 24 * 60 * 60 * 1000,  // 7 days
           });
           console.log("logindata",response)
-          res.status(200).json({ message: "Login successful", response});
+          res.status(HTTP_statusCode.OK).json({ message: "Login successful", response});
             
         } catch (error: any) {
           console.log("controller error")
           if(error.message==="Admin Doesn't exist"){
-            res.status(400).json({ message: "Admin Doesn't exist" });
+            res.status(HTTP_statusCode.BadRequest).json({ message: "Admin Doesn't exist" });
     
         }
           if(error.message==="Password is wrong"){
-            res.status(400).json({ message: "Password is wrong" });
+            res.status(HTTP_statusCode.BadRequest).json({ message: "Password is wrong" });
     
         }
           if(error.message==="Admin is Blocked"){
-            res.status(400).json({ message: "Admin is Blocked" });
+            res.status(HTTP_statusCode.BadRequest).json({ message: "Admin is Blocked" });
     
         }
            
@@ -69,10 +70,10 @@ export class adminController {
           res.cookie('RefreshToken', '', { httpOnly: true, expires: new Date(0) });
       
           // Send success response
-          res.status(200).json({ message: "Logout successful" });
+          res.status(HTTP_statusCode.OK).json({ message: "Logout successful" });
         } catch (error: any) {
           console.error('Logout error:', error);
-          res.status(500).json({ message: "Logout failed" });
+          res.status(HTTP_statusCode.InternalServerError).json({ message: "Logout failed" });
         }
       }
       async addSpecialization(req: Request, res: Response): Promise<void> {
@@ -88,7 +89,7 @@ export class adminController {
             console.log("Specialization successfully created:", response);
     
            
-            res.status(200).json({ message: "Specialization added successfully", response });
+            res.status(HTTP_statusCode.OK).json({ message: "Specialization added successfully", response });
             
         } catch (error: any) {
          
@@ -96,10 +97,10 @@ export class adminController {
     
           
             if (error.message === "Something went wrong while creating the specialization.") {
-                res.status(400).json({ message: "Something went wrong while creating the specialization." });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while creating the specialization." });
             } else {
                 
-                res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
             }
         }
     }
@@ -113,13 +114,13 @@ export class adminController {
           const response = await this.adminService.getSpecialization(page, limit);
 
           // Respond with the result
-          res.status(200).json({ message: "Specializations fetched successfully", response });
+          res.status(HTTP_statusCode.OK).json({ message: "Specializations fetched successfully", response });
       } catch (error: any) {
           // Handle different error scenarios
           if (error.message === "Something went wrong while fetching the specialization.") {
-              res.status(400).json({ message: "Something went wrong while fetching the specialization." });
+              res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while fetching the specialization." });
           } else {
-              res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+              res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
           }
       }
   }
@@ -137,17 +138,17 @@ export class adminController {
             console.log("Specialization successfully edited", response);
     
            
-            res.status(200).json({ message: "Specialization updated successfully", response });
+            res.status(HTTP_statusCode.OK).json({ message: "Specialization updated successfully", response });
             
         } catch (error: any) {
            
             console.error("Error in editSpecialization controller:", error.message);
     
             if (error.message === "Something went wrong while editing the specialization.") {
-                res.status(400).json({ message: "Something went wrong while editing the specialization." });
+                res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while editing the specialization." });
             } else {
               
-                res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
             }
         }
     }
@@ -165,13 +166,13 @@ export class adminController {
             
     
            
-            res.status(200).json({ message: "updated successfully", response });
+            res.status(HTTP_statusCode.OK).json({ message: "updated successfully", response });
             
         } catch (error: any) {
            
            
               
-                res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+                res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
             
         }
     }
@@ -184,14 +185,14 @@ export class adminController {
           // Call the service layer to get applications with pagination
           const response = await this.adminService.getApplication(page, limit);
   
-          res.status(200).json({ message: "Applications fetched successfully", response });
+          res.status(HTTP_statusCode.OK).json({ message: "Applications fetched successfully", response });
       } catch (error: any) {
           console.error("Error fetching applications:", error.message);
           
           if (error.message === "Something went wrong while fetching the applications.") {
-              res.status(400).json({ message: "Something went wrong while fetching the applications." });
+              res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while fetching the applications." });
           } else {
-              res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+              res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
           }
       }
   }
@@ -210,17 +211,17 @@ export class adminController {
           console.log("successfully fetched", response);
   
          
-          res.status(200).json({ message: "successfully fetched", response });
+          res.status(HTTP_statusCode.OK).json({ message: "successfully fetched", response });
           
       } catch (error: any) {
          
          
   
           if (error.message === "Something went wrong while fetching the data") {
-              res.status(400).json({ message: "Something went wrong while fetching the data" });
+              res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while fetching the data" });
           } else {
             
-              res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+              res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
           }
       }
   }
@@ -239,7 +240,7 @@ export class adminController {
           console.log("successfully fetched", response);
   
          
-          res.status(200).json({ message: "Application approved successfully"});
+          res.status(HTTP_statusCode.OK).json({ message: "Application approved successfully"});
           
       } catch (error: any) {
          
@@ -247,7 +248,7 @@ export class adminController {
   
          
             
-              res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+              res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
           
       }
   }
@@ -266,15 +267,15 @@ export class adminController {
       const response = await this.adminService.rejectApplication(doctorId as string, reason);
   
       console.log("Successfully processed rejection:", response);
-      res.status(200).json({ message: "Application rejected successfully" });
+      res.status(HTTP_statusCode.OK).json({ message: "Application rejected successfully" });
       
     } catch (error: any) {
       console.error("Error in rejectApplication controller:", error.message);
       
       if (error.message === "Something went wrong while rejecting the application.") {
-        res.status(400).json({ message: "Something went wrong while rejecting the application." });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while rejecting the application." });
       } else {
-        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
       }
     }
   }
@@ -296,14 +297,14 @@ export class adminController {
         const { users, totalPages } = await this.adminService.getAllUsers(skip, pageLimit,search);
 
         // Send the response with users and pagination details
-        res.status(200).json({
+        res.status(HTTP_statusCode.OK).json({
             message: "Fetch users successfully",
             response: { users, totalPages }
         });
         
     } catch (error: any) {
         console.error("Error in getUsers controller:", error.message);
-        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
     }
 }
 async getDoctors(req: Request, res: Response): Promise<void> {
@@ -321,12 +322,12 @@ async getDoctors(req: Request, res: Response): Promise<void> {
 
       console.log("Doctors successfully fetched", response);
 
-      res.status(200).json({ message: "Fetched doctors successfully", response });
+      res.status(HTTP_statusCode.OK).json({ message: "Fetched doctors successfully", response });
       
   } catch (error: any) {
       console.error("Error in getDoctors controller:", error.message);
 
-      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
   }
 }
 
@@ -345,17 +346,17 @@ async listUnlistUser(req: Request, res: Response): Promise<void> {
         console.log("user successfully edited", response);
 
        
-        res.status(200).json({ message: "user updated successfully", response });
+        res.status(HTTP_statusCode.OK).json({ message: "user updated successfully", response });
         
     } catch (error: any) {
        
         console.error("Error in edituser controller:", error.message);
 
         if (error.message === "Something went wrong while creating the user.") {
-            res.status(400).json({ message: "Something went wrong while updating the user." });
+            res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while updating the user." });
         } else {
           
-            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
         }
     }
 }
@@ -373,17 +374,17 @@ async listUnlistDoctor(req: Request, res: Response): Promise<void> {
         console.log("Doctor successfully edited", response);
 
        
-        res.status(200).json({ message: "Doctor updated successfully", response });
+        res.status(HTTP_statusCode.OK).json({ message: "Doctor updated successfully", response });
         
     } catch (error: any) {
        
         console.error("Error in edituser controller:", error.message);
 
         if (error.message === "Something went wrong while creating the user.") {
-            res.status(400).json({ message: "Something went wrong while updating the user." });
+            res.status(HTTP_statusCode.BadRequest).json({ message: "Something went wrong while updating the user." });
         } else {
           
-            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
         }
     }
 }
@@ -391,16 +392,16 @@ async getDashboardData(req: Request, res: Response): Promise<void> {
     try {
         const response = await this.adminService.getDashboardData();
 
-        res.status(200).json({ message: "Dashboard data retrieved successfully", response });
+        res.status(HTTP_statusCode.OK).json({ message: "Dashboard data retrieved successfully", response });
         
     } catch (error: any) {
         console.error("Error in getDashboardData controller:", error.message);
 
       
         if (error.message === "Something went wrong while retrieving dashboard data.") {
-            res.status(400).json({ message: "Failed to retrieve dashboard data." });
+            res.status(HTTP_statusCode.BadRequest).json({ message: "Failed to retrieve dashboard data." });
         } else {
-            res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+            res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
         }
     }
 }
@@ -418,13 +419,13 @@ async getAllAppointments(req: Request, res: Response): Promise<void> {
     const response = await this.adminService.getAppointments(status as string, pageNumber, limitNumber, startDate as string, endDate as string);
 
     // Respond with success and data
-    res.status(200).json({ message: "Appointments fetched successfully", data: response });
+    res.status(HTTP_statusCode.OK).json({ message: "Appointments fetched successfully", data: response });
   } catch (error: any) {
     console.error("Error fetching appointments:", error.message);
     if (error.message.includes("Failed to get appointments")) {
-      res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+      res.status(HTTP_statusCode.BadRequest).json({ message: `Failed to get appointments: ${error.message}` });
     } else {
-      res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+      res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
     }
   }
 }
@@ -438,7 +439,7 @@ async getAllAppointments(req: Request, res: Response): Promise<void> {
   
       const response = await this.adminService.getTransactions(status as string, page, limit, startDate as string, endDate as string);
   
-      res.status(200).json({
+      res.status(HTTP_statusCode.OK).json({
         message: "Appointments fetched successfully",
         data: response.appointments,
         totalPages: response.totalPages,
@@ -447,9 +448,9 @@ async getAllAppointments(req: Request, res: Response): Promise<void> {
     } catch (error: any) {
       console.error("Error fetching appointments:", error.message);
       if (error.message.includes("Failed to get appointments")) {
-        res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+        res.status(HTTP_statusCode.BadRequest).json({ message: `Failed to get appointments: ${error.message}` });
       } else {
-        res.status(500).json({ message: "An unexpected error occurred", error: error.message });
+        res.status(HTTP_statusCode.InternalServerError).json({ message: "An unexpected error occurred", error: error.message });
       }
     }
   }

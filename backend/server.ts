@@ -10,6 +10,10 @@ import adminRoute from './src/routes/adminRoutes'
 import { createServer } from 'http';
 import { configSocketIO } from './src/config/socket.ioConfig';
 import "./src/helper/nodeCron"
+import morgan from 'morgan';
+import * as rfs from 'rotating-file-stream';
+import path from 'path';
+import fs from 'fs';
 
 
 
@@ -28,6 +32,27 @@ const server = createServer(app);
 configSocketIO(server);
 
 app.use(cookieParser());
+
+const logDirectory = path.join(__dirname, 'logs');
+if (!fs.existsSync(logDirectory)) {
+  fs.mkdirSync(logDirectory);
+}
+const errorLogStream = rfs.createStream('error.log', {
+  interval: '1d',     
+  path: logDirectory,
+  maxFiles: 7,        
+});
+
+
+
+app.use(
+  morgan('combined', {
+    stream: errorLogStream,
+    skip: (req: Request, res: Response) => res.statusCode < 400, 
+  })
+);
+
+
 
 app.use(express.json({ limit: '10mb' })); // For JSON payloads
 app.use(express.urlencoded({ limit: '10mb', extended: true }));

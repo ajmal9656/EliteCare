@@ -83,9 +83,12 @@ export class userService implements IUserService {
 
       this.OTP = hashedOTP;
 
+      let text = `Your OTP is ${Generated_OTP}`; 
+      let subject = 'OTP Verification';
+
       const sendMailStatus: boolean = await sendMail(
         userData.email,
-        Generated_OTP
+        subject,text
       );
 
       if (!sendMailStatus) {
@@ -223,8 +226,10 @@ export class userService implements IUserService {
       const hashedOTP: string = await bcrypt.hash(Generated_OTP, saltRounds);
 
       this.OTP = hashedOTP;
+      let text = `Your OTP is ${Generated_OTP}`; 
+      let subject = 'OTP Verification';
 
-      const sendMailStatus: boolean = await sendMail(email, Generated_OTP);
+      const sendMailStatus: boolean = await sendMail(email, subject,text);
 
       if (!sendMailStatus) {
         throw new Error("Otp not send");

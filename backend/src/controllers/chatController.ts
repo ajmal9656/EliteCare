@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { chatRepository } from "../repository/chatRepository";
 import { chatService } from "../services/chatService";
 import { IChatService } from "../interface/chat.service.interface";
+import HTTP_statusCode from "../enums/HttpStatusCode";
 
 export class chatController {
 
@@ -26,10 +27,10 @@ export class chatController {
           console.log("whole chat res",chatHistory);
           
           
-          res.status(200).json(chatHistory);
+          res.status(HTTP_statusCode.OK).json(chatHistory);
         } catch (error) {
           
-          res.status(400).json(error);
+          res.status(HTTP_statusCode.BadRequest).json(error);
         };
       };
        async getNotificationCount (req: Request, res: Response)  {
@@ -39,10 +40,10 @@ export class chatController {
           const count = await this.chatService.getNotificationCount(recieverID);
           console.log("sssss",count);
           
-          res.status(200).json(count);
+          res.status(HTTP_statusCode.OK).json(count);
         } catch (error) {
           
-          res.status(400).json(error);
+          res.status(HTTP_statusCode.BadRequest).json(error);
         };
       };
        async getAllNotifications (req: Request, res: Response) {
@@ -53,10 +54,10 @@ export class chatController {
           const notifications = await this.chatService.getAllNotifications(recieverID);
           
           
-          res.status(200).json(notifications);
+          res.status(HTTP_statusCode.OK).json(notifications);
         } catch (error) {
           
-          res.status(400).json(error);
+          res.status(HTTP_statusCode.BadRequest).json(error);
         };
       };
        async readAllNotifications (req: Request, res: Response)  {
@@ -67,10 +68,10 @@ export class chatController {
           const notifications = await this.chatService.readAllNotifications(recieverID);
           
           
-          res.status(200).json(notifications);
+          res.status(HTTP_statusCode.OK).json(notifications);
         } catch (error) {
           
-          res.status(400).json(error);
+          res.status(HTTP_statusCode.BadRequest).json(error);
         };
       };
        async updateAppointment (req: Request, res: Response) {
@@ -84,10 +85,10 @@ export class chatController {
           const response = await this.chatService.updateAppointment(appointmentId);
           // console.log("iiiiiiiii",notifications);
           
-          res.status(200).json(response);
+          res.status(HTTP_statusCode.OK).json(response);
         } catch (error) {
           console.log("chat:= get chat error", error)
-          res.status(400).json(error);
+          res.status(HTTP_statusCode.BadRequest).json(error);
         };
       };
 

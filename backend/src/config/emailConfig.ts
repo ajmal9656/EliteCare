@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const sendMail = async (email: string, otp: string): Promise<boolean> => {
+const sendMail = async (email: string, subject: string, text: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -16,8 +16,8 @@ const sendMail = async (email: string, otp: string): Promise<boolean> => {
     const mailOptions = {
       from: process.env.EMAIL as string,
       to: email,
-      subject: "OTP Verification",
-      text: `Your OTP is ${otp}`,
+      subject: subject,
+      text: text,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -26,13 +26,10 @@ const sendMail = async (email: string, otp: string): Promise<boolean> => {
         resolve(false);  
       } else {
         console.log("Email sent: " + info.response);
-        console.log(otp);
-        
         resolve(true); 
       }
     });
   });
 };
 
-
-export default sendMail
+export default sendMail;

@@ -89,10 +89,13 @@ export class doctorService {
       const hashedOTP: string = await bcrypt.hash(Generated_OTP, saltRounds);
 
       this.OTP = hashedOTP;
+      
+      let subject = 'OTP Verification';
+      let text = `Your OTP is ${Generated_OTP}`; 
 
       const sendMailStatus: boolean = await sendMail(
         doctorData.email,
-        Generated_OTP
+        subject,text
       );
 
       if (!sendMailStatus) {
@@ -171,7 +174,10 @@ export class doctorService {
 
       this.OTP = hashedOTP;
 
-      const sendMailStatus: boolean = await sendMail(email, Generated_OTP);
+      let text = `Your OTP is ${Generated_OTP}`; 
+      let subject = 'OTP Verification';
+
+      const sendMailStatus: boolean = await sendMail(email, subject,text);
 
       if (!sendMailStatus) {
         throw new Error("Otp not send");

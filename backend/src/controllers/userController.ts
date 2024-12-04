@@ -1,3 +1,4 @@
+import HTTP_statusCode from "../enums/HttpStatusCode";
 import { IUserService } from "../interface/user.service.interface";
 import { userService } from "../services/userService";
 import { Request, Response } from "express";
@@ -19,17 +20,17 @@ export class userController {
       //   path:"/"
       // });
 
-      res.status(200).json({ status: true, response });
+      res.status(HTTP_statusCode.OK).json({ status: true, response });
     } catch (error: any) {
       if (error.message === "Email already in use") {
-        res.status(409).json({ message: "Email already in use" });
+        res.status(HTTP_statusCode.Conflict).json({ message: "Email already in use" });
       } else if (error.message === "Phone already in use") {
-        res.status(409).json({ message: "Phone number already in use" });
+        res.status(HTTP_statusCode.Conflict).json({ message: "Phone number already in use" });
       } else if (error.message === "Otp not send") {
-        res.status(500).json({ message: "OTP not sent" });
+        res.status(HTTP_statusCode.InternalServerError).json({ message: "OTP not sent" });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({ message: "Something went wrong, please try again later" });
       }
     }
@@ -39,13 +40,13 @@ export class userController {
       const token = req.headers.authorization?.split(" ")[1];
 
       if (!token) {
-        res.status(401).json({ message: "No token provided" });
+        res.status(HTTP_statusCode.Unauthorized).json({ message: "No token provided" });
         return;
       }
 
       const userOtp: string = req.body.otp;
       if (!userOtp) {
-        res.status(400).json({ message: "OTP is required" });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "OTP is required" });
         return;
       }
       console.log("otp", userOtp);
@@ -53,23 +54,23 @@ export class userController {
       const response = await this.userService.otpCheck(userOtp, token);
       if (response.valid) {
         res
-          .status(200)
+          .status(HTTP_statusCode.OK)
           .json({ status: true, message: "OTP verified successfully" });
       } else {
-        res.status(400).json({ status: false, message: "Invalid OTP" });
+        res.status(HTTP_statusCode.BadRequest).json({ status: false, message: "Invalid OTP" });
       }
     } catch (error: any) {
       if (error.message === "Invalid OTP") {
-        res.status(400).json({ message: "Invalid OTP" });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "Invalid OTP" });
       } else if (error.message === "OTP has expired") {
-        res.status(400).json({ message: "OTP has expired" });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "OTP has expired" });
       } else if (error.message === "Invalid token") {
-        res.status(401).json({ message: "Invalid token" });
+        res.status(HTTP_statusCode.Unauthorized).json({ message: "Invalid token" });
       } else if (error.message === "OTP has expired") {
-        res.status(401).json({ message: "Token has expired" });
+        res.status(HTTP_statusCode.Unauthorized).json({ message: "Token has expired" });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({ message: "Something went wrong, please try again later" });
       }
     }
@@ -96,16 +97,16 @@ export class userController {
         maxAge: 1 * 24 * 60 * 60 * 1000, // 7 days
       });
 
-      res.status(200).json({ message: "Login successful", response });
+      res.status(HTTP_statusCode.OK).json({ message: "Login successful", response });
     } catch (error: any) {
       if (error.message === "User Doesn't exist") {
-        res.status(400).json({ message: "User Doesn't exist" });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "User Doesn't exist" });
       }
       if (error.message === "Password is wrong") {
-        res.status(400).json({ message: "Password is wrong" });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "Password is wrong" });
       }
       if (error.message === "User is Blocked") {
-        res.status(400).json({ message: "User is Blocked" });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "User is Blocked" });
       }
     }
   }
@@ -123,10 +124,10 @@ export class userController {
       });
 
       // Send success response
-      res.status(200).json({ message: "Logout successful" });
+      res.status(HTTP_statusCode.OK).json({ message: "Logout successful" });
     } catch (error: any) {
       console.error("Logout error:", error);
-      res.status(500).json({ message: "Logout failed" });
+      res.status(HTTP_statusCode.InternalServerError).json({ message: "Logout failed" });
     }
   }
 
@@ -135,28 +136,28 @@ export class userController {
       const token = req.headers.authorization?.split(" ")[1];
 
       if (!token) {
-        res.status(401).json({ message: "No token provided" });
+        res.status(HTTP_statusCode.Unauthorized).json({ message: "No token provided" });
         return;
       }
 
       const response = await this.userService.resendOtpCheck(token);
       if (response) {
         res
-          .status(200)
+          .status(HTTP_statusCode.OK)
           .json({
             status: true,
             message: "OTP Resended successfully",
             response,
           });
       } else {
-        res.status(400).json({ status: false, message: "something wnt wrong" });
+        res.status(HTTP_statusCode.BadRequest).json({ status: false, message: "something wnt wrong" });
       }
     } catch (error: any) {
       if (error.message === "Otp not send") {
-        res.status(500).json({ message: "OTP not sent" });
+        res.status(HTTP_statusCode.InternalServerError).json({ message: "OTP not sent" });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({ message: "Something went wrong, please try again later" });
       }
     }
@@ -167,16 +168,16 @@ export class userController {
       const response = await this.userService.getSpecialization();
 
       res
-        .status(200)
+        .status(HTTP_statusCode.OK)
         .json({ message: "Specialization fetched successfully", response });
     } catch (error: any) {
       if (error.message === `Failed to get specialization: ${error.message}`) {
         res
-          .status(400)
+          .status(HTTP_statusCode.BadRequest)
           .json({ message: `Failed to get specialization: ${error.message}` });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -195,7 +196,7 @@ export class userController {
       const response = await this.userService.getDoctorsWithSpecialization(specializationId, page, limit, search);
   
       // Return the response to the client
-      res.status(200).json({
+      res.status(HTTP_statusCode.OK).json({
         message: "Fetched successfully",
         data: response.doctors,
         totalDoctors: response.totalDoctors,
@@ -203,7 +204,7 @@ export class userController {
         currentPage: page,
       });
     } catch (error: any) {
-      res.status(500).json({
+      res.status(HTTP_statusCode.InternalServerError).json({
         message: "An unexpected error occurred",
         error: error.message,
       });
@@ -219,10 +220,10 @@ export class userController {
 
       const response = await this.userService.getDoctors();
 
-      res.status(200).json({ message: "Fetched successfully", response });
+      res.status(HTTP_statusCode.OK).json({ message: "Fetched successfully", response });
     } catch (error: any) {
       res
-        .status(500)
+        .status(HTTP_statusCode.InternalServerError)
         .json({
           message: "An unexpected error occurred",
           error: error.message,
@@ -239,20 +240,20 @@ export class userController {
         reviewData
       );
 
-      res.status(200).json({ message: "successfully", response });
+      res.status(HTTP_statusCode.OK).json({ message: "successfully", response });
     } catch (error: any) {
       if (
         error.message ===
         "Something went wrong while creating the specialization."
       ) {
         res
-          .status(400)
+          .status(HTTP_statusCode.BadRequest)
           .json({
             message: "Something went wrong while creating the specialization.",
           });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -265,7 +266,7 @@ export class userController {
       const { date, doctorId } = req.query;
 
       if (!date || !doctorId) {
-        res.status(400).json({ message: "Date and doctorId are required." });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "Date and doctorId are required." });
       }
 
       const response = await this.userService.getSlots(
@@ -274,14 +275,14 @@ export class userController {
       );
 
       res
-        .status(200)
+        .status(HTTP_statusCode.OK)
         .json({ message: "Doctor slots fetched successfully", response });
     } catch (error: any) {
       if (error.message.includes("something went wrong")) {
-        res.status(400).json({ message: "Error fetching doctor slots." });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "Error fetching doctor slots." });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -299,20 +300,20 @@ export class userController {
         userId
       );
 
-      res.status(200).json({ message: "successfully", response });
+      res.status(HTTP_statusCode.OK).json({ message: "successfully", response });
     } catch (error: any) {
       if (
         error.message ===
         "Something went wrong while creating the specialization."
       ) {
         res
-          .status(400)
+          .status(HTTP_statusCode.BadRequest)
           .json({
             message: "Something went wrong while creating the specialization.",
           });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -331,16 +332,16 @@ export class userController {
       });
 
       res
-        .status(200)
+        .status(HTTP_statusCode.OK)
         .json({ message: "Profile updated successfully", response });
     } catch (error: any) {
       console.error("Error updating profile:", error.message);
 
       if (error.message.includes("something went wrong")) {
-        res.status(400).json({ message: "Error updating profile." });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "Error updating profile." });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -351,29 +352,29 @@ export class userController {
   async updateProfileImage(req: Request, res: Response): Promise<void> {
     try {
       if (!req.file) {
-        res.status(400).json({ message: "No image file provided." });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "No image file provided." });
         return;
       }
 
       const userId = req.body._id;
       if (!userId) {
-        res.status(400).json({ message: "User ID is required." });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "User ID is required." });
         return;
       }
 
       const response = await this.userService.updateImage(userId, req.file);
 
       res
-        .status(200)
+        .status(HTTP_statusCode.OK)
         .json({ message: "Profile image updated successfully", response });
     } catch (error: any) {
       console.error("Error updating profile Image:", error.message);
 
       if (error.message.includes("something went wrong")) {
-        res.status(400).json({ message: "Error updating profile image." });
+        res.status(HTTP_statusCode.BadRequest).json({ message: "Error updating profile image." });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -395,7 +396,7 @@ export class userController {
         userId
       );
 
-      res.status(200).json({
+      res.status(HTTP_statusCode.OK).json({
         message: "Slot status retrieved successfully",
         data: response,
       });
@@ -404,11 +405,11 @@ export class userController {
 
       if (error.message.includes("Slot is locked")) {
         res
-          .status(400)
+          .status(HTTP_statusCode.BadRequest)
           .json({ message: "The selected slot is already locked." });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -422,7 +423,7 @@ export class userController {
 
       const session = await this.userService.createSession(appointment);
 
-      res.status(200).json({
+      res.status(HTTP_statusCode.OK).json({
         message: "Checkout session created successfully",
         session,
       });
@@ -430,10 +431,10 @@ export class userController {
       console.error("Error checking slot statusssss:", error.message);
 
       if (error.message === "Session Timed Out") {
-        res.status(409).json({ message: "Session Timed out" });
+        res.status(HTTP_statusCode.Conflict).json({ message: "Session Timed out" });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -449,7 +450,7 @@ export class userController {
         appointmentId
       );
 
-      res.status(200).json({
+      res.status(HTTP_statusCode.OK).json({
         message: "Checkout response created successfully",
         confirmAppointment,
       });
@@ -457,10 +458,10 @@ export class userController {
       console.error("Error checking slot status:", error.message);
 
       if (error.message == "Session Timed Out") {
-        res.status(409).json({ message: "Session Timed Out" });
+        res.status(HTTP_statusCode.Conflict).json({ message: "Session Timed Out" });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -482,7 +483,7 @@ export class userController {
             Number(limit)
         );
 
-        res.status(200).json({
+        res.status(HTTP_statusCode.OK).json({
             message: "Appointments fetched successfully",
             data: response.appointments,
             totalPages: response.totalPages
@@ -491,9 +492,9 @@ export class userController {
         console.error("Error fetching appointments:", error.message);
 
         if (error.message.includes("Failed to get appointments")) {
-            res.status(400).json({ message: `Failed to get appointments: ${error.message}` });
+            res.status(HTTP_statusCode.BadRequest).json({ message: `Failed to get appointments: ${error.message}` });
         } else {
-            res.status(500).json({
+            res.status(HTTP_statusCode.InternalServerError).json({
                 message: "An unexpected error occurred",
                 error: error.message,
             });
@@ -508,18 +509,18 @@ export class userController {
       const response = await this.userService.cancelAppointment(appointmentId);
 
       res
-        .status(200)
+        .status(HTTP_statusCode.OK)
         .json({ message: "Appointment canceled successfully", data: response });
     } catch (error: any) {
       console.error("Error canceling appointment:", error.message);
 
       if (error.message.includes("Failed to cancel appointment")) {
         res
-          .status(400)
+          .status(HTTP_statusCode.BadRequest)
           .json({ message: `Failed to cancel appointment: ${error.message}` });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -538,18 +539,18 @@ export class userController {
       );
 
       res
-        .status(200)
+        .status(HTTP_statusCode.OK)
         .json({ message: "Review added successfully", data: response });
     } catch (error: any) {
       console.error("Error adding review:", error.message);
 
       if (error.message.includes("Failed to add review")) {
         res
-          .status(400)
+          .status(HTTP_statusCode.BadRequest)
           .json({ message: `Failed to add review: ${error.message}` });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
@@ -565,7 +566,7 @@ export class userController {
       const response = await this.userService.getAppointment(appointmentId);
 
       res
-        .status(200)
+        .status(HTTP_statusCode.OK)
         .json({ message: "Appointment fetched successfully", data: response });
     } catch (error: any) {
       console.error(
@@ -575,11 +576,11 @@ export class userController {
 
       if (error.message.includes("Failed to get appointments")) {
         res
-          .status(400)
+          .status(HTTP_statusCode.BadRequest)
           .json({ message: `Failed to get appointments: ${error.message}` });
       } else {
         res
-          .status(500)
+          .status(HTTP_statusCode.InternalServerError)
           .json({
             message: "An unexpected error occurred",
             error: error.message,
