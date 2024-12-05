@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from "react";
 import { BsSendFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import axiosUrl from "../../utils/axios";
 import { useSocket } from "../../Context/SocketIO";
 import { MdDeleteOutline } from "react-icons/md";
+import { fetchTwoMembersChat } from "../../services/userAxiosService";
 
 function Chat() {
   const location = useLocation();
@@ -27,7 +27,9 @@ function Chat() {
       try {
 
         
-        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, { params: { doctorID: appointment?.docId._id, userID: appointment?.userId , sender:"USER" } });
+        const response = await fetchTwoMembersChat(appointment?.docId._id,appointment?.userId) 
+        
+        
         console.log("whole chat front",response.data);
         
         

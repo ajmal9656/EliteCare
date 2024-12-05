@@ -6,6 +6,7 @@ import { MdHealthAndSafety } from "react-icons/md";
 import { FaHeartbeat } from "react-icons/fa";
 import {  Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { getSpecializations } from "../../services/userAxiosService";
 
 interface Specialization {
   _id: string;
@@ -21,7 +22,7 @@ const Services = () => {
     try {
       console.log("enter");
       
-      const response = await axiosUrl.get("/getSpecializations");
+      const response = await getSpecializations()
       console.log("spec", response);
       setSpecializations(response.data.response); // Store the fetched data in state
     } catch (error) {

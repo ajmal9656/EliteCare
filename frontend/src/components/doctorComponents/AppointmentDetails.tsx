@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
-import axiosUrl from "../../utils/axios";
 import jsPDF from "jspdf";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import { logoutDoctor } from "../../Redux/Action/doctorActions";
+import { addPrescription, cancelAppointment, getMedicalrecords } from "../../services/doctorAxiosService";
 
 function AppointmentDetails() {
   const location = useLocation();
@@ -72,11 +72,8 @@ function AppointmentDetails() {
         confirmButtonText: "Yes, cancel it!",
       }).then((result) => {
         if (result.isConfirmed) {
-          axiosUrl
-            .put("/doctor/cancelAppointment", {
-              appointmentId: appointment.viewDetails._id,
-              reason: values.cancelReason,
-            })
+          
+            cancelAppointment(appointment.viewDetails._id,values.cancelReason)
             .then(() => {
               setAppointmentStatus("cancelled by Dr");
               Swal.fire(
@@ -129,12 +126,7 @@ function AppointmentDetails() {
             appointment.viewDetails &&
             appointment.viewDetails._id
           ) {
-            axiosUrl
-              .put("/doctor/addPrescription", {
-                appointmentId: appointment.viewDetails._id, // Passing appointment ID
-                prescription: values.prescription, // Passing prescription details
-              })
-              .then(() => {
+            addPrescription(appointment.viewDetails._id,values.prescription).then(() => {
                 setAppointmentStatus("completed"); // Update the local status
                 Swal.fire(
                   "Submitted!",
@@ -161,9 +153,8 @@ function AppointmentDetails() {
   useEffect(() => {
     const fetchMedicalRecords = async () => {
       try {
-        const response = await axiosUrl.get(
-          `/doctor/getMedical-records/${appointment.viewDetails.userId._id}`
-        ); // Adjust the API endpoint as needed
+        
+        const response = await getMedicalrecords(appointment.viewDetails.userId._id) // Adjust the API endpoint as needed
 
         console.log("medfical", response.data.response);
 

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import axiosUrl from '../../utils/axios';
 import { DoctorApplication } from '../../interfaces/doctorinterface';
 import { useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../../Redux/Action/adminActions';
 import { useDispatch } from 'react-redux';
+import { getApplications, getDoctorApplication } from '../../services/adminAxiosService';
 
 function Applications() {
   const navigate = useNavigate();
@@ -15,9 +15,7 @@ function Applications() {
 
   const fetchApplications = async (page:number) => {
     try {
-      const response = await axiosUrl.get('/admin/getApplications',{
-        params: { page, limit: 1  }
-      });
+      const response = await getApplications(page) 
       setApplications(response.data.response.applications);
       setTotalPages(response.data.response.totalPages)
     } catch (error:any) {
@@ -33,7 +31,7 @@ function Applications() {
 
   const viewApplication = async (applicationId: string) => {
     try {
-      const response = await axiosUrl.get(`/admin/getDoctorApplication/${applicationId}`);
+      const response = await getDoctorApplication(applicationId)
       navigate('/admin/viewApplication', { state: { response: response.data.response } });
     } catch (error) {
       toast.error('Failed to fetch applications');

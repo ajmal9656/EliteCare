@@ -11,6 +11,7 @@ import { useSocket } from '../../Context/SocketIO';
 import { setRoomId, setShowIncomingVideoCall, setShowVideoCall } from '../../Redux/Slice/userSlice';
 
 import axiosUrl from '../../utils/axios';
+import { endCall } from '../../services/userAxiosService';
 
 
 export function getUrlParams(
@@ -58,10 +59,8 @@ function VideoChat() {
             dispatch(setRoomId(null))
             dispatch(setVideoCall(null))
             dispatch(setShowIncomingVideoCall(null))
-            axiosUrl.post('/chat/end-call', {
-              appointmentId: showIncomingVideoCall.appointmentId,
-              
-          });
+            endCall(showIncomingVideoCall.appointmentId)
+            
         },
     });
 

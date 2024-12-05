@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../Redux/store";
 import { useSocket } from "../../../Context/SocketIO";
 
+
 const Navbar = () => {
   const [menu, setMenu] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -30,14 +31,21 @@ const Navbar = () => {
     
     try {
       console.log("hellow");
-      
-      const response = await axiosUrl.get(`/chat/getAllNotifications/${userData?._id}`);
-      console.log("wwwwwww",response.data);
-       // Adjust endpoint as needed
-      setNotifications(response.data);
+      if(userData?._id){
+        const response = await axiosUrl.get(`/chat/getAllNotifications/${userData?._id}`);
+        console.log("wwwwwwwss",response.data);
+         // Adjust endpoint as needed
+        setNotifications(response.data);
+  
+        await axiosUrl.get(`/chat/readAllNotifications/${userData?._id}`);
 
-      await axiosUrl.get(`/chat/readAllNotifications/${userData?._id}`);
-    } catch (error) {
+      }
+      
+     
+    } catch (error:any) {
+      if(error.message=="Request failed with status code 400"){
+        setNotifications([])
+      }
       console.error("Error fetching notifications:", error);
     } 
   };
@@ -63,12 +71,19 @@ const Navbar = () => {
     
     const fetchNotificationCount = async () => {
       try {
-        const response = await axiosUrl.get(`/chat/notificationCount/${userData?._id}`);
+        if(userData?._id){
+          const response = await axiosUrl.get(`/chat/notificationCount/${userData?._id}`);
         
         console.log("no",response.data.notificationCount.notificationCount);
         
         setNotificationCount(response.data.notificationCount.notificationCount);
-      } catch (error) {
+
+        }
+        
+      } catch (error:any) {
+        if(error.message=="Request failed with status code 400"){
+          setNotificationCount(0)
+        }
         console.error("Error fetching notification count:", error);
       }
     };

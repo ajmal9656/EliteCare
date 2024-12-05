@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppDispatch } from '../../Redux/store';
 import { addSpecialization, updateSpecialization, listUnlistSpecialization, logoutAdmin } from '../../Redux/Action/adminActions';
 import { Specializations } from '../../interfaces/doctorinterface';
-import axiosUrl from '../../utils/axios';
+import { getSpecializations } from '../../services/adminAxiosService';
 
 const validationSchema = Yup.object({
   name: Yup.string().required('Name is required'),
@@ -27,9 +27,7 @@ const Specialization: React.FC = () => {
 
   const fetchSpecializations = async (page:number) => {
     try {
-      const response = await axiosUrl.get('/admin/getSpecializations',{
-        params: { page, limit: 5  }
-      });
+      const response = await getSpecializations(page)
       console.log("specia",response.data.response);
       
       setCategories(response.data.response.specializations);

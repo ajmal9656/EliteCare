@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import axiosUrl from "../../utils/axios";
 import { DoctorDataWithSpecialization } from '../../interfaces/doctorinterface';
 import { Link } from "react-router-dom";
+import { getDoctorswithSpecialization } from "../../services/userAxiosService";
 
 interface DoctorsWithSpecializationProps {
   specializationId: string | undefined;
@@ -15,9 +15,7 @@ function DoctorsWithSpecialization({ specializationId }: DoctorsWithSpecializati
 
   const fetchDoctorsWithSpecialization = async (id: string, page: number, search: string) => {
     try {
-      const response = await axiosUrl.get(`/getDoctorsWithSpecialization/${id}`, {
-        params: { page, limit: 3, search } // Added search query to params
-      });
+      const response = await getDoctorswithSpecialization(id,page,search)
       console.log("response", response.data.data);
       setDoctors(response.data.data);
       setTotalPages(response.data.totalPages);

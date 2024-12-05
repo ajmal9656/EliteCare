@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axiosUrl from "../../utils/axios";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Swal from "sweetalert2";
+import { approveApplication, rejectApplication } from "../../services/adminAxiosService";
 
 function ApplicationDetails() {
   const navigate = useNavigate();
@@ -24,9 +24,7 @@ function ApplicationDetails() {
     }),
     onSubmit: async (values) => {
       try {
-        await axiosUrl.delete(`/admin/rejectApplication/${response.doctorId}`, {
-          data: { reason: values.rejectionReason },
-        });
+        await rejectApplication(response.doctorId,values.rejectionReason) 
         setIsModalOpen(false);
         navigate("/admin/applications");
       } catch (error) {
@@ -48,7 +46,7 @@ function ApplicationDetails() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axiosUrl.post(`/admin/approveApplication/${response.doctorId}`);
+          await approveApplication(response.doctorId) 
           Swal.fire({
             title: "Success!",
             text: "Application approved successfully.",

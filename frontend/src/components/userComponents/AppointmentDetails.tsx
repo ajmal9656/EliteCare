@@ -4,10 +4,10 @@ import moment from "moment";
 import { Rating } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik"; 
 import * as Yup from "yup";
-import axiosUrl from "../../utils/axios";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
 import Swal from "sweetalert2";
+import { addReview, cancelAppointment, getAppointment } from "../../services/userAxiosService";
 
 
 interface ReviewFormValues {
@@ -53,7 +53,7 @@ function AppointmentDetails() {
   useEffect(() => {
     const fetchAppointmentDetails = async () => {
       try {
-        const response = await axiosUrl.get(`/getAppointment/${appointmentId}`);
+        const response = await getAppointment(appointmentId)
         
         console.log("appoin",response.data.data);
         
@@ -90,11 +90,12 @@ function AppointmentDetails() {
 
   const handleSubmitReview = async (values: ReviewFormValues, { resetForm }: { resetForm: () => void }) => {
     try {
-      const response = await axiosUrl.post('/addReview', {
-        appointmentId: appointment?._id, // Ensure appointment is not null
-        rating: 4,
-        reviewText: values.reviewText,
-      });
+      const response = await addReview(appointment?._id,values.reviewText)
+      //  axiosUrl.post('/addReview', {
+      //   appointmentId: , // Ensure appointment is not null
+      //   rating: 4,
+      //   reviewText: values.reviewText,
+      // });
       setAppointment(response.data.data);
       console.log("Review submitted successfully:", response.data);
       toast.success("Your Review Added Successfully");
@@ -195,8 +196,7 @@ function AppointmentDetails() {
       confirmButtonText: "Yes, cancel it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        axiosUrl
-          .put(`/cancelAppointment/${appointmentId}`)
+        cancelAppointment(appointmentId)
           .then((result) => {
             setAppointmentStatus("cancelled")
             toast.success("Appointment cancelled");

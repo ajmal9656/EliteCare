@@ -3,11 +3,11 @@ import Button from '../common/userCommon/Button';
 import { DoctorDataWithSpecialization } from '../../interfaces/doctorinterface';
 import { Rating, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import axiosUrl from '../../utils/axios';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { MdArrowBackIos, MdArrowForwardIos } from 'react-icons/md';
+import { getDoctorDetails } from '../../services/userAxiosService';
 
 
 function DoctorProfile() {
@@ -24,9 +24,7 @@ function DoctorProfile() {
 
   const fetchDoctorDetails = async (doctorId: string) => {
     try {
-      const response = await axiosUrl.get(`/doctordetails/${doctorId}`, {
-        params: { reviewData: true },
-      });
+      const response = await getDoctorDetails(doctorId)
       setReviews(response.data.response.appointments);
       calculateAverageRating(response.data.response.appointments);
     } catch (error) {

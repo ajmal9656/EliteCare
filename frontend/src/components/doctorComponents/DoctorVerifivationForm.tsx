@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import DetailsUpload from '../../components/doctorComponents/DetailsUpload';
-import axiosUrl from '../../utils/axios';
 import { Specializations } from '../../interfaces/doctorinterface';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import VerificationProcessingPage from '../../pages/doctorPages/VerificationProcessingPage';
 import { useDispatch } from 'react-redux';
 import { logoutDoctor } from '../../Redux/Action/doctorActions';
+import { getSpeacializations, uploadApplicationData } from '../../services/doctorAxiosService';
 
 // Validation schema for the form
 const validationSchema = Yup.object({
@@ -77,7 +77,7 @@ function DoctorVerifivationForm() {
       try {
        
         
-        const response = await axiosUrl.get('/admin/getSpecializations');
+        const response = await getSpeacializations()
        
         
         setSpecializations(response.data.response.specializations);
@@ -158,11 +158,7 @@ function DoctorVerifivationForm() {
         console.log("form enter");
         
         
-        const response = await axiosUrl.post('/doctor/uploadDoctorData', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await uploadApplicationData(formData)
 
         console.log('Form submitted successfully', response.data);
         if(response.data.status){

@@ -1,7 +1,8 @@
-import axiosUrl from '../../utils/axios';
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MdHealthAndSafety } from "react-icons/md";
+import { getSpecializations } from '../../services/userAxiosService';
 
 interface Specialization {
   _id: string;
@@ -16,7 +17,7 @@ function Specializations() {
 
   const fetchSpecializations = async () => {
     try {
-      const response = await axiosUrl.get("/getSpecializations");
+      const response = await getSpecializations()
       setSpecializations(response.data.response);  // Store the fetched data in state
     } catch (error) {
       console.error("Error fetching specializations:", error);

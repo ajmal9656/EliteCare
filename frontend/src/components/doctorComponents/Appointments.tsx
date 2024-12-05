@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import CustomTable from "../common/doctorCommon/Table";
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
-import axiosUrl from '../../utils/axios';
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { logoutDoctor } from '../../Redux/Action/doctorActions';
+import { getAppointments } from '../../services/doctorAxiosService';
 
 function Appointments() {
   const DoctorData = useSelector((state: RootState) => state.doctor);
@@ -40,7 +40,7 @@ function Appointments() {
       console.log("params",params);
       
 
-      const response = await axiosUrl.get(`/doctor/getAppointments/${DoctorData?.doctorInfo?.doctorId}`, { params });
+      const response = await getAppointments(DoctorData?.doctorInfo?.doctorId,params) 
       const convertedData = response.data.data.appointments.map((appointment: any) => ({
         patientName: appointment.patientNAme,
         date: new Date(appointment.date).toLocaleDateString(),

@@ -4,13 +4,13 @@ import DatePicker from 'react-datepicker';
 import { addDays } from 'date-fns';
 import 'react-datepicker/dist/react-datepicker.css';
 import { DoctorDataWithSpecialization } from '../../interfaces/doctorinterface';
-import axiosUrl from '../../utils/axios';
 import Button from '../common/userCommon/Button';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
 import { User } from '../../interfaces/userInterface';
 import { MdOutlineAccessTime } from 'react-icons/md';
+import { checKSlotStatus, getSlots } from '../../services/userAxiosService';
 
 interface Slot {
   _id: string;
@@ -60,12 +60,8 @@ function TimeSlots() {
     if (!date) return;
     const formattedDate = formatDateForBackend(date);
     try {
-      const response = await axiosUrl.get('/getSlots', {
-        params: {
-          date: formattedDate,
-          doctorId: doctor._id,
-        },
-      });
+      
+      const response = await getSlots(formattedDate,doctor._id) 
       setSlots(response.data.response);
       setSelectedSlot(null); // Reset selected slot when slots change
     } catch (error) {
@@ -103,12 +99,9 @@ function TimeSlots() {
       const formattedDate = formatDateForBackend(selectedDate);
       console.log("gggg",formattedDate)
 
-      const response = await axiosUrl.post('/checkSlotStatus', {
-        slotId: selectedSlot,   
-        doctorId: doctor._id ,
-        date:formattedDate ,
-        userId:userData._id  
-      });
+      
+
+      const response = await checKSlotStatus(selectedSlot,formattedDate,doctor._id,userData._id)
       console.log("qqqqqq",response.data.data)
       if(response.data.data){
 

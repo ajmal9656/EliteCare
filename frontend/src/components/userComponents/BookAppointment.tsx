@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import Button from '../common/userCommon/Button';
 import axiosUrl from '../../utils/axios';
 import { toast } from 'sonner';
+import { createCheckoutSession } from '../../services/userAxiosService';
 
 function BookAppointment() {
   const location = useLocation();
@@ -51,9 +52,7 @@ function BookAppointment() {
   // Handle payment click
   const handleClick = async () => {
     try {
-      const responses = await axiosUrl.post('/create-checkout-session', {
-        appointment: appointmentData,
-      });
+      const responses = await createCheckoutSession(appointmentData)
 
       console.log("session", responses.data.message);
 

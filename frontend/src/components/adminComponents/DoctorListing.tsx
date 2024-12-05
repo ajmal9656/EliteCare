@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-
-import axiosUrl from '../../utils/axios';
 import { DoctorDetails } from '../../interfaces/doctorinterface';
 import { useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../../Redux/Action/adminActions';
 import { useDispatch } from 'react-redux';
+import { getDoctors, listUnlistDoctor } from '../../services/adminAxiosService';
 
 function DoctorListing() {
     const navigate = useNavigate();
@@ -16,9 +15,7 @@ function DoctorListing() {
 
     const fetchDoctors = async (page:number,search:string) => {
         try {
-            const response = await axiosUrl.get('/admin/getDoctors',{
-                params: { page, limit: 1,search  }
-              });
+            const response = await getDoctors(page,search) 
               console.log("doxttt",response.data);
               
             setDoctors(response.data.response.doctors);
@@ -39,7 +36,7 @@ function DoctorListing() {
     }, [currentPage]);
 
     const toggleListState = async (id: string) => {
-        await axiosUrl.put(`/admin/listUnlistDoctor/${id}`);
+        await listUnlistDoctor(id) 
         setDoctors((prevDoctors) =>
             prevDoctors.map((doctor) =>
                 doctor._id === id ? { ...doctor, isBlocked: !doctor.isBlocked } : doctor

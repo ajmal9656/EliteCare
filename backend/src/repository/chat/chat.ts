@@ -245,6 +245,15 @@ export class chatRepository implements IChatRepository{
                 { $match: { "notifications.read": false } },
                 { $count: "unreadCount" }
             ]);
+
+            if(!notificationCount){
+                return{
+
+                    notificationCount:0
+                }
+                
+
+            }
     
             return {
                 notificationCount: notificationCount[0]?.unreadCount || 0
@@ -259,6 +268,8 @@ export class chatRepository implements IChatRepository{
                 { $match: { receiverId: new mongoose.Types.ObjectId(receiverId) } },
                 { $unwind: "$notifications" }
             ]);
+
+            
 
            
             

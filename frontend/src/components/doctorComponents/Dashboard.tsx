@@ -4,10 +4,10 @@ import { GrMoney } from 'react-icons/gr';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
-import axiosUrl from '../../utils/axios';
 import RevenueChart from './RevenueChart';
 import { useNavigate } from 'react-router-dom';
 import { logoutDoctor } from '../../Redux/Action/doctorActions';
+import { getDashboardData } from '../../services/doctorAxiosService';
 
 function Dashboard() {
 
@@ -26,9 +26,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosUrl.get('/doctor/dashboardData', {
-          params: { doctorId: DoctorData?.doctorInfo?.doctorId }, 
-        });
+        const response = await getDashboardData(DoctorData?.doctorInfo?.doctorId) 
 
         console.log("Dashboard Data:", response.data.response);
         

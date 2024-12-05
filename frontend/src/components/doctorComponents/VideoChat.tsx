@@ -4,8 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setRoomId, setShowVideoCall, setVideoCall } from '../../Redux/Slice/doctorSlice';
 import { RootState } from '../../Redux/store';
 import { useSocket } from '../../Context/SocketIO';
-
-import axiosUrl from '../../utils/axios';
+import { endCall } from '../../services/doctorAxiosService';
 
 
 
@@ -52,11 +51,8 @@ function VideoChat() {
             dispatch(setRoomId(null))
             dispatch(setVideoCall(null))
             console.log("videosss",videoCall);
+        endCall(videoCall?.appointmentId)
         
-        axiosUrl.post('/chat/end-call', {
-          appointmentId: videoCall?.appointmentId,
-          
-      });
             
         },
     });

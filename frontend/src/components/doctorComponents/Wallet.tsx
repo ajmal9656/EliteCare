@@ -4,10 +4,10 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import CustomTable from '../common/doctorCommon/Table';
 import { RootState } from '../../Redux/store';
-import axiosUrl from '../../utils/axios';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { logoutDoctor } from '../../Redux/Action/doctorActions';
+import { getWallet, withdraw } from '../../services/doctorAxiosService';
 
 interface Transaction {
   transactionId: string;
@@ -34,9 +34,7 @@ function Wallet() {
       const doctorId = DoctorData?.doctorInfo?.doctorId;
 
       if (doctorId) {
-        const response = await axiosUrl.get(`/doctor/getWallet/${doctorId}`, {
-          params: { status, page, limit: 7 }
-        });
+        const response = await getWallet(doctorId,status,page) 
         if (response.data.response.transactions.length === 0) {
           setTransactions([]);
         }
@@ -110,10 +108,7 @@ function Wallet() {
             console.log("aaaaaaaaaaaaaaaaa");
             
             // Make the axios call to the backend to process the withdrawal
-            const response = await axiosUrl.post(`/doctor/withdraw/${doctorId}`, {
-              
-              withdrawAmount: values.withdrawAmount,
-            });
+            const response = await withdraw(doctorId,values.withdrawAmount) 
             console.log("mne",response.data.response);
             
   

@@ -4,11 +4,11 @@ import { S3Service } from "../../config/s3client";
 import { Appointment,chatData,GetChatResult,NotificationData } from "../../interface/chatInterface/chatInterface";
 import { chatRepository } from "../../repository/chat/chat";
 import { IChatRepository } from "../../interface/chat/chat.repository.interface";
+import { IChatService } from "../../interface/chat/chat.service.interface";
 
 
-const chatRepositoryInstance = new chatRepository()
 const S3Services = new S3Service()
-export class chatService{
+export class chatService implements IChatService{
 
     private chatRepository:IChatRepository
 

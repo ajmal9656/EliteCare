@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { logoutUser, updateUserProfile,updateUserProfileImage } from "../../Redux/Action/userActions";
 import { useNavigate } from "react-router-dom";
-import axiosUrl from "../../utils/axios";
+import { getUserData } from "../../services/userAxiosService";
 
 
 function UserProfile() {
@@ -124,9 +124,8 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axiosUrl.get(`/getUserDetails/${userData?._id}`,{
-          withCredentials: true, // Ensure cookies are included
-        }); // Replace with your backend endpoint
+        
+        const response = await getUserData(userData?._id)  // Replace with your backend endpoint
         console.log("userrrrr",response);
         
         setUserImage(response.data.response); // Assuming response data has the list of doctors

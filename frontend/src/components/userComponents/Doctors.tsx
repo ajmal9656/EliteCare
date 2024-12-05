@@ -4,8 +4,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
-import axiosUrl from "../../utils/axios";
 import { Link } from "react-router-dom";
+import { getDoctors } from "../../services/userAxiosService";
 
 interface Doctor {
   _id: string;
@@ -21,7 +21,7 @@ const Doctors: React.FC = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axiosUrl.get('/getDoctors'); // Replace with your backend endpoint
+        const response = await getDoctors() // Replace with your backend endpoint
         console.log("docsss",response.data.response);
         
         setDoctors(response.data.response); // Assuming response data has the list of doctors

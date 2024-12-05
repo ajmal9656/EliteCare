@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { GrMoney } from "react-icons/gr";
 import { FaUsers, FaUserDoctor } from "react-icons/fa6";
-import axiosUrl from "../../utils/axios";
 import RevenueChart from "./RevenueChart";
 import UserDoctorChart from "./UserDoctorChart";
 import { useNavigate } from "react-router-dom";
 import { logoutAdmin } from "../../Redux/Action/adminActions";
 import { useDispatch } from "react-redux";
+import { getdashboardData } from "../../services/adminAxiosService";
 
 function Dashboard() {
   const navigate = useNavigate()
@@ -26,7 +26,7 @@ function Dashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axiosUrl.get("/admin/dashboardData"); // Replace with your API endpoint
+        const response = await getdashboardData() // Replace with your API endpoint
         console.log("resss",response.data.response);
         setDashboardData({
           totalRevenue: response.data.response.totalRevenue,

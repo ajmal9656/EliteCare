@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
-import axiosUrl from "../../utils/axios";
 import { Rating, Typography, Modal, Box, TextField, Button } from "@mui/material"; // Import Modal, TextField, Button
 import { FaEdit ,FaCamera} from "react-icons/fa";
 import { logoutDoctor, updateDoctorProfile, updateDoctorProfileImage } from "../../Redux/Action/doctorActions";
@@ -9,6 +8,7 @@ import Swal from 'sweetalert2';
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { getDoctorDetails } from "../../services/doctorAxiosService";
 
 
 
@@ -47,12 +47,7 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
     if (DoctorData?.doctorInfo?.doctorId) {
       const fetchProfile = async () => {
         try {
-          const response = await axiosUrl.get(
-            `/doctor/getDoctorDetails/${DoctorData?.doctorInfo?.doctorId}`,
-            {
-              params: { reviewData: true },
-            }
-          );
+          const response = await getDoctorDetails(DoctorData?.doctorInfo?.doctorId) 
   
           const profile = response.data.response;
           setProfileData(profile); // Update the state with fetched data

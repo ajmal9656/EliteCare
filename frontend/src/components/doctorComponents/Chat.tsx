@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { BsSendFill } from "react-icons/bs";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import axiosUrl from "../../utils/axios";
 import { FcVideoCall } from "react-icons/fc";
 import { useDispatch } from "react-redux";
 import { setVideoCall } from "../../Redux/Slice/doctorSlice";
 import { useSocket } from "../../Context/SocketIO";
 import { MdDeleteOutline } from "react-icons/md";
+import { fetchTwoMembersChat } from "../../services/doctorAxiosService";
 
 
 
@@ -93,13 +93,7 @@ const Chat = () => {
           appointment?.viewDetails?.userId?._id
         );
   
-        const response = await axiosUrl.get(`/chat/fetchTwoMembersChat`, {
-          params: {
-            doctorID: appointment?.viewDetails?.docId,
-            userID: appointment?.viewDetails?.userId?._id,
-            sender: "DOCTOR",
-          },
-        });
+        const response = await fetchTwoMembersChat(appointment?.viewDetails?.docId,appointment?.viewDetails?.userId?._id) 
         
         console.log("whole chat front", response.data);
   

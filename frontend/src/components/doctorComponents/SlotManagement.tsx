@@ -7,7 +7,6 @@ import moment from 'moment-timezone';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'sonner';
-import axiosUrl from '../../utils/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../Redux/store';
 import { MdDelete } from "react-icons/md";
@@ -16,6 +15,7 @@ import withReactContent from 'sweetalert2-react-content';
 import { TiTick } from "react-icons/ti";
 import { useNavigate } from 'react-router-dom';
 import { logoutDoctor } from '../../Redux/Action/doctorActions';
+import { checkSlotAvailabile, createSlot, deleteSlot, getSlots } from '../../services/doctorAxiosService';
 
 
 function SlotManagement() {
@@ -126,7 +126,7 @@ function SlotManagement() {
     
         console.log("Slot Form Data:", formData);
     
-        await axiosUrl.post('/doctor/createSlot', formData);
+        await createSlot(formData)
     
         toggleAddSlotModal();
       } catch (error) {
@@ -246,12 +246,8 @@ function SlotManagement() {
             
   
     try {
-      const response = await axiosUrl.post('/doctor/checkSlotAvailability', {
-        timeSlots:timeSlots,
-        startDate: startDate,
-        endDate: endDate,
-        doctorId: DoctorData?.doctorInfo?.doctorId,
-      });
+      
+      const response = await checkSlotAvailabile(timeSlots,startDate,endDate,DoctorData?.doctorInfo?.doctorId)
       console.log("mmm",response.data.data);
       if(response.data.data){
         return true
@@ -279,12 +275,7 @@ function SlotManagement() {
         
         
 
-        const response = await axiosUrl.get(`/doctor/getSlots`, {
-          params: {
-            date: date, 
-            doctorId: doctorId,
-          },
-        });
+        const response = await getSlots(date,doctorId)
         console.log("gggg",response.data.data)
 
         if (response?.data?.data?.length > 0) {
@@ -332,9 +323,7 @@ function SlotManagement() {
         
   
        
-        await axiosUrl.delete(`/doctor/deleteSlot`, {
-          params: { slotId, date, doctorId }
-        });
+        await deleteSlot(slotId,date,doctorId)
   
         
         setAvailableSlots(prevSlots => prevSlots.filter(slot => slot._id !== slotId));

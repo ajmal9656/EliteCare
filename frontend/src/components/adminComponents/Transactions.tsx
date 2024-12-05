@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axiosUrl from "../../utils/axios";
 import DatePicker from "react-datepicker";
 import { useNavigate } from "react-router-dom";
 import { logoutAdmin } from "../../Redux/Action/adminActions";
 import { useDispatch } from "react-redux";
+import { getTransactionsDetails } from "../../services/adminAxiosService";
 
 const Transactions = () => {
   const navigate = useNavigate()
@@ -30,9 +30,7 @@ const Transactions = () => {
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
       console.log("paramss",params);
-      const response = await axiosUrl.get(`/admin/getTransactionsDetails`,{
-        params
-      });
+      const response = await getTransactionsDetails(params)
       console.log("transacti",response.data);
       
       setTransactions(response.data.data);

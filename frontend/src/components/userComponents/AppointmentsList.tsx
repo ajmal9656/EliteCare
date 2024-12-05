@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../Redux/store";
-import axiosUrl from "../../utils/axios";
-import Swal from "sweetalert2";
-import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import { getAppointments } from "../../services/userAxiosService";
 
 interface Appointment {
   _id: string;
@@ -31,11 +29,8 @@ function AppointmentsList() {
   // Function to fetch appointments based on status and pagination
   const fetchAppointments = (status: string, page: number) => {
     if (userData?._id) {
-      axiosUrl
-        .get(`/getAppointments/${userData._id}`, {
-          params: { status, page, limit: 3 }, // Adding page and limit to the API request
-        })
-        .then((response) => {
+      
+        getAppointments(userData._id,status,page).then((response) => {
           setAppointments(response.data.data);
           setTotalPages(response.data.totalPages); // Assuming response contains totalPages
         })
@@ -55,40 +50,7 @@ function AppointmentsList() {
     setCurrentPage(1); // Reset to first page when status changes
   };
 
-  // Function to cancel an appointment
-  const handleCancelAppointment = (appointmentId: string) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to cancel this appointment?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, cancel it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        axiosUrl
-          .put(`/cancelAppointment/${appointmentId}`)
-          .then(() => {
-            toast.success("Appointment cancelled");
-            Swal.fire(
-              "Cancelled!",
-              "The appointment has been cancelled. Your money will be refunded to your bank account.",
-              "success"
-            );
-            
-            
-
-            console.log("cancalled appointment" ,result);
-            fetchAppointments(status, currentPage); // Refresh the appointments list
-          })
-          .catch((error) => {
-            console.error("Error canceling appointment:", error);
-            Swal.fire("Failed!", "Failed to cancel the appointment. Please try again.", "error");
-          });
-      }
-    });
-  };
+  
 
   const handleViewAppointment = (appointment: any) => {
     navigate("/userProfile/viewAppointment", { state: { appointmentId: appointment._id } });

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import axiosUrl from '../../utils/axios';
 import DatePicker from 'react-datepicker';
 import { useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../../Redux/Action/adminActions';
 import { useDispatch } from 'react-redux';
+import { getAppointments } from '../../services/adminAxiosService';
 
 function Appointments() {
 
@@ -25,9 +25,7 @@ function Appointments() {
       if (endDate) params.endDate = endDate
       console.log("paramss",params);
       
-      const response = await axiosUrl.get('/admin/getAppointments',{
-        params
-      });
+      const response = await getAppointments(params) 
       console.log('tt', response.data.data);
       setAppointments(response.data.data.appointments);
       setTotalPages(response.data.data.totalPages)

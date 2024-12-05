@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-
 import axiosUrl from '../../utils/axios';
 import { UserDetails } from '../../interfaces/userInterface';
 import { useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../../Redux/Action/adminActions';
 import { useDispatch } from 'react-redux';
+import { getUsers, listUnlistUser } from '../../services/adminAxiosService';
 
 function UserListing() {
     const navigate = useNavigate();
@@ -19,9 +19,7 @@ function UserListing() {
         try {
           console.log("searchhh",search);
           
-            const response = await axiosUrl.get('/admin/getUsers',{
-                params: { page, limit: 1 ,search }
-              });
+            const response = await getUsers(page,search)
             setUsers(response.data.response.users);
             setTotalPages(response.data.response.totalPages)
         } catch (error:any) {
@@ -40,7 +38,7 @@ function UserListing() {
     }, [currentPage]);
 
     const toggleListState = async (id: string) => {
-        await axiosUrl.put(`/admin/listUnlistUser/${id}`);
+        await listUnlistUser(id)
         setUsers((prevUsers) =>
             prevUsers.map((user) =>
                 user._id === id ? { ...user, isBlocked: !user.isBlocked } : user
