@@ -26,6 +26,8 @@ export class AuthService implements IAuthService {
     
     async verifyAdmin(email: string, password: string):Promise<{adminInfo:Admin,accessToken:string,refreshToken:string}> {
         try {
+            console.log("this is aqdmin login service");
+            
             
             const adminData = await this.AuthRepository.adminCheck(email);
             if (adminData) {

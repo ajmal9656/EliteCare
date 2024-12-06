@@ -9,7 +9,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 export const login = createAsyncThunk('admin/adminLogin',
     async({ email, password }: { email: string; password: string }, { rejectWithValue })=>{
         try{
-          console.log("zzzzz")
+          console.log("admin login thunk",email,password)
 
             const response = await axiosUrl.post('/admin/login',{email,password});
         // const response = await axios.post(`${url}/admin/adlogin`,{email , password})
@@ -19,6 +19,8 @@ export const login = createAsyncThunk('admin/adminLogin',
 
 
         }catch(error:any){
+          console.log(error);
+          
             if (error.response) {
                 
                 const errorMessage = error.response.data.message || 'Login failed';

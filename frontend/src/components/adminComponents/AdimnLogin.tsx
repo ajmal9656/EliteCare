@@ -24,7 +24,7 @@ function AdminLogin() {
         onSubmit: async(values) => {
           
           try {
-            console.log(values);
+            console.log("admin prelogin",values);
             const loginData = await dispatch(login(values)).unwrap();
             if(loginData){
               console.log("logggg success",loginData);

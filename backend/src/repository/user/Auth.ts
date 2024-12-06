@@ -13,6 +13,9 @@ export class AuthRepository implements IAuthRepository {
     phone: string
   ): Promise<{ existEmail: boolean; existPhone: boolean }> {
     try {
+
+      console.log("this is admin login repo");
+      
       let existEmail = true;
       let existPhone = true;
 
