@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import axiosUrl from '../../utils/axios';
 import { UserDetails } from '../../interfaces/userInterface';
 import { useNavigate } from 'react-router-dom';
 import { logoutAdmin } from '../../Redux/Action/adminActions';

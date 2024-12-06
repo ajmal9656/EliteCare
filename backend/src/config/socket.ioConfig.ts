@@ -25,11 +25,11 @@ const configSocketIO = (server: HttpServer) => {
     try{
         
     
-    io = new SocketServer(server, {
-       cors: {
-          origin: ["http://localhost:5173"]
-       },
-    });
+      io = new SocketServer(server, {
+        cors: {
+           origin: ["https://ajmals.site"]
+        },
+     });
     
     
     

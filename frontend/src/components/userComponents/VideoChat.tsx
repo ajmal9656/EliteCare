@@ -10,7 +10,7 @@ import { useSocket } from '../../Context/SocketIO';
 
 import { setRoomId, setShowIncomingVideoCall, setShowVideoCall } from '../../Redux/Slice/userSlice';
 
-import axiosUrl from '../../utils/axios';
+
 import { endCall } from '../../services/userAxiosService';
 
 

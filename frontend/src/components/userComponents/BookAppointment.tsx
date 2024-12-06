@@ -1,7 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Button from '../common/userCommon/Button';
-import axiosUrl from '../../utils/axios';
 import { toast } from 'sonner';
 import { createCheckoutSession } from '../../services/userAxiosService';
 

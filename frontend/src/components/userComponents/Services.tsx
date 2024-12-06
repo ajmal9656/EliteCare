@@ -1,4 +1,4 @@
-import axiosUrl from "../../utils/axios"; // Import Axios
+
 
 import { RiMicroscopeLine } from "react-icons/ri";
 import ServicesCard from "../common/userCommon/ServiceCard";
