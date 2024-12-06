@@ -1,5 +1,5 @@
-import { Document } from "mongoose";
-import { BookAppointment, Doctors, GetAppointments, GetDoctorsResponse, MedicalField, ScheduleSlot, SingleDoctor, Slot, userImage, UserProfile, UserProfileData, UserProfileDetails, userType } from ".././userInterface/interface";
+
+import {  Doctors,  GetDoctorsResponse, MedicalField, ScheduleSlot, SingleDoctor,  userImage,  UserProfileData, UserProfileDetails } from ".././userInterface/interface";
 
 export interface IUserRepository {
    

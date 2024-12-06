@@ -90,7 +90,7 @@ function AppointmentDetails() {
 
   const handleSubmitReview = async (values: ReviewFormValues, { resetForm }: { resetForm: () => void }) => {
     try {
-      const response = await addReview(appointment?._id,values.reviewText)
+      const response = await addReview(appointment?._id,values.reviewText,values.rating)
       //  axiosUrl.post('/addReview', {
       //   appointmentId: , // Ensure appointment is not null
       //   rating: 4,
@@ -395,24 +395,26 @@ function AppointmentDetails() {
     <div className="bg-white p-6 rounded-lg shadow-lg w-[400px] max-h-[80%] overflow-y-auto overflow-x-hidden">
       <h3 className="text-lg font-semibold mb-4">Submit Your Review</h3>
       <Formik
-        initialValues={{ rating: 4, reviewText: "" }}
+        initialValues={{ rating: null, reviewText: "" }}
         validationSchema={validationSchema}
         onSubmit={handleSubmitReview}
       >
+
         {({ setFieldValue }) => (
           <Form>
             <div className="mb-4">
               <label className="block text-gray-700">Rating:</label>
               <Field name="rating">
                 {({ field }: FieldProps) => (
-                  <Rating
-                    {...field}
-                    value={field.value}
-                    onChange={( newValue) => {
-                      setFieldValue("rating", newValue);
-                    }}
-                    precision={0.5}
-                  />
+                 <Rating
+                 {...field}
+                 value={field.value}
+                 onChange={(_, newValue) => {
+                   console.log("new value", newValue);
+                   setFieldValue("rating", newValue); // Directly use newValue
+                 }}
+                 precision={0.5}
+               />
                 )}
               </Field>
               <ErrorMessage name="rating" component="div" className="text-red-600 text-sm" />

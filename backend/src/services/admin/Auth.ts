@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken";
 import { Admin,adminType } from '../../interface/adminInterface/adminInterface';
-import { S3Service } from '../../config/s3client';
-import { IAdminRepository } from '../../interface/admin.repository.interface';
 import { IAuthRepository } from "../../interface/admin/Auth.repository.interface";
 import { IAuthService } from "../../interface/admin/Auth.service.interface";
 

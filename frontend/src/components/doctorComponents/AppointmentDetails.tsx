@@ -330,7 +330,20 @@ const renderButtons = () => {
         </button>
       );
     case "completed":
-      return <p className="text-green-600 text-lg font-medium">Completed</p>;
+      return (
+        <>
+      {isChatButtonVisible && (
+        <button
+          className="bg-blue-500 w-[30%] h-[70%] rounded-md text-white font-medium hover:bg-blue-600 transition duration-200 ease-in-out"
+          onClick={navigateChat}
+        >
+          Chat
+        </button>
+      )}
+      <p className="text-green-600 text-lg font-medium">Completed</p>
+      </>
+      )
+      
     default:
       return null;
   }
@@ -482,6 +495,13 @@ const renderButtons = () => {
                       {appointment?.viewDetails?.reason}
                     </p>
                   </div>
+                  <button
+                      className="bg-gray-500 text-white mt-5 px-4 py-2 rounded-md text-sm"
+                      type="button"
+                      onClick={closeModal}
+                    >
+                      Cancel
+                    </button>
                 </>
               ) : (
                 <form onSubmit={formik.handleSubmit}>

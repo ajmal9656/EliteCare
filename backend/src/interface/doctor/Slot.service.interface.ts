@@ -5,7 +5,7 @@ import {   Slot, TimeSlot } from "../doctorInterface/doctorInterface";
 
 export interface ISlotService {
     
-    createSlot(data: TimeSlot): Promise<any>;
+    createSlot(data: TimeSlot): Promise<{success:boolean,message:string}>;
     getSlots(date: string, doctorId: string): Promise<Slot[]>;
     checkAvailability(startDate: string,
         endDate:string,

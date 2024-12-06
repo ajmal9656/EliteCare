@@ -77,7 +77,7 @@ export class AppointmentService implements IAppointmentService {
     return moment(slot).tz("UTC").format("h:mm A");
   }
 
-  async cancelAppointment(appointmentId: string): Promise<BookAppointment|undefined> {
+  async cancelAppointment(appointmentId: string): Promise<BookAppointment> {
     try {
       const response = await this.AppointmentRepository.cancelAppointment(
         appointmentId
@@ -93,6 +93,9 @@ export class AppointmentService implements IAppointmentService {
         } else {
           throw new Error("No payment ID available for refund");
         }
+      }else{
+        throw new Error(`Failed to cancel appointment`);
+
       }
     } catch (error: any) {
       console.error("Error in cancelAppointment:", error.message);

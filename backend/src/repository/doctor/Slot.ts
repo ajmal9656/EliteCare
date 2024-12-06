@@ -14,10 +14,10 @@ import moment from "moment-timezone";
 export class SlotRepository implements ISlotRepository {
  
 
-  async createSlot(data: any): Promise<any> {
+  async createSlot(data: any): Promise<{success:boolean,message:string}> {
     try {
       console.log("Received slot data:", data.selectedSlots[0]);
-      console.log("Received slot data:", data.selectedSlots[1]);
+      
   
       const { startDate, endDate, selectedSlots, doctorId } = data;
   
@@ -46,15 +46,21 @@ export class SlotRepository implements ISlotRepository {
            // Use Mongoose's `.push()` to add new slots to the DocumentArray
         existingSlot.slots.push(...slots); // Add the new slots
         await existingSlot.save()
+
+        console.log("existingSlot",existingSlot);
+        
         } else {
           // Create a new record
-          await doctorSlotsModel.create({
+        const slotCreate = await doctorSlotsModel.create({
             doctorId,
             date: slotDate,
             slots,
             active: true,
           });
+          console.log("slot create",slotCreate);
         }
+        
+        
       }
   
       return { success: true, message: "Slots created/updated successfully" };

@@ -23,7 +23,7 @@ export class SlotService implements ISlotService {
 
 
   
-  async createSlot(data: TimeSlot): Promise<any> {
+  async createSlot(data: TimeSlot): Promise<{success:boolean,message:string}> {
     try {
       const response = await this.SlotRepository.createSlot(data);
 

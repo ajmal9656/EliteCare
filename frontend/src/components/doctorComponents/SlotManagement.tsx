@@ -127,6 +127,13 @@ function SlotManagement() {
         console.log("Slot Form Data:", formData);
     
         await createSlot(formData)
+
+
+        setSelectedDate(values.startDate)
+
+
+
+        fetchSlotsForDate(formData.startDate)
     
         toggleAddSlotModal();
       } catch (error) {

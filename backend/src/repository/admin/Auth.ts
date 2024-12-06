@@ -6,9 +6,6 @@ import { IAuthRepository } from "../../interface/admin/Auth.repository.interface
 
 
 
-
-
-
 export class AuthRepository implements IAuthRepository {
    
     

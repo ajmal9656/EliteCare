@@ -31,10 +31,10 @@ export const createCheckoutSession=(appointmentData:any)=>{
 }
 
 
-export const addReview=(appointmentId:string|any,reviewText:string)=>{
+export const addReview=(appointmentId:string|any,reviewText:string,rating:any)=>{
     return axiosUrl.post('/addReview', {
         appointmentId: appointmentId, // Ensure appointment is not null
-        rating: 4,
+        rating: rating,
         reviewText: reviewText,
       });
 
