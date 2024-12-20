@@ -145,7 +145,7 @@ export const getWallet=(doctorId:string,status:string,page:number)=>{
     
     
     return axiosUrl.get(`/doctor/getWallet/${doctorId}`, {
-        params: { status, page, limit: 7 }
+        params: { status, page, limit: 5 }
       });
     
 }
