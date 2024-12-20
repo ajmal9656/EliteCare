@@ -20,7 +20,7 @@ function Appointments() {
   // Function to fetch appointments from the backend
   const fetchAppointments = async (status: string, page:number,startDate: Date | null, endDate: Date | null) => {
     try {
-      const params: { [key: string]: any } = { status, page, limit: 2 };
+      const params: { [key: string]: any } = { status, page, limit: 7 };
       if (startDate) params.startDate = startDate
       if (endDate) params.endDate = endDate
       console.log("paramss",params);

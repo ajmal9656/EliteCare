@@ -25,7 +25,7 @@ export const getApplications=(page:number)=>{
    
     
     return axiosUrl.get('/admin/getApplications',{
-        params: { page, limit: 1  }
+        params: { page, limit: 7  }
       });
     
 }
@@ -47,7 +47,7 @@ export const getDoctors=(page:number,search:string)=>{
    
     
     return axiosUrl.get('/admin/getDoctors',{
-        params: { page, limit: 1,search  }
+        params: { page, limit: 7,search  }
       });
     
 }
@@ -55,7 +55,7 @@ export const getUsers=(page:number,search:string)=>{
    
     
     return axiosUrl.get('/admin/getUsers',{
-        params: { page, limit: 1 ,search }
+        params: { page, limit: 7 ,search }
       });
     
 }
@@ -75,7 +75,7 @@ export const getSpecializations=(page:number)=>{
    
     
     return axiosUrl.get('/admin/getSpecializations',{
-        params: { page, limit: 5  }
+        params: { page, limit: 7  }
       });
     
 }
