@@ -154,27 +154,28 @@ function Sidebar() {
         </NavLink>
       </li>
       <li>
-        <NavLink
-          to="/admin/appointments"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg group ${
-              isActive
-                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
-                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
-            }`
-          }
-        >
-          <svg
-            className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
-          </svg>
-          <span className="ms-3">Appointments</span>
-        </NavLink>
+      <NavLink
+  to="/admin/appointments"
+  className={({ isActive }) =>
+    `flex items-center p-2 rounded-lg group ${
+      isActive
+        ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+        : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+    }`
+  }
+>
+  <svg
+    className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path d="M17 2h-3V1a1 1 0 1 0-2 0v1H8V1a1 1 0 1 0-2 0v1H3a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2ZM3 8h14v9H3V8Zm14-3H3V4h2v1a1 1 0 1 0 2 0V4h4v1a1 1 0 1 0 2 0V4h2v1a1 1 0 1 0 2 0V4Z" />
+  </svg>
+  <span className="ms-3">Appointments</span>
+</NavLink>
+
       </li>
       <li>
         <NavLink
