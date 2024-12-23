@@ -57,7 +57,7 @@ export const getDoctors=()=>{
 }
 export const getDoctorswithSpecialization=(id:string,page:number,search:string)=>{
     return axiosUrl.get(`/getDoctorsWithSpecialization/${id}`, {
-        params: { page, limit: 3, search } // Added search query to params
+        params: { page, limit: 9, search } // Added search query to params
       });
 
 }
