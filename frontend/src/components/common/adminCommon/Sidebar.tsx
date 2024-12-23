@@ -178,27 +178,28 @@ function Sidebar() {
 
       </li>
       <li>
-        <NavLink
-          to="/admin/doctorsList"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg group ${
-              isActive
-                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
-                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
-            }`
-          }
-        >
-          <svg
-            className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 10C6.346 10 0 11.022 0 13v2.98C0 16.548 0 17 0 17h12c0 0 0-.452 0-1.02V13c0-1.978-6.346-3-8-3Zm6.5-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Zm-1.882 1.598A5.028 5.028 0 0 1 16.048 12H20v4.98C20 16.548 20 17 20 17h-6v-1.02a5.992 5.992 0 0 0-1.382-4.382Z" />
-          </svg>
-          <span className="ms-3">Doctors</span>
-        </NavLink>
+      <NavLink
+  to="/admin/doctorsList"
+  className={({ isActive }) =>
+    `flex items-center p-2 rounded-lg group ${
+      isActive
+        ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+        : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+    }`
+  }
+>
+  <svg
+    className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path d="M10 2a1 1 0 0 0-1 1v7.586A2 2 0 0 1 8 13a2 2 0 0 1-2-2V5a1 1 0 1 0-2 0v6a4 4 0 0 0 3 3.874V17a3 3 0 1 0 6 0v-2.126A4 4 0 0 0 16 11V5a1 1 0 1 0-2 0v6a2 2 0 0 1-2 2 2 2 0 0 1-1-3.414V3a1 1 0 0 0-1-1Zm1 15a1 1 0 0 1-2 0v-2a4.05 4.05 0 0 0 2 0v2Z" />
+  </svg>
+  <span className="ms-3">Doctors</span>
+</NavLink>
+
       </li>
       <li>
         <NavLink
@@ -224,73 +225,76 @@ function Sidebar() {
         </NavLink>
       </li>
       <li>
-        <NavLink
-          to="/admin/specializations"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg group ${
-              isActive
-                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
-                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
-            }`
-          }
-        >
-          <svg
-            className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 18 16"
-          >
-            <path d="M17.618 4.078 10 .335a2.015 2.015 0 0 0-1.968 0L.618 4.078A1.969 1.969 0 0 0 0 5.82v6.36a1.969 1.969 0 0 0 .618 1.742l7.414 4.035a2.015 2.015 0 0 0 1.968 0l7.414-4.035A1.969 1.969 0 0 0 18 12.179V5.82a1.969 1.969 0 0 0-.382-1.742ZM9 14a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm7-7h-4a.5.5 0 1 1 0-1h4a.5.5 0 0 1 0 1Z" />
-          </svg>
-          <span className="flex-1 ms-3 whitespace-nowrap">Specializations</span>
-        </NavLink>
+      <NavLink
+  to="/admin/specializations"
+  className={({ isActive }) =>
+    `flex items-center p-2 rounded-lg group ${
+      isActive
+        ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+        : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+    }`
+  }
+>
+  <svg
+    className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path d="M10 2a1 1 0 0 0-1 1v1.586A3.99 3.99 0 0 0 6 8a4 4 0 1 0 4 4 4.002 4.002 0 0 0-1.415-3H11a4 4 0 1 0 0-2H8.585A3.99 3.99 0 0 0 11 5.414V7a1 1 0 0 0 2 0V3a1 1 0 0 0-1-1Zm-6 9a2 2 0 1 1 2 2 2.002 2.002 0 0 1-2-2Zm10-6a2 2 0 1 1-2 2 2.002 2.002 0 0 1 2-2Zm3 9a2 2 0 1 1-2-2 2.002 2.002 0 0 1 2 2Z" />
+  </svg>
+  <span className="flex-1 ms-3 whitespace-nowrap">Specializations</span>
+</NavLink>
+
       </li>
       <li>
-        <NavLink
-          to="/admin/applications"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg group ${
-              isActive
-                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
-                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
-            }`
-          }
-        >
-          <svg
-            className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 0a2 2 0 0 0-2 2v4h4V2a2 2 0 0 0-2-2Zm-5 7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5Zm1 2h8v8H6V9Zm2-7a.5.5 0 0 0-1 0v3.5A.5.5 0 0 0 7.5 6h5a.5.5 0 0 0 0-1H8V2Z" />
-          </svg>
-          <span className="flex-1 ms-3 whitespace-nowrap">Applications</span>
-        </NavLink>
+      <NavLink
+  to="/admin/applications"
+  className={({ isActive }) =>
+    `flex items-center p-2 rounded-lg group ${
+      isActive
+        ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+        : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+    }`
+  }
+>
+  <svg
+    className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path d="M4 2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.414a2 2 0 0 0-.586-1.414l-4.414-4.414A2 2 0 0 0 12.586 1H4Zm7 1.5L15.5 7H12a1 1 0 0 1-1-1V3.5ZM5 9a1 1 0 0 1 1 0l2 2 5-5a1 1 0 0 1 1.414 1.414l-6 6a1 1 0 0 1-1.414 0l-3-3A1 1 0 0 1 5 9Z" />
+  </svg>
+  <span className="flex-1 ms-3 whitespace-nowrap">Applications</span>
+</NavLink>
+
       </li>
       <li>
-        <NavLink
-          to="/admin/transactions"
-          className={({ isActive }) =>
-            `flex items-center p-2 rounded-lg group ${
-              isActive
-                ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
-                : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
-            }`
-          }
-        >
-          <svg
-            className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 0a2 2 0 0 0-2 2v4h4V2a2 2 0 0 0-2-2Zm-5 7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H5Zm1 2h8v8H6V9Zm2-7a.5.5 0 0 0-1 0v3.5A.5.5 0 0 0 7.5 6h5a.5.5 0 0 0 0-1H8V2Z" />
-          </svg>
-          <span className="flex-1 ms-3 whitespace-nowrap">Transactions</span>
-        </NavLink>
+      <NavLink
+  to="/admin/transactions"
+  className={({ isActive }) =>
+    `flex items-center p-2 rounded-lg group ${
+      isActive
+        ? "bg-gradient-to-br from-gray-700 via-gray-600 to-gray-800 text-white"
+        : "text-slate-600 hover:bg-gray-100 dark:hover:bg-gradient-to-l from-gray-300 to-gray-500"
+    }`
+  }
+>
+  <svg
+    className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path d="M10 0a1 1 0 0 1 1 1v1.586A5.002 5.002 0 0 1 15 7h2a1 1 0 1 1 0 2h-2a5.002 5.002 0 0 1-4 4.914V17h1a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2h1v-3.086A5.002 5.002 0 0 1 5 9H3a1 1 0 1 1 0-2h2a5.002 5.002 0 0 1 4-4.414V1a1 1 0 0 1 1-1Zm0 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
+  </svg>
+  <span className="flex-1 ms-3 whitespace-nowrap">Transactions</span>
+</NavLink>
+
       </li>
     </ul>
   </div>
