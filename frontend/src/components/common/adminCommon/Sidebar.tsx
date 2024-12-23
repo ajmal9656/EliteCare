@@ -188,15 +188,16 @@ function Sidebar() {
     }`
   }
 >
-  <svg
-    className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-    aria-hidden="true"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="currentColor"
-    viewBox="0 0 20 20"
-  >
-    <path d="M10 2a1 1 0 0 0-1 1v7.586A2 2 0 0 1 8 13a2 2 0 0 1-2-2V5a1 1 0 1 0-2 0v6a4 4 0 0 0 3 3.874V17a3 3 0 1 0 6 0v-2.126A4 4 0 0 0 16 11V5a1 1 0 1 0-2 0v6a2 2 0 0 1-2 2 2 2 0 0 1-1-3.414V3a1 1 0 0 0-1-1Zm1 15a1 1 0 0 1-2 0v-2a4.05 4.05 0 0 0 2 0v2Z" />
-  </svg>
+<svg
+  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+  aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="currentColor"
+  viewBox="0 0 20 20"
+>
+  <path d="M10 0a3 3 0 0 1 3 3v4a1 1 0 0 1-2 0V3a1 1 0 0 0-2 0v4a1 1 0 0 1-2 0V3a3 3 0 0 1 3-3Zm4 8a1 1 0 1 1 2 0v2a5 5 0 1 1-10 0V8a1 1 0 1 1 2 0v2a3 3 0 1 0 6 0V8Zm-4 9a2 2 0 1 1-2 0V16a1 1 0 1 1 2 0v1Z" />
+</svg>
+
   <span className="ms-3">Doctors</span>
 </NavLink>
 
@@ -235,15 +236,16 @@ function Sidebar() {
     }`
   }
 >
-  <svg
-    className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-    aria-hidden="true"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="currentColor"
-    viewBox="0 0 20 20"
-  >
-    <path d="M10 2a1 1 0 0 0-1 1v1.586A3.99 3.99 0 0 0 6 8a4 4 0 1 0 4 4 4.002 4.002 0 0 0-1.415-3H11a4 4 0 1 0 0-2H8.585A3.99 3.99 0 0 0 11 5.414V7a1 1 0 0 0 2 0V3a1 1 0 0 0-1-1Zm-6 9a2 2 0 1 1 2 2 2.002 2.002 0 0 1-2-2Zm10-6a2 2 0 1 1-2 2 2.002 2.002 0 0 1 2-2Zm3 9a2 2 0 1 1-2-2 2.002 2.002 0 0 1 2 2Z" />
-  </svg>
+<svg
+  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+  aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="currentColor"
+  viewBox="0 0 20 20"
+>
+  <path d="M10 2a1 1 0 0 0-1 1v1.586A3.99 3.99 0 0 0 6 8a4 4 0 1 0 4 4 4.002 4.002 0 0 0-1.415-3H11a4 4 0 1 0 0-2H8.585A3.99 3.99 0 0 0 11 5.414V7a1 1 0 0 0 2 0V3a1 1 0 0 0-1-1Zm-6 9a2 2 0 1 1 2 2 2.002 2.002 0 0 1-2-2Zm10-6a2 2 0 1 1-2 2 2.002 2.002 0 0 1 2-2Zm3 9a2 2 0 1 1-2-2 2.002 2.002 0 0 1 2 2Z" />
+</svg>
+
   <span className="flex-1 ms-3 whitespace-nowrap">Specializations</span>
 </NavLink>
 
@@ -283,15 +285,16 @@ function Sidebar() {
     }`
   }
 >
-  <svg
-    className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
-    aria-hidden="true"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="currentColor"
-    viewBox="0 0 20 20"
-  >
-    <path d="M10 0a1 1 0 0 1 1 1v1.586A5.002 5.002 0 0 1 15 7h2a1 1 0 1 1 0 2h-2a5.002 5.002 0 0 1-4 4.914V17h1a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2h1v-3.086A5.002 5.002 0 0 1 5 9H3a1 1 0 1 1 0-2h2a5.002 5.002 0 0 1 4-4.414V1a1 1 0 0 1 1-1Zm0 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
-  </svg>
+<svg
+  className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+  aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="currentColor"
+  viewBox="0 0 20 20"
+>
+  <path d="M10 0a1 1 0 0 1 1 1v1.586A5.002 5.002 0 0 1 15 7h2a1 1 0 1 1 0 2h-2a5.002 5.002 0 0 1-4 4.914V17h1a1 1 0 1 1 0 2h-2a1 1 0 1 1 0-2h1v-3.086A5.002 5.002 0 0 1 5 9H3a1 1 0 1 1 0-2h2a5.002 5.002 0 0 1 4-4.414V1a1 1 0 0 1 1-1Zm0 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
+</svg>
+
   <span className="flex-1 ms-3 whitespace-nowrap">Transactions</span>
 </NavLink>
 
