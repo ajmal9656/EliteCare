@@ -38,8 +38,8 @@ function SlotManagement() {
     { start: '13:15', end: '14:00' },
     { start: '14:15', end: '15:00' },
     { start: '15:15', end: '16:00' },
-    { start: '16:15', end: '17:00' },
-    { start: '17:15', end: '18:00' },
+    { start: '18:15', end: '19:00' },
+    { start: '19:15', end: '20:00' },
     
   ];
 

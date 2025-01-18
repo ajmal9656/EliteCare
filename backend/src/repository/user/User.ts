@@ -294,6 +294,7 @@ export class UserRepository implements IUserRepository {
       const updatedUser = await userModel
         .findByIdAndUpdate(
           userId,
+          
           { $set: updateData }, // Update fields
           { new: true, lean: true } // Return the updated document as a plain object
         )
