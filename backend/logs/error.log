@@ -41,3 +41,5 @@
 ::1 - - [05/Dec/2024:14:01:46 +0000] "GET /doctor/getMedical-records/undefined HTTP/1.1" 500 241 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
 ::1 - - [05/Dec/2024:14:26:40 +0000] "GET /doctor/getSlots HTTP/1.1" 400 65 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
 ::1 - - [05/Dec/2024:15:36:34 +0000] "GET /doctor/getWallet/66e01f2813b352d072068b9c?status=All&page=1&limit=7 HTTP/1.1" 401 56 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+::1 - - [20/Feb/2025:08:06:27 +0000] "GET /getUserDetails/undefined HTTP/1.1" 401 56 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"
+::1 - - [20/Feb/2025:08:06:45 +0000] "PUT /updateProfileImage HTTP/1.1" 500 148 "http://localhost:5173/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"

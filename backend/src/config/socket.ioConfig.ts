@@ -27,8 +27,8 @@ const configSocketIO = (server: HttpServer) => {
     
       io = new SocketServer(server, {
         cors: {
-           origin: ["https://ajmals.site"]
-        },
+           origin: ["https://ajmals.site","http://localhost:5173"]
+        },transports: ['polling', 'websocket']
      });
     
     

@@ -79,6 +79,8 @@ export class AuthController {
   }
   async loginUser(req: Request, res: Response): Promise<void> {
     try {
+      console.log("sssssssssssssssss");
+      
         
         
       const { email, password } = req.body;
