@@ -1,5 +1,5 @@
 import { UpdateWriteOpResult } from "mongoose"
-import { Appointment, chatData, GetChatResult, NotificationData } from "./chatInterface/chatInterface"
+import { Appointment, chatData, GetChatResult, NotificationData } from "../chatInterface/chatInterface";
 
 
 
