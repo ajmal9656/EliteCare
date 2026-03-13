@@ -79,7 +79,7 @@ export class chatController {
         try {
           const {appointmentId} = req.body;
 
-          console.log("appoinmt",appointmentId);
+          console.log("appoinmt update enterd",appointmentId);
           
           
          

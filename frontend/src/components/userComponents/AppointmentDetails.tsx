@@ -219,6 +219,14 @@ function AppointmentDetails() {
       }
     });
   };
+  const canChat = (date: string) => {
+  return moment().isBetween(
+    moment(date).subtract(1, "day").startOf("day"),
+    moment(date).add(2, "days").endOf("day"),
+    undefined,
+    "[]"
+  );
+};
   
   
   
@@ -290,103 +298,103 @@ function AppointmentDetails() {
 
     {/* Appointment Actions */}
     <div className="text-right">
-      {appointment?.status === "completed" && (
-        <>
-          {appointment?.review?.rating === 0 ? (
-            <button
-              className="px-6 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-full shadow-lg hover:from-green-500 hover:to-green-700 transform hover:scale-105 transition duration-300 ease-in-out"
-              onClick={openReviewModal}
-            >
-              Add Review
-            </button>
-          ) : (
-            <p className="text-green-600 pb-2">Review Added: {appointment?.review?.rating} ⭐</p>
-          )}
-          <button
-            className="px-6 py-2 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-full shadow-lg hover:from-indigo-500 hover:to-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
-            onClick={downloadPrescription}
-          >
-            Download Prescription
-          </button>
-        </>
-      )}
 
-      {appointment?.status === "cancelled" && (
-        <p className="px-4 py-2 text-red-600 rounded-lg">Cancelled</p>
-      )}
-
-      {appointment?.status === "cancelled by Dr" && (
+  {/* COMPLETED */}
+  {appointment?.status === "completed" && (
+    <>
+      {appointment?.review?.rating === 0 ? (
         <button
-          className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out"
-          onClick={openModal}
+          className="px-6 py-2 bg-gradient-to-r from-green-400 to-green-600 text-white rounded-full shadow-lg hover:from-green-500 hover:to-green-700 transform hover:scale-105 transition duration-300 ease-in-out"
+          onClick={openReviewModal}
         >
-          Cancelled by Dr
+          Add Review
+        </button>
+      ) : (
+        <p className="text-green-600 pb-2">
+          Review Added: {appointment?.review?.rating} ⭐
+        </p>
+      )}
+
+      <button
+        className="px-6 py-2 bg-gradient-to-r from-indigo-400 to-indigo-600 text-white rounded-full shadow-lg hover:from-indigo-500 hover:to-indigo-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+        onClick={downloadPrescription}
+      >
+        Download Prescription
+      </button>
+    </>
+  )}
+
+  {/* CANCELLED */}
+  {appointment?.status === "cancelled" && (
+    <p className="px-4 py-2 text-red-600 rounded-lg">Cancelled</p>
+  )}
+
+  {/* CANCELLED BY DOCTOR */}
+  {appointment?.status === "cancelled by Dr" && (
+    <button
+      className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out"
+      onClick={openModal}
+    >
+      Cancelled by Dr
+    </button>
+  )}
+
+  {/* PRESCRIPTION PENDING */}
+  {appointment?.status === "prescription pending" && (
+    <div>
+
+      {canChat(appointment.date) && (
+        <button
+          className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
+          onClick={navigateChat}
+        >
+          Chat
         </button>
       )}
 
-      {appointment?.status === "prescription pending" && (
-        <div>
-          {moment(appointment.date).isSame(moment(), 'day') && moment(appointment.date).isBetween(
-      moment().startOf('day'),
-      moment().add(2, 'days').endOf('day'),
-      undefined,
-      '[]' // Includes boundary dates
-    ) && (
-      <button
-        className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
-        onClick={navigateChat}
-      >
-        Chat
-      </button>
-    )}
-          
-        <p className="text-lg italic text-yellow-600">
-          Prescription will be added soon...
-        </p>
-        </div>
-      )}
-
-{appointment?.status === "pending" && (
-  <div>
-    {/* Chat Button: Show only if appointment date is today and within the next 2 days */}
-    {moment(appointment.date).isSame(moment(), 'day') && moment(appointment.date).isBetween(
-      moment().startOf('day'),
-      moment().add(2, 'days').endOf('day'),
-      undefined,
-      '[]' // Includes boundary dates
-    ) && (
-      <button
-        className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
-        onClick={navigateChat}
-      >
-        Chat
-      </button>
-    )}
-
-    {/* Cancel Button: Hide if appointment date is today */}
-    {!moment(appointment.date).isBefore(moment(), 'day') && 
- !moment(appointment.date).isSame(moment(), 'day') &&
- (
-   appointmentStatus !== "cancelled" ? (
-     <button
-       className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
-       onClick={() => handleCancelAppointment(appointment._id)}
-     >
-       Cancel
-     </button>
-   ) : (
-    <p className="px-4 py-2 text-red-600 rounded-lg">Cancelled</p>
-   )
- )}
-
-
-  </div>
-)}
-
-
-
+      <p className="text-lg italic text-yellow-600">
+        Prescription will be added soon...
+      </p>
 
     </div>
+  )}
+
+  {/* PENDING */}
+  {appointment?.status === "pending" && (
+    <div>
+
+      {/* CHAT */}
+      {canChat(appointment.date) && (
+        <button
+          className="px-6 py-2 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-full shadow-lg hover:from-blue-500 hover:to-blue-700 transform hover:scale-105 transition duration-300 ease-in-out"
+          onClick={navigateChat}
+        >
+          Chat
+        </button>
+      )}
+
+      {/* CANCEL BUTTON */}
+      {!moment(appointment.date).isBefore(moment(), "day") &&
+        !moment(appointment.date).isSame(moment(), "day") &&
+        (
+          appointmentStatus !== "cancelled" ? (
+            <button
+              className="px-6 py-2 bg-gradient-to-r from-red-400 to-red-600 text-white rounded-full shadow-lg hover:from-red-500 hover:to-red-700 transform hover:scale-105 transition duration-300 ease-in-out ml-2"
+              onClick={() => handleCancelAppointment(appointment._id)}
+            >
+              Cancel
+            </button>
+          ) : (
+            <p className="px-4 py-2 text-red-600 rounded-lg">
+              Cancelled
+            </p>
+          )
+        )}
+
+    </div>
+  )}
+
+</div>
   </div>
 
   {/* Review Modal */}

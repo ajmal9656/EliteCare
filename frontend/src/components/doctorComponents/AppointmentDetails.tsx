@@ -252,7 +252,7 @@ const shouldShowChatButton = (appointmentDate: string) => {
   const appointmentMoment = moment(appointmentDate).startOf("day"); // Appointment date
   const daysDiff = today.diff(appointmentMoment, "days"); // Difference in days
 
-  return daysDiff >= 0 && daysDiff <= 2; // Show button if today or within 2 days after
+  return daysDiff >= -1 && daysDiff <= 2; // Show button if today or within 2 days after
 };
 
 // Helper function to check if the cancel button should be displayed
