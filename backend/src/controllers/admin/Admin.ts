@@ -201,7 +201,6 @@ export class AdminController {
       const { reason } = req.body; 
       console.log("Doctor ID:", doctorId);
       console.log("Rejection Reason:", reason);
-      console.log("Rhgff:", req.body);
   
       
       const response = await this.AdminService.rejectApplication(doctorId as string, reason);
