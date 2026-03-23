@@ -279,6 +279,7 @@ async withdrawMoney(doctorId: string, withdrawalAmount: number): Promise<IWallet
 
   async getAllStatistics(doctorId: string): Promise<IDashboardStats>{
     try {
+   
       // Get wallet details
       const wallet = await WalletModel.findOne({ doctorId });
 
@@ -367,11 +368,10 @@ async withdrawMoney(doctorId: string, withdrawalAmount: number): Promise<IWallet
       const uniquePatients = await appointmentModel.distinct("userId", {
         docId: doctorId,
       });
-
-      
+ 
 
       return {
-        totalRevenue,
+        totalRevenue: parseFloat(totalRevenue.toFixed(4)),
         monthlyRevenue: monthlyRevenueArray,
         totalAppointments,
         todaysAppointments,

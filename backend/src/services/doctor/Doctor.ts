@@ -275,7 +275,7 @@ export class DoctorService implements IDoctorService {
 
   async getDashboardData(doctorId: string): Promise<IDashboardStats> {
     try {
-      
+
 
       const response = await this.DoctorRepository.getAllStatistics(
         doctorId as string

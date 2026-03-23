@@ -186,6 +186,7 @@ export class DoctorController {
 
   async getDashboardData(req: Request, res: Response): Promise<void> {
     try {
+      
       const doctorId = req.query.doctorId;
       const response = await this.DoctorService.getDashboardData(
         doctorId as string
