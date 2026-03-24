@@ -14,6 +14,8 @@ export class UserController {
   async getSpecializations(req: Request, res: Response): Promise<void> {
     try {
       const response = await this.userService.getSpecialization();
+      console.log("spec",response);
+      
 
       res
         .status(HTTP_statusCode.OK)
@@ -42,6 +44,8 @@ export class UserController {
   
       // Call the service to fetch doctors with the specialization and search query
       const response = await this.userService.getDoctorsWithSpecialization(specializationId, page, limit, search);
+      console.log("RES",response);
+      
   
       // Return the response to the client
       res.status(HTTP_statusCode.OK).json({
@@ -67,6 +71,7 @@ export class UserController {
       
 
       const response = await this.userService.getDoctors();
+
 
       res.status(HTTP_statusCode.OK).json({ message: "Fetched successfully", response });
     } catch (error: any) {

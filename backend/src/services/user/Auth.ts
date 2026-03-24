@@ -70,6 +70,8 @@ export class AuthService implements IAuthService {
         userData.email,
         subject,text
       );
+      console.log(Generated_OTP);
+      
 
       if (!sendMailStatus) {
         throw new Error("Otp not send");

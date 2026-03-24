@@ -238,6 +238,7 @@ async withdrawMoney(doctorId: string, withdrawalAmount: number): Promise<IWallet
         },
       ]);
 
+ 
       if (doctor.length === 0) {
         return null;
       }

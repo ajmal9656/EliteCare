@@ -194,30 +194,39 @@ export class DoctorService implements IDoctorService {
     }
   }
 
-  async getDoctorData(doctorId: string, reviewData: any): Promise<IDoctor|undefined> {
-    try {
-      const response = await this.DoctorRepository.getDoctor(
-        doctorId,
-        reviewData
-      );
+  async getDoctorData(
+  doctorId: string,
+  reviewData: any
+): Promise<IDoctor | undefined> {
+  try {
+    const response = await this.DoctorRepository.getDoctor(
+      doctorId,
+      reviewData
+    );
 
-      if (response?.image && response.image.url && response.image.type) {
-        const folderPath = this.getFolderPathByFileType(response.image.type);
-        const signedUrl = await this.S3Service.getFile(
-          response.image.url,
-          folderPath
-        );
 
-        return {
-          ...response,
-          signedImageUrl: signedUrl,
-        };
-      }
-    } catch (error: any) {
-      console.error("Error in getDoctor:", error.message);
-      throw new Error(`Failed to get specialization: ${error.message}`);
-    }
+    if (!response) return undefined;
+
+    let signedUrl: string | undefined;
+
+if (response.image?.url && response.image?.type) {
+  const folderPath = this.getFolderPathByFileType(response.image.type);
+
+  signedUrl = await this.S3Service.getFile(
+    response.image.url,
+    folderPath
+  );
+}
+
+return {
+  ...response,
+  signedImageUrl: signedUrl,
+};
+  } catch (error: any) {
+    console.error("Error in getDoctor:", error.message);
+    throw new Error(`Failed to get doctor: ${error.message}`);
   }
+}
 
   private getFolderPathByFileType(fileType: string): string {
     switch (fileType) {
