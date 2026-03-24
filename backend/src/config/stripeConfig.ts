@@ -38,8 +38,8 @@ async function makeThePayment(data: any, appointmentId: any) {
 
   try {
     const session = await stripe.checkout.sessions.create({
-      success_url: `https://www.ajmals.sbs/confirmPayment/${appointmentId}/${doctorId}`,
-      cancel_url: `https://www.ajmals.sbs/paymentFailed`,
+      success_url: `https://elite-care-delta.vercel.app/confirmPayment/${appointmentId}/${doctorId}`,
+      cancel_url: `https://elite-care-delta.vercel.app/paymentFailed`,
       line_items: line_items,
       mode: "payment",
     });
