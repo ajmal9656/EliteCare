@@ -21,7 +21,12 @@ function DoctorProfileLayout() {
           {/* Render the doctor's image only if doctor data is available */}
           {doctor ? (
             <img
-              src={doctor.signedImageUrl}
+              
+              src={
+      doctor?.signedImageUrl && doctor.signedImageUrl!== ''
+        ? doctor.signedImageUrl
+        : "https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg"
+    }
               alt={doctor.name}
               className='w-full h-full object-cover z-10 mt-28 rounded-md'
             />

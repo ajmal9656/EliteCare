@@ -114,7 +114,12 @@ const Doctors: React.FC = () => {
     >
       <div className="overflow-hidden h-72 rounded-t-xl w-full">
         <img
-          src={doctor.signedImageUrl}
+          
+          src={
+      doctor?.signedImageUrl && doctor.signedImageUrl!== ''
+        ? doctor.signedImageUrl
+        : "https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg"
+    }
           alt="img"
           className="w-full h-full object-cover"
         />

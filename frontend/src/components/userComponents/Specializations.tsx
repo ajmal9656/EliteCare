@@ -18,6 +18,7 @@ function Specializations() {
   const fetchSpecializations = async () => {
     try {
       const response = await getSpecializations()
+      console.log("response",response)
       setSpecializations(response.data.response);  // Store the fetched data in state
     } catch (error) {
       console.error("Error fetching specializations:", error);

@@ -47,9 +47,15 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
     if (DoctorData?.doctorInfo?.doctorId) {
       const fetchProfile = async () => {
         try {
-          const response = await getDoctorDetails(DoctorData?.doctorInfo?.doctorId) 
+          console.log("id",DoctorData?.doctorInfo?.doctorId);
+          
+          const response = await getDoctorDetails(DoctorData?.doctorInfo?.doctorId)
+          console.log("doc respo",response.data);
+          
   
           const profile = response.data.response;
+          console.log("profile",profile);
+          
           setProfileData(profile); // Update the state with fetched data
           setReviews(profile.appointments);
           calculateAverageRating(profile.appointments);
@@ -282,7 +288,12 @@ const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDa
                   <div className="relative">
                     <img
                       alt="Profile"
-                      src={profileData?.signedImageUrl || "default-image-url.jpg"}
+                      
+                      src={
+      profileData?.signedImageUrl && profileData.signedImageUrl!== ''
+        ? profileData.signedImageUrl
+        : "https://t4.ftcdn.net/jpg/00/64/67/27/360_F_64672736_U5kpdGs9keUll8CRQ3p3YaEv2M6qkVY5.jpg"
+    }
                       className="shadow-xl rounded-3xl h-44 align-middle border-none -m-16 mx-auto max-w-150-px ml-60"
                     />
                     {/* Camera Icon */}
