@@ -91,17 +91,18 @@ export class AuthController {
         userInfo: loginResponse.userInfo,
       };
       res.cookie("RefreshToken", loginResponse.refreshToken, {
-        httpOnly: true, // Makes the cookie inaccessible to JavaScript
-        // secure: process.env.NODE_ENV === "production", // Ensures the cookie is sent over HTTPS in production
-        sameSite: "strict", // Protects against CSRF attacks
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 21 days
-      });
-      res.cookie("AccessToken", loginResponse.accessToken, {
-        httpOnly: true, // Makes the cookie inaccessible to JavaScript
-        // secure: process.env.NODE_ENV === "production", // Ensures the cookie is sent over HTTPS in production
-        sameSite: "strict", // Protects against CSRF attacks
-        maxAge: 1 * 24 * 60 * 60 * 1000, // 7 days
-      });
+  httpOnly: true,
+  secure: true,              // 🔥 REQUIRED for HTTPS
+  sameSite: "none",          // 🔥 REQUIRED for cross-origin
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
+res.cookie("AccessToken", loginResponse.accessToken, {
+  httpOnly: true,
+  secure: true,              // 🔥 REQUIRED
+  sameSite: "none",          // 🔥 REQUIRED
+  maxAge: 1 * 24 * 60 * 60 * 1000,
+});
 
       res.status(HTTP_statusCode.OK).json({ message: "Login successful", response });
     } catch (error: any) {
