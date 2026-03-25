@@ -92,15 +92,15 @@ export class AuthController {
       };
       res.cookie("RefreshToken", loginResponse.refreshToken, {
   httpOnly: true,
-  secure: true,              // 🔥 REQUIRED for HTTPS
-  sameSite: "none",          // 🔥 REQUIRED for cross-origin
+  secure: true,              
+  sameSite: "none",          
   maxAge: 7 * 24 * 60 * 60 * 1000,
 });
 
 res.cookie("AccessToken", loginResponse.accessToken, {
   httpOnly: true,
-  secure: true,              // 🔥 REQUIRED
-  sameSite: "none",          // 🔥 REQUIRED
+  secure: true,              
+  sameSite: "none",          
   maxAge: 1 * 24 * 60 * 60 * 1000,
 });
 
